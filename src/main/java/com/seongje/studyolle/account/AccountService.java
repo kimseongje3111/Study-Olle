@@ -4,9 +4,14 @@ import com.seongje.studyolle.domain.Account;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collections;
 
 @Service
 @RequiredArgsConstructor
@@ -17,14 +22,29 @@ public class AccountService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public void processNewAccount(SignUpForm signUpForm) {
+    public Account processNewAccount(SignUpForm signUpForm) {
         Account newAccount = helloNewAccount(signUpForm);
+
+        newAccount.generateCheckEmailToken();
         sendSignUpConfirmEmail(newAccount);
+
+        return newAccount;
+
+    }
+
+    public void login(Account newAccount) {
+        // SecurityContext 에 Authentication(Token) 이 존재하는가 //
+
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+                newAccount.getNickname(),
+                newAccount.getPassword(),
+                Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"))
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(token);
     }
 
     private void sendSignUpConfirmEmail(Account newAccount) {
-        newAccount.generateCheckEmailToken();
-
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
         simpleMailMessage.setTo(newAccount.getEmail());
         simpleMailMessage.setSubject("[스터디올래] 회원 가입 인증 메일입니다.");

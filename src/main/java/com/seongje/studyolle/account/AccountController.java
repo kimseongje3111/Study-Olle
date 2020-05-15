@@ -9,7 +9,6 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.time.LocalDateTime;
 
 @Controller
 @RequiredArgsConstructor
@@ -40,7 +39,8 @@ public class AccountController {
             return "account/sign-up";
         }
 
-        accountService.processNewAccount(signUpForm);
+        Account newAccount = accountService.processNewAccount(signUpForm);
+        accountService.login(newAccount);
 
         return "redirect:/";
     }
@@ -55,12 +55,13 @@ public class AccountController {
             return view;
         }
 
-        if (!findAccount.getEmailCheckToken().equals(token)) {
+        if (!findAccount.isValidToken(token)) {
             model.addAttribute("error", "wrong.token");
             return view;
         }
 
         findAccount.completeJoin();
+        accountService.login(findAccount);
 
         model.addAttribute("numberOfUser", accountRepository.count());
         model.addAttribute("nickname", findAccount.getNickname());
