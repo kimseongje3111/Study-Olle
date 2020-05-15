@@ -57,9 +57,14 @@ public class Account {
 
     private boolean studyUpdatedByWeb;
 
-    // 생성 메서드 //
+    // 생성 및 변경 메서드 //
 
     public void generateCheckEmailToken() {
         this.emailCheckToken = UUID.randomUUID().toString();
+    }
+
+    public void completeJoin() {
+        this.emailVerified = true;
+        this.joinedAt = LocalDateTime.now();
     }
 }
