@@ -60,6 +60,8 @@ class AccountControllerTest {
         // then
         assertThat(accountRepository.existsByEmail("abcd@email.com")).isTrue();
         assertThat(findAccount.getPassword()).isNotEqualTo("12345678");
+        assertThat(findAccount.getEmailCheckToken()).isNotNull();
+
         then(javaMailSender).should().send(any(SimpleMailMessage.class));
     }
 }
