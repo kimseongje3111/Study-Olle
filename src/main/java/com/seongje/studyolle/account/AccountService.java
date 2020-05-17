@@ -43,6 +43,10 @@ public class AccountService {
         SecurityContextHolder.getContext().setAuthentication(token);
     }
 
+    public void resendSignUpConfirmEmail(Account newAccount) {
+        sendSignUpConfirmEmail(newAccount);
+    }
+
     private void sendSignUpConfirmEmail(Account newAccount) {
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
         simpleMailMessage.setTo(newAccount.getEmail());

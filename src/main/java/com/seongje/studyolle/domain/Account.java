@@ -28,6 +28,8 @@ public class Account {
 
     private String emailCheckToken;
 
+    private LocalDateTime emailCheckTokenGeneratedAt;
+
     private LocalDateTime joinedAt;
 
     // 회원 정보 //
@@ -57,10 +59,11 @@ public class Account {
 
     private boolean studyUpdatedByWeb;
 
-    // 생성 및 변경 메서드 //
+    // 비지니스 메서드 //
 
     public void generateCheckEmailToken() {
         this.emailCheckToken = UUID.randomUUID().toString();
+        this.emailCheckTokenGeneratedAt = LocalDateTime.now();
     }
 
     public void completeJoin() {
@@ -70,5 +73,9 @@ public class Account {
 
     public boolean isValidToken(String token) {
         return this.emailCheckToken.equals(token);
+    }
+
+    public boolean canResendConfirmEmail() {
+        return this.emailCheckTokenGeneratedAt.isBefore(LocalDateTime.now().minusHours(1));
     }
 }
