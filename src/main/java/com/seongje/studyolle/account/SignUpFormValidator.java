@@ -9,7 +9,7 @@ import org.springframework.validation.Validator;
 @RequiredArgsConstructor
 public class SignUpFormValidator implements Validator {
 
-    // Custom Validator for 'Sign-up Form' //
+    // Custom Validator for Sign up Form //
 
     private final AccountRepository accountRepository;
 

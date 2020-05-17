@@ -29,14 +29,13 @@ public class AccountService {
         sendSignUpConfirmEmail(newAccount);
 
         return newAccount;
-
     }
 
     public void login(Account newAccount) {
         // SecurityContext 에 Authentication(Token) 이 존재하는가 //
 
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                newAccount.getNickname(),
+                new UserAccount(newAccount),   // 현재 인증된 Principal
                 newAccount.getPassword(),
                 Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"))
         );
