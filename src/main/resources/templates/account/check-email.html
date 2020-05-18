@@ -9,6 +9,7 @@
 <div class="container">
     <div class="py-5 text-center" th:if="${error}">
         <div class="alert alert-danger" role="alert" th:text="${error}"></div>
+
         <div>
             <p class="lead" th:text="${email}">your@email.com</p>
             <a class="btn btn-outline-info" th:href="@{/}">메인으로</a>
@@ -16,10 +17,11 @@
     </div>
 
     <div class="py-5 text-center" th:if="${error == null}">
-        <h3>스터디올래 서비스를 이용하기 위한 인증 이메일을 확인해주세요.</h3>
+        <h3>스터디올래 서비스를 이용하기 위해 전송된 계정 인증 이메일을 확인해주세요.</h3>
+
         <div>
             <p class="lead" th:text="${email}">your@email.com</p>
-            <a class="btn btn-outline-info" th:href="@{/resend-confirm-email}">인증 이메일 재전송</a>
+            <a class="btn btn-outline-info" th:href="@{/resend-confirm-email}">계정 인증 이메일 재전송</a>
         </div>
     </div>
 

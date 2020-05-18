@@ -7,6 +7,9 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,7 +18,7 @@ import java.util.Collections;
 
 @Service
 @RequiredArgsConstructor
-public class AccountService {
+public class AccountService implements UserDetailsService {
 
     private final AccountRepository accountRepository;
     private final JavaMailSender javaMailSender;
@@ -32,6 +35,7 @@ public class AccountService {
     }
 
     public void login(Account newAccount) {
+
         // SecurityContext 에 Authentication(Token) 이 존재하는가 //
 
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
@@ -47,10 +51,28 @@ public class AccountService {
         sendSignUpConfirmEmail(newAccount);
     }
 
+    @Override
+    public UserDetails loadUserByUsername(String emailOrUsername) throws UsernameNotFoundException {
+
+        // Login administration //
+
+        Account account = accountRepository.findByEmail(emailOrUsername);
+
+        if (account == null) {
+            account = accountRepository.findByNickname(emailOrUsername);
+        }
+
+        if (account == null) {
+            throw new UsernameNotFoundException(emailOrUsername);
+        }
+
+        return new UserAccount(account);
+    }
+
     private void sendSignUpConfirmEmail(Account newAccount) {
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
         simpleMailMessage.setTo(newAccount.getEmail());
-        simpleMailMessage.setSubject("[스터디올래] 회원 가입 인증 메일입니다.");
+        simpleMailMessage.setSubject("[스터디올래] 회원 가입 완료를 위한 계정 인증 메일입니다.");
         simpleMailMessage.setText("/check-email-token?token=" + newAccount.getEmailCheckToken()
                 + "&email=" + newAccount.getEmail());
 

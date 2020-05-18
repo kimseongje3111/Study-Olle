@@ -8,13 +8,13 @@
 
 <div class="container">
     <div class="py-5 text-center">
-        <h1>계정 만들기</h1>
+        <h2>회원가입</h2>
     </div>
 
     <div class="row justify-content-center">
-        <form class="needs-validation col-sm-6" th:action="@{/sign-up}" th:object="${signUpForm}"
-              method="post" novalidate>
-            <div class="form-group">
+        <form class="needs-validation col-sm-6 border border-white rounded" th:action="@{/sign-up}"
+              th:object="${signUpForm}" method="post" novalidate>
+            <div class="form-group mt-2">
                 <label for="nickname">닉네임</label>
                 <input id="nickname" type="text" th:field="*{nickname}" class="form-control"
                        placeholder="공백없이 문자와 숫자로만 이루어진 형식이며 3자 이상 20자 이내로 입력하세요."
@@ -57,9 +57,9 @@
             </div>
         </form>
     </div>
-</div>
 
-<div th:replace="fragments.html :: footer"></div>
+    <div th:replace="fragments.html :: footer"></div>
+</div>
 
 <script th:replace="fragments.html :: form-validation"></script>
 </body>
