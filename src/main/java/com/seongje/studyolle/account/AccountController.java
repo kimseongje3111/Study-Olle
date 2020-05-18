@@ -39,8 +39,7 @@ public class AccountController {
             return "account/sign-up";
         }
 
-        Account newAccount = accountService.processNewAccount(signUpForm);
-        accountService.login(newAccount);
+        accountService.processNewAccount(signUpForm);
 
         return "redirect:/";
     }
@@ -81,12 +80,26 @@ public class AccountController {
             return view;
         }
 
-        findAccount.completeJoin();
-        accountService.login(findAccount);
+        accountService.completeSignUpAndCheckEmail(findAccount);
 
         model.addAttribute("numberOfUser", accountRepository.count());
         model.addAttribute("nickname", findAccount.getNickname());
 
         return view;
+    }
+
+    @GetMapping("/profile/{nickname}")
+    public String viewProfile(@PathVariable String nickname, Model model,
+                              @CurrentUser Account account) {
+        Account findAccount = accountRepository.findByNickname(nickname);
+
+        if (findAccount == null) {
+            throw new IllegalArgumentException(nickname + "에 해당하는 사용자가 없습니다.");
+        }
+
+        model.addAttribute(findAccount);
+        model.addAttribute("isOwner", findAccount.equals(account));
+
+        return "account/profile";
     }
 }

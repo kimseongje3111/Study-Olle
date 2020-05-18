@@ -22,7 +22,7 @@
 </head>
 
 <footer th:fragment="footer">
-    <div class="row justify-content-center mt-2">
+    <div class="row justify-content-center mt-5">
         <img class="mb-2 mr-2" src="/images/logo.png" width="25" height="25">
         <small class="d-block mb-3 text-muted">&copy; 스터디올래 2020</small>
     </div>
@@ -76,7 +76,7 @@
                 </a>
 
                 <div class="dropdown-menu dropdown-menu-sm-right" aria-labelledby="userDropdown">
-                    <h6 class="dropdown-header"><span sec:authentication="name">Username</span></h6>
+                    <h6 class="dropdown-header"><span sec:authentication="name">username</span></h6>
                     <a class="dropdown-item" th:href="@{'/profile/' + ${#authentication.name}}">프로필</a>
                     <a class="dropdown-item">스터디</a>
                     <div class="dropdown-divider"></div>

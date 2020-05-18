@@ -14,7 +14,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
@@ -54,7 +53,7 @@ class MainControllerTest {
     @DisplayName("이메일 로그인")
     void login_with_email() throws Exception {
         mockMvc.perform(post("/login")
-                .param("nickname", "seongje@email.com")
+                .param("username", "seongje@email.com")
                 .param("password", "12345678")
                 .with(csrf()))
                 .andExpect(status().is3xxRedirection())
@@ -66,7 +65,7 @@ class MainControllerTest {
     @DisplayName("닉네임 로그인")
     void login_with_nickname() throws Exception {
         mockMvc.perform(post("/login")
-                .param("nickname", "seongje")
+                .param("username", "seongje")
                 .param("password", "12345678")
                 .with(csrf()))
                 .andExpect(status().is3xxRedirection())
