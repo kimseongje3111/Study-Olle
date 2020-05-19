@@ -1,5 +1,8 @@
-package com.seongje.studyolle.account;
+package com.seongje.studyolle.modules.account;
 
+import com.seongje.studyolle.modules.account.authentication.UserAccount;
+import com.seongje.studyolle.modules.account.form.ProfileForm;
+import com.seongje.studyolle.modules.account.form.SignUpForm;
 import com.seongje.studyolle.domain.Account;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
@@ -18,6 +21,7 @@ import java.util.Collections;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AccountService implements UserDetailsService {
 
     private final AccountRepository accountRepository;
@@ -59,6 +63,16 @@ public class AccountService implements UserDetailsService {
         }
 
         return new UserAccount(account);
+    }
+
+    @Transactional
+    public void updateProfile(Account account, ProfileForm profileForm) {
+        Account findAccount = accountRepository.findByEmail(account.getEmail());
+
+        findAccount.setAboutMe(profileForm.getAboutMe());
+        findAccount.setUrl(profileForm.getUrl());
+        findAccount.setOccupation(profileForm.getOccupation());
+        findAccount.setLocation(profileForm.getLocation());
     }
 
     private Account helloNewAccount(SignUpForm signUpForm) {

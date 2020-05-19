@@ -1,6 +1,6 @@
-package com.seongje.studyolle.main;
+package com.seongje.studyolle.modules.main;
 
-import com.seongje.studyolle.account.CurrentUser;
+import com.seongje.studyolle.modules.account.authentication.CurrentUser;
 import com.seongje.studyolle.domain.Account;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

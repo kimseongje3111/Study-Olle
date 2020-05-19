@@ -1,7 +1,7 @@
-package com.seongje.studyolle.account;
+package com.seongje.studyolle.modules.account;
 
 import com.seongje.studyolle.domain.Account;
-import org.assertj.core.api.Assertions;
+import com.seongje.studyolle.modules.account.AccountRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +14,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.then;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -107,4 +106,6 @@ class AccountControllerTest {
                 .andExpect(view().name("account/checked-email"))
                 .andExpect(authenticated());
     }
+
+
 }

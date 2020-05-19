@@ -1,5 +1,8 @@
-package com.seongje.studyolle.account;
+package com.seongje.studyolle.modules.account;
 
+import com.seongje.studyolle.modules.account.authentication.CurrentUser;
+import com.seongje.studyolle.modules.account.form.SignUpForm;
+import com.seongje.studyolle.modules.account.validator.SignUpFormValidator;
 import com.seongje.studyolle.domain.Account;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -28,13 +31,13 @@ public class AccountController {
 
     @GetMapping("/sign-up")
     public String signUpForm(Model model) {
-        model.addAttribute("signUpForm", new SignUpForm());
+        model.addAttribute(new SignUpForm());
 
         return "account/sign-up";
     }
 
     @PostMapping("/sign-up")
-    public String signUpSubmit(@Valid @ModelAttribute SignUpForm signUpForm, Errors errors) {
+    public String signUpSubmit(@Valid SignUpForm signUpForm, Errors errors) {
         if (errors.hasErrors()) {
             return "account/sign-up";
         }
@@ -97,7 +100,7 @@ public class AccountController {
             throw new IllegalArgumentException(nickname + "에 해당하는 사용자가 없습니다.");
         }
 
-        model.addAttribute(findAccount);
+        model.addAttribute(findAccount);        // TODO : 엔티티 외부 노출
         model.addAttribute("isOwner", findAccount.equals(account));
 
         return "account/profile";

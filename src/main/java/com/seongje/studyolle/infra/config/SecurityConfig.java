@@ -1,6 +1,6 @@
-package com.seongje.studyolle.config;
+package com.seongje.studyolle.infra.config;
 
-import com.seongje.studyolle.account.AccountService;
+import com.seongje.studyolle.modules.account.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;

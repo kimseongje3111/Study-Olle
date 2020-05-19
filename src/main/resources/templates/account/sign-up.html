@@ -14,7 +14,7 @@
     <div class="row justify-content-center">
         <form class="needs-validation col-sm-6 border border-white rounded" th:action="@{/sign-up}"
               th:object="${signUpForm}" method="post" novalidate>
-            <div class="form-group mt-2">
+            <div class="form-group mt-3">
                 <label for="nickname">닉네임</label>
                 <input id="nickname" type="text" th:field="*{nickname}" class="form-control"
                        placeholder="공백없이 문자와 숫자로만 이루어진 형식이며 3자 이상 20자 이내로 입력하세요."
@@ -50,10 +50,10 @@
             </div>
 
             <div class="form-group">
-                <button class="btn btn-primary btn-block" type="submit" aria-describedby="submitHelp">가입 완료</button>
-                <small id="submitHelp" class="form-text text-muted">
+                <small id="submitHelp" class="form-text text-muted mb-1">
                     <a href="#">약관</a>에 동의하시면 가입하기 버튼을 클릭하세요.
                 </small>
+                <button class="btn btn-primary btn-block" type="submit" aria-describedby="submitHelp">가입 완료</button>
             </div>
         </form>
     </div>

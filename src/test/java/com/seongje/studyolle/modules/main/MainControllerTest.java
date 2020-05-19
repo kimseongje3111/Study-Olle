@@ -1,8 +1,8 @@
-package com.seongje.studyolle.main;
+package com.seongje.studyolle.modules.main;
 
-import com.seongje.studyolle.account.AccountRepository;
-import com.seongje.studyolle.account.AccountService;
-import com.seongje.studyolle.account.SignUpForm;
+import com.seongje.studyolle.modules.account.AccountRepository;
+import com.seongje.studyolle.modules.account.AccountService;
+import com.seongje.studyolle.modules.account.form.SignUpForm;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;

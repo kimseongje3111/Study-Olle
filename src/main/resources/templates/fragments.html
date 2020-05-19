@@ -3,6 +3,7 @@
       xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
+<!-- header -->
 <head th:fragment="header">
     <meta charset="UTF-8">
     <title>StudyOlle</title>
@@ -21,6 +22,7 @@
     </style>
 </head>
 
+<!-- footer -->
 <footer th:fragment="footer">
     <div class="row justify-content-center mt-5">
         <img class="mb-2 mr-2" src="/images/logo.png" width="25" height="25">
@@ -28,6 +30,7 @@
     </div>
 </footer>
 
+<!-- nav -->
 <nav th:fragment="main-nav" class="navbar navbar-expand-sm navbar-dark bg-dark">
     <a class="navbar-brand" href="/" th:href="@{/}">
         <img src="/images/logo.png" width="30" height="30">
@@ -90,6 +93,16 @@
         </ul>
     </div>
 </nav>
+
+<!-- setting menu -->
+<div th:fragment="settings-menu (currentMenu)" class="list-group">
+    <a class="list-group-item list-group-item-action" th:classappend="${currentMenu == 'profile'}? active" th:href="@{/settings/profile}">프로필</a>
+    <a class="list-group-item list-group-item-action" th:classappend="${currentMenu == 'password'}? active" th:href="@{/settings/password}">패스워드</a>
+    <a class="list-group-item list-group-item-action" th:classappend="${currentMenu == 'notifications'}? active" th:href="@{/settings/notifications}">알림</a>
+    <a class="list-group-item list-group-item-action" th:classappend="${currentMenu == 'tags'}? active" th:href="@{/settings/tags}">관심 주제</a>
+    <a class="list-group-item list-group-item-action" th:classappend="${currentMenu == 'zones'}? active" th:href="@{/settings/zones}">활동 지역</a>
+    <a class="list-group-item list-group-item-action list-group-item-danger" th:classappend="${currentMenu == 'account'}? active" th:href="@{/settings/account}">계정</a>
+</div>
 
 <!-- form validation by script -->
 <script type="application/javascript" th:fragment="form-validation">

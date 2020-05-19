@@ -1,4 +1,4 @@
-package com.seongje.studyolle.account;
+package com.seongje.studyolle.modules.account.authentication;
 
 import com.seongje.studyolle.domain.Account;
 import lombok.Getter;
