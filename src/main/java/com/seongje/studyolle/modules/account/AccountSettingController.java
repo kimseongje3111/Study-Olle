@@ -2,8 +2,11 @@ package com.seongje.studyolle.modules.account;
 
 import com.seongje.studyolle.domain.Account;
 import com.seongje.studyolle.modules.account.authentication.CurrentUser;
+import com.seongje.studyolle.modules.account.form.PasswordForm;
 import com.seongje.studyolle.modules.account.form.ProfileForm;
+import com.seongje.studyolle.modules.account.validator.PasswordFormValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -20,6 +23,12 @@ import javax.validation.Valid;
 public class AccountSettingController {
 
     private final AccountService accountService;
+    private final PasswordFormValidator passwordFormValidator;
+
+    @InitBinder("passwordForm")
+    public void initBinder(WebDataBinder webDataBinder) {
+        webDataBinder.addValidators(passwordFormValidator);
+    }
 
     @GetMapping("/settings/profile")
     public String updateProfileForm(@CurrentUser Account account, Model model) {
@@ -32,8 +41,10 @@ public class AccountSettingController {
     @PostMapping("/settings/profile")
     public String updateProfileFormSubmit(@CurrentUser Account account,
                                           @Valid ProfileForm profileForm,
-                                          Errors errors, Model model,
+                                          Errors errors,
+                                          Model model,
                                           RedirectAttributes attributes) {
+
         if (errors.hasErrors()) {
             model.addAttribute(account);        // TODO : 엔티티 외부 노출
             return "settings/profile";
@@ -44,4 +55,31 @@ public class AccountSettingController {
 
         return "redirect:/settings/profile";
     }
+
+    @GetMapping("/settings/password")
+    public String updatePasswordForm(@CurrentUser Account account, Model model) {
+        model.addAttribute(account);
+        model.addAttribute(new PasswordForm());
+
+        return "settings/password";
+    }
+
+    @PostMapping("/settings/password")
+    public String updatePasswordFormSubmit(@CurrentUser Account account,
+                                           @Valid PasswordForm passwordForm,
+                                           Errors errors,
+                                           Model model,
+                                           RedirectAttributes attributes) {
+
+        if (errors.hasErrors()) {
+            model.addAttribute(account);
+            return "settings/password";
+        }
+
+        accountService.updatePassword(account, passwordForm.getNewPassword());
+        attributes.addFlashAttribute("message", "패스워드가 변경되었습니다.");
+
+        return "redirect:/settings/password";
+    }
+
 }

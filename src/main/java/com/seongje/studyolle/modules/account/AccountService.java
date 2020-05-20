@@ -1,6 +1,7 @@
 package com.seongje.studyolle.modules.account;
 
 import com.seongje.studyolle.modules.account.authentication.UserAccount;
+import com.seongje.studyolle.modules.account.form.PasswordForm;
 import com.seongje.studyolle.modules.account.form.ProfileForm;
 import com.seongje.studyolle.modules.account.form.SignUpForm;
 import com.seongje.studyolle.domain.Account;
@@ -76,6 +77,13 @@ public class AccountService implements UserDetailsService {
         accountRepository.save(account);
     }
 
+    @Transactional
+    public void updatePassword(Account account, String newPassword) {
+        account.setPassword(passwordEncoder.encode(newPassword));
+
+        accountRepository.save(account);
+    }
+
     private Account helloNewAccount(SignUpForm signUpForm) {
         Account newAccount = Account.builder()
                 .nickname(signUpForm.getNickname())
@@ -113,4 +121,5 @@ public class AccountService implements UserDetailsService {
 
         SecurityContextHolder.getContext().setAuthentication(token);
     }
+
 }
