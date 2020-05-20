@@ -24,6 +24,7 @@
             </div>
 
             <div class="row mt-3">
+                <!-- profile -->
                 <form class="col-sm-6" th:action="@{/settings/profile}" th:object="${profileForm}"
                       method="post" novalidate>
                     <div class="form-group">
@@ -69,6 +70,10 @@
                         </small>
                     </div>
 
+                    <div class="form-group">
+                        <input id="profileImage" type="hidden" th:field="*{profileImg}" class="form-control" />
+                    </div>
+
                     <div class="form-group mt-4">
                         <button class="btn btn-primary btn-block" type="submit" aria-describedby="submitHelp">
                             수정하기
@@ -76,7 +81,44 @@
                     </div>
                 </form>
 
+                <!-- profile image -->
                 <div class="col-sm-6">
+                    <div class="card text-center ml-2">
+                        <div class="card-header text-white bg-info">
+                            내 프로필 이미지
+                        </div>
+
+                        <div id="current-profile-image" class="mt-3">
+                            <svg th:if="${#strings.isEmpty(profileForm.profileImg)}" class="rounded"
+                                 th:data-jdenticon-value="${account.nickname}" width="125" height="125"></svg>
+                            <img th:if="${!#strings.isEmpty(profileForm.profileImg)}" class="rounded"
+                                 th:src="${profileForm.profileImg}"
+                                 width="125" height="125" alt="name" th:alt="${account.nickname}"/>
+                        </div>
+
+                        <div id="new-profile-image" class="mt-3"></div>
+
+                        <div class="card-body">
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="profile-image-file">
+                                <label class="custom-file-label text-muted" for="profile-image-file">변경 이미지 선택</label>
+                            </div>
+
+                            <div id="new-profile-image-control" class="mt-3">
+                                <button class="btn btn-outline-primary btn-block" id="cut-button">자르기</button>
+                                <button class="btn btn-outline-success btn-block" id="confirm-button">확인</button>
+                                <button class="btn btn-outline-warning btn-block" id="reset-button">취소</button>
+                            </div>
+                        </div>
+
+                        <div id="cut-image">
+                            <div class="card-footer text-white bg-info">
+                                적용 이미지
+                            </div>
+
+                            <div id="cropped-new-profile-image" class="rounded mt-3 mb-3"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -84,5 +126,107 @@
 
     <div th:replace="fragments.html :: footer"></div>
 </div>
+
+<link  href="/node_modules/cropper/dist/cropper.min.css" rel="stylesheet">
+
+<script src="/node_modules/cropper/dist/cropper.min.js"></script>
+<script src="/node_modules/jquery-cropper/dist/jquery-cropper.min.js"></script>
+<script type="application/javascript">
+    $(function() {
+        cropper = '';
+        let $profileImage = $("#profileImage");     // form data
+
+        let $profileImageFile = $("#profile-image-file");
+        let $currentProfileImage = $("#current-profile-image");
+        let $newProfileImage = $("#new-profile-image");
+        let $resultImage = $("#cropped-new-profile-image");
+        let $profileCutImage = $("#cut-image");
+
+        let $cutBtn = $("#cut-button");
+        let $confirmBtn = $("#confirm-button");
+        let $resetBtn = $("#reset-button");
+
+        $newProfileImage.hide();
+        $profileCutImage.hide();
+        $cutBtn.hide();
+        $confirmBtn.hide();
+        $resetBtn.hide();
+
+        $profileImageFile.change(function(e) {
+            if (e.target.files.length === 1) {
+                const reader = new FileReader();
+
+                reader.onload = e => {
+                    if (e.target.result) {
+                        if (!e.target.result.startsWith("data:image")) {
+                            alert("파일 확장자 오류 : 이미지 파일을 선택하세요.");
+                            return;
+                        }
+
+                        let img = document.createElement("img");
+                        img.id = 'new-profile';
+                        img.src = e.target.result;
+                        img.setAttribute('width', '99%');
+
+                        $newProfileImage.html(img);
+                        $newProfileImage.show();
+                        $currentProfileImage.hide();
+
+                        let $newImage = $(img);
+                        $newImage.cropper({aspectRatio: 1});
+                        cropper = $newImage.data('cropper');
+
+                        $cutBtn.show();
+                        $resetBtn.show();
+                        $confirmBtn.hide();
+                    }
+                };
+
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+
+        $resetBtn.click(function() {
+            $currentProfileImage.show();
+
+            $newProfileImage.hide();
+            $resultImage.hide();
+            $cutBtn.hide();
+            $confirmBtn.hide();
+            $resetBtn.hide();
+            $profileCutImage.hide();
+            $profileImageFile.val('');
+            $profileImage.val('');
+        });
+
+        $cutBtn.click(function () {
+            let dataUrl = cropper.getCroppedCanvas().toDataURL();
+
+            if (dataUrl.length > 1000 * 1024) {
+                alert("이미지 파일의 크기가 너무 큽니다. (1024 * 1000) 크기보다 작은 파일을 사용하세요.");
+                return;
+            }
+
+            let newImage = document.createElement("img");
+            newImage.id = "cropped-new-profile-image";
+            newImage.src = dataUrl;
+            newImage.width = 125;
+
+            $resultImage.html(newImage);
+            $resultImage.show();
+            $confirmBtn.show();
+            $profileCutImage.show();
+
+            $confirmBtn.click(function () {
+                $newProfileImage.html(newImage);
+
+                $cutBtn.hide();
+                $confirmBtn.hide();
+                $profileCutImage.hide();
+                $profileImage.val(dataUrl);
+            });
+        });
+    });
+</script>
 </body>
 </html>

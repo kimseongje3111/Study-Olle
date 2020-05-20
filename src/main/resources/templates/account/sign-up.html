@@ -19,7 +19,7 @@
                 <input id="nickname" type="text" th:field="*{nickname}" class="form-control"
                        placeholder="공백없이 문자와 숫자로만 이루어진 형식이며 3자 이상 20자 이내로 입력하세요."
                        aria-describedby="nicknameHelp" required minlength="3" maxlength="20">
-                <small class="invalid-feedback">닉네임을 입력하세요.</small>
+                <small class="invalid-feedback">값이 비어있거나 형식에 맞지 않습니다.</small>
                 <small class="form-text text-danger" th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}">
                     Nickname Error
                 </small>
@@ -32,7 +32,7 @@
                 <small id="emailHelp" class="form-text text-muted">
                     스터디올래는 사용자의 이메일을 공개하지 않습니다.
                 </small>
-                <small class="invalid-feedback">이메일을 입력하세요.</small>
+                <small class="invalid-feedback">값이 비어있거나 형식에 맞지 않습니다.</small>
                 <small class="form-text text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">
                     Email Error
                 </small>
@@ -43,7 +43,7 @@
                 <input id="password" type="password" th:field="*{password}" class="form-control"
                        placeholder="8자 이상 50자 이내로 입력하세요. 영문자, 숫자, 특수기호를 사용할 수 있고 공백은 사용할 수 없습니다."
                        aria-describedby="passwordHelp" required minlength="8" maxlength="50">
-                <small class="invalid-feedback">패스워드를 입력하세요.</small>
+                <small class="invalid-feedback">값이 비어있거나 형식에 맞지 않습니다.</small>
                 <small class="form-text text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">
                     Password Error
                 </small>

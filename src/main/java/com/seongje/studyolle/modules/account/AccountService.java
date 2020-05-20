@@ -67,12 +67,13 @@ public class AccountService implements UserDetailsService {
 
     @Transactional
     public void updateProfile(Account account, ProfileForm profileForm) {
-        Account findAccount = accountRepository.findByEmail(account.getEmail());
+        account.setAboutMe(profileForm.getAboutMe());
+        account.setUrl(profileForm.getUrl());
+        account.setOccupation(profileForm.getOccupation());
+        account.setLocation(profileForm.getLocation());
+        account.setProfileImg(profileForm.getProfileImg());
 
-        findAccount.setAboutMe(profileForm.getAboutMe());
-        findAccount.setUrl(profileForm.getUrl());
-        findAccount.setOccupation(profileForm.getOccupation());
-        findAccount.setLocation(profileForm.getLocation());
+        accountRepository.save(account);
     }
 
     private Account helloNewAccount(SignUpForm signUpForm) {

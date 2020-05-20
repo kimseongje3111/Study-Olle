@@ -21,14 +21,9 @@ public class AccountSettingController {
 
     private final AccountService accountService;
 
-    @InitBinder("profileForm")
-    public void initBinder(WebDataBinder webDataBinder) {
-        webDataBinder.addValidators();
-    }
-
     @GetMapping("/settings/profile")
     public String updateProfileForm(@CurrentUser Account account, Model model) {
-        model.addAttribute(account);
+        model.addAttribute(account);        // TODO : 엔티티 외부 노출
         model.addAttribute(new ProfileForm(account));
 
         return "settings/profile";
