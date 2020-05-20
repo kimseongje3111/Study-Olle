@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments.html :: header"></head>
+
+<body class="bg-light">
+<div th:replace="fragments.html :: main-nav"></div>
+
+<div class="container">
+    <div class="row mt-5 justify-content-center">
+        <div class="col-2 mr-5">
+            <div th:replace="fragments.html :: settings-menu(currentMenu='account')"></div>
+        </div>
+
+        <div class="col-8">
+            <div th:if="${message}" class="alert alert-info alert-dismissible fade show mt-3" role="alert">
+                <span th:text="${message}">메시지</span>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <i class="fa fa-times-circle" aria-hidden="true"></i>
+                </button>
+            </div>
+
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                <span th:text="${error}">에러 메시지</span>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <i class="fa fa-times-circle" aria-hidden="true"></i>
+                </button>
+            </div>
+
+            <div class="row">
+                <h2 class="col-sm-12">닉네임 변경</h2>
+            </div>
+
+            <div class="row mt-3">
+                <form class="needs-validation col-8" th:object="${accountForm}" th:action="@{/settings/account}"
+                      method="post" novalidate>
+                    <div class="alert alert-warning" role="alert">
+                        닉네임을 변경하면 프로필 페이지 링크도 바뀝니다 !
+                    </div>
+
+                    <div class="form-group">
+                        <input id="nickname" type="text" th:field="*{nickname}" class="form-control"
+                               aria-describedby="nicknameHelp" minlength="3" maxlength="20" required>
+                        <small id="nicknameHelp" class="form-text text-muted">
+                            공백없이 문자와 숫자로만 이루어진 형식이며 3자 이상 20자 이내로 입력하세요.
+                            <br>닉네임 변경은 하루에 한번만 가능합니다.
+                        </small>
+                        <small class="invalid-feedback">값이 비어있거나 형식에 맞지 않습니다.</small>
+                        <small class="form-text text-danger" th:if="${#fields.hasErrors('nickname')}"
+                               th:errors="*{nickname}">
+                            Nickname Error
+                        </small>
+                    </div>
+
+                    <div class="form-group mt-4">
+                        <button class="btn btn-outline-primary" type="submit" aria-describedby="submitHelp">
+                            변경하기
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="dropdown-divider col-8 mt-5"></div>
+
+            <div class="row mt-3">
+                <h2 class="col-sm-12 text-danger">계정 삭제</h2>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-8">
+                    <div class="alert alert-danger" role="alert">
+                        이 계정은 삭제할 수 없습니다.
+                    </div>
+                    <button class="btn btn-outline-danger mt-3 disabled">계정 삭제</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="fragments.html :: footer"></div>
+</div>
+
+<script th:replace="fragments.html :: form-validation"></script>
+</body>
+</html>

@@ -2,9 +2,11 @@ package com.seongje.studyolle.modules.account;
 
 import com.seongje.studyolle.domain.Account;
 import com.seongje.studyolle.modules.account.authentication.CurrentUser;
+import com.seongje.studyolle.modules.account.form.AccountForm;
 import com.seongje.studyolle.modules.account.form.NotificationsForm;
 import com.seongje.studyolle.modules.account.form.PasswordForm;
 import com.seongje.studyolle.modules.account.form.ProfileForm;
+import com.seongje.studyolle.modules.account.validator.AccountFormValidator;
 import com.seongje.studyolle.modules.account.validator.PasswordFormValidator;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -26,11 +28,17 @@ public class AccountSettingController {
 
     private final AccountService accountService;
     private final PasswordFormValidator passwordFormValidator;
+    private final AccountFormValidator accountFormValidator;
     private final ModelMapper modelMapper;
 
     @InitBinder("passwordForm")
-    public void initBinder(WebDataBinder webDataBinder) {
+    public void initBinderOfPasswordForm(WebDataBinder webDataBinder) {
         webDataBinder.addValidators(passwordFormValidator);
+    }
+
+    @InitBinder("accountForm")
+    public void initBinderOfAccountForm(WebDataBinder webDataBinder) {
+        webDataBinder.addValidators(accountFormValidator);
     }
 
     @GetMapping("/settings/profile")
@@ -109,5 +117,38 @@ public class AccountSettingController {
         attributes.addFlashAttribute("message", "변경 사항이 저장되었습니다.");
 
         return "redirect:/settings/notifications";
+    }
+
+    @GetMapping("/settings/account")
+    public String updateAccountForm(@CurrentUser Account account, Model model) {
+        model.addAttribute(account);
+        model.addAttribute(modelMapper.map(account, AccountForm.class));
+
+        return "settings/account";
+    }
+
+    @PostMapping("/settings/account")
+    public String updateAccountFormSubmit(@CurrentUser Account account,
+                                          @Valid AccountForm accountForm,
+                                          Errors errors,
+                                          Model model,
+                                          RedirectAttributes attributes) {
+
+        if (errors.hasErrors()) {
+            model.addAttribute(account);
+            return "settings/account";
+        }
+
+        if (!accountService.updateNickname(account, accountForm.getNickname())) {
+            model.addAttribute(account);
+            model.addAttribute(modelMapper.map(account, AccountForm.class));
+            model.addAttribute("error", "닉네임 변경은 하루에 한번만 가능합니다.");
+
+            return "settings/account";
+        }
+
+        attributes.addFlashAttribute("message", "닉네임이 변경되었습니다.");
+
+        return "redirect:/settings/account";
     }
 }

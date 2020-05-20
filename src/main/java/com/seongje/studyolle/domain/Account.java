@@ -45,6 +45,8 @@ public class Account {
     @Lob @Basic(fetch = FetchType.EAGER)
     private String profileImg;
 
+    private LocalDateTime nicknameLastChangedAt;
+
     // 알림 설정 //
 
     private boolean studyCreatedByEmail;
@@ -71,6 +73,11 @@ public class Account {
         this.joinedAt = LocalDateTime.now();
     }
 
+    public void changeNickname(String newNickname) {
+        this.nickname = newNickname;
+        this.nicknameLastChangedAt = LocalDateTime.now();
+    }
+
     public void changePassword(String newPassword) {
         this.password = newPassword;
     }
@@ -81,5 +88,9 @@ public class Account {
 
     public boolean canResendConfirmEmail() {
         return this.emailCheckTokenGeneratedAt.isBefore(LocalDateTime.now().minusHours(1));
+    }
+
+    public boolean canChangeNickName() {
+        return this.getNicknameLastChangedAt().isBefore(LocalDateTime.now().minusHours(24));
     }
 }

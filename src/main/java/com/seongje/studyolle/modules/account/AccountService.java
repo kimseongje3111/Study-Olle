@@ -20,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 
 @Service
@@ -87,11 +88,25 @@ public class AccountService implements UserDetailsService {
         accountRepository.save(account);
     }
 
+    @Transactional
+    public boolean updateNickname(Account account, String newNickname) {
+        Account findAccount = accountRepository.findByNickname(account.getNickname());
+
+        if (!findAccount.canChangeNickName()) return false;
+
+        account.changeNickname(newNickname);
+        accountRepository.save(account);
+        login(account);     // principal update
+
+        return true;
+    }
+
     private Account helloNewAccount(SignUpForm signUpForm) {
         Account newAccount = Account.builder()
                 .nickname(signUpForm.getNickname())
                 .email(signUpForm.getEmail())
                 .password(passwordEncoder.encode(signUpForm.getPassword()))
+                .nicknameLastChangedAt(LocalDateTime.now())
                 .studyCreatedByWeb(true)
                 .studyEnrollmentResultByWeb(true)
                 .studyUpdatedByWeb(true)

@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,6 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Transactional
 class AccountSettingControllerTest {
 
     @Autowired
@@ -103,5 +105,33 @@ class AccountSettingControllerTest {
                 .andExpect(model().attributeExists("account"))
                 .andExpect(model().attributeExists("passwordForm"))
                 .andExpect(view().name("settings/password"));
+    }
+
+    @Test
+    @DisplayName("닉네임 수정 - 닉네임 중복")
+    @WithAccount("seongje")
+    void updateAccountForm_nickname_duplication() throws Exception {
+        mockMvc.perform(post("/settings/account")
+                .param("nickname", "seongje")
+                .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(model().hasErrors())
+                .andExpect(model().attributeExists("account"))
+                .andExpect(model().attributeExists("accountForm"))
+                .andExpect(view().name("settings/account"));
+    }
+
+    @Test
+    @DisplayName("닉네임 수정 - 변경 불가(하루에 한번 이상)")
+    @WithAccount("seongje")
+    void updateAccountForm_nickname_change_twiceADay() throws Exception {
+        mockMvc.perform(post("/settings/account")
+                .param("nickname", "newName")
+                .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeExists("account"))
+                .andExpect(model().attributeExists("accountForm"))
+                .andExpect(model().attributeExists("error"))
+                .andExpect(view().name("settings/account"));
     }
 }

@@ -18,7 +18,7 @@
                 <label for="nickname">닉네임</label>
                 <input id="nickname" type="text" th:field="*{nickname}" class="form-control"
                        placeholder="공백없이 문자와 숫자로만 이루어진 형식이며 3자 이상 20자 이내로 입력하세요."
-                       aria-describedby="nicknameHelp" required minlength="3" maxlength="20">
+                       aria-describedby="nicknameHelp" minlength="3" maxlength="20" required>
                 <small class="invalid-feedback">값이 비어있거나 형식에 맞지 않습니다.</small>
                 <small class="form-text text-danger" th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}">
                     Nickname Error
@@ -42,14 +42,14 @@
                 <label for="password">패스워드</label>
                 <input id="password" type="password" th:field="*{password}" class="form-control"
                        placeholder="8자 이상 50자 이내로 입력하세요. 공백을 제외하고 영문자, 숫자, 특수기호를 사용할 수 있습니다."
-                       aria-describedby="passwordHelp" required minlength="8" maxlength="50">
+                       aria-describedby="passwordHelp" minlength="8" maxlength="50" required>
                 <small class="invalid-feedback">값이 비어있거나 형식에 맞지 않습니다.</small>
                 <small class="form-text text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">
                     Password Error
                 </small>
             </div>
 
-            <div class="form-group">
+            <div class="form-group mt-4">
                 <small id="submitHelp" class="form-text text-muted mb-1">
                     <a href="#">약관</a>에 동의하시면 가입하기 버튼을 클릭하세요.
                 </small>
