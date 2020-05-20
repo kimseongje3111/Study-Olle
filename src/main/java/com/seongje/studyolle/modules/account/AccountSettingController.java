@@ -2,10 +2,12 @@ package com.seongje.studyolle.modules.account;
 
 import com.seongje.studyolle.domain.Account;
 import com.seongje.studyolle.modules.account.authentication.CurrentUser;
+import com.seongje.studyolle.modules.account.form.NotificationsForm;
 import com.seongje.studyolle.modules.account.form.PasswordForm;
 import com.seongje.studyolle.modules.account.form.ProfileForm;
 import com.seongje.studyolle.modules.account.validator.PasswordFormValidator;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,6 +26,7 @@ public class AccountSettingController {
 
     private final AccountService accountService;
     private final PasswordFormValidator passwordFormValidator;
+    private final ModelMapper modelMapper;
 
     @InitBinder("passwordForm")
     public void initBinder(WebDataBinder webDataBinder) {
@@ -33,7 +36,7 @@ public class AccountSettingController {
     @GetMapping("/settings/profile")
     public String updateProfileForm(@CurrentUser Account account, Model model) {
         model.addAttribute(account);        // TODO : 엔티티 외부 노출
-        model.addAttribute(new ProfileForm(account));
+        model.addAttribute(modelMapper.map(account, ProfileForm.class));
 
         return "settings/profile";
     }
@@ -82,4 +85,29 @@ public class AccountSettingController {
         return "redirect:/settings/password";
     }
 
+    @GetMapping("/settings/notifications")
+    public String updatedNotificationsForm(@CurrentUser Account account, Model model) {
+        model.addAttribute(account);
+        model.addAttribute(modelMapper.map(account, NotificationsForm.class));
+
+        return "settings/notifications";
+    }
+
+    @PostMapping("/settings/notifications")
+    public String updatedNotificationsFormSubmit(@CurrentUser Account account,
+                                                 @Valid NotificationsForm notificationsForm,
+                                                 Errors errors,
+                                                 Model model,
+                                                 RedirectAttributes attributes) {
+
+        if (errors.hasErrors()) {
+            model.addAttribute(account);
+            return "settings/notifications";
+        }
+
+        accountService.updateNotifications(account, notificationsForm);
+        attributes.addFlashAttribute("message", "변경 사항이 저장되었습니다.");
+
+        return "redirect:/settings/notifications";
+    }
 }

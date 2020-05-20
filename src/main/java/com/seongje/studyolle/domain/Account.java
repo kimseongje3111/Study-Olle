@@ -71,6 +71,10 @@ public class Account {
         this.joinedAt = LocalDateTime.now();
     }
 
+    public void changePassword(String newPassword) {
+        this.password = newPassword;
+    }
+
     public boolean isValidToken(String token) {
         return this.emailCheckToken.equals(token);
     }

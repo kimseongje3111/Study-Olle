@@ -1,11 +1,13 @@
 package com.seongje.studyolle.modules.account;
 
 import com.seongje.studyolle.modules.account.authentication.UserAccount;
+import com.seongje.studyolle.modules.account.form.NotificationsForm;
 import com.seongje.studyolle.modules.account.form.PasswordForm;
 import com.seongje.studyolle.modules.account.form.ProfileForm;
 import com.seongje.studyolle.modules.account.form.SignUpForm;
 import com.seongje.studyolle.domain.Account;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,6 +30,7 @@ public class AccountService implements UserDetailsService {
     private final AccountRepository accountRepository;
     private final JavaMailSender javaMailSender;
     private final PasswordEncoder passwordEncoder;
+    private final ModelMapper modelMapper;
 
     @Transactional
     public void processNewAccount(SignUpForm signUpForm) {
@@ -68,19 +71,19 @@ public class AccountService implements UserDetailsService {
 
     @Transactional
     public void updateProfile(Account account, ProfileForm profileForm) {
-        account.setAboutMe(profileForm.getAboutMe());
-        account.setUrl(profileForm.getUrl());
-        account.setOccupation(profileForm.getOccupation());
-        account.setLocation(profileForm.getLocation());
-        account.setProfileImg(profileForm.getProfileImg());
-
+        modelMapper.map(profileForm, account);
         accountRepository.save(account);
     }
 
     @Transactional
     public void updatePassword(Account account, String newPassword) {
-        account.setPassword(passwordEncoder.encode(newPassword));
+        account.changePassword(passwordEncoder.encode(newPassword));
+        accountRepository.save(account);
+    }
 
+    @Transactional
+    public void updateNotifications(Account account, NotificationsForm notificationsForm) {
+        modelMapper.map(notificationsForm, account);
         accountRepository.save(account);
     }
 
@@ -121,5 +124,4 @@ public class AccountService implements UserDetailsService {
 
         SecurityContextHolder.getContext().setAuthentication(token);
     }
-
 }
