@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="fragments.html :: header"></head>
+
+<body class="bg-light">
+<div th:replace="fragments.html :: main-nav"></div>
+
+<div class="container">
+    <!-- email check error -->
+    <div class="py-5 text-center" th:if="${error}">
+        <div class="alert alert-danger" role="alert">
+            이메일 로그인 오류 : 이메일 로그인 링크를 다시 확인해 주세요.
+        </div>
+    </div>
+
+    <!-- email check complete -->
+    <div class="py-5 text-center" th:if="${error == null}">
+        <h3>이메일로 로그인 했습니다.</h3>
+        <p class="text-info">먼저 <a th:href="@{/settings/password}">패스워드를 변경</a>해주세요.</p>
+    </div>
+
+    <div th:replace="fragments.html :: footer"></div>
+</div>
+</body>
+</html>

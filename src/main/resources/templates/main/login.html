@@ -12,13 +12,14 @@
     </div>
 
     <div class="row justify-content-center">
-        <div th:if="${param.error}" class="alert alert-danger mr-2" role="alert">
-            <p class="mt-5">이메일 (또는 닉네임)과 패스워드가 정확하지 않습니다.</p>
-            <p>또는 인증되지 않은 계정입니다. 이메일을 확인해 주세요.</p>
-            <p>만일 패스워드가 기억나지 않는다면, <a th:href="@{/find-passsword}">패스워드 찾기</a>를 이용하세요.</p>
+        <div th:if="${param.error}" class="alert alert-danger col-sm-6 mr-2" role="alert">
+            <p>로그인 정보가 일치하지 않습니다.</p>
+            <p>또는 인증되지 않은 계정입니다. 이메일을 통해 인증을 완료해 주세요.</p>
         </div>
+    </div>
 
-        <form class="needs-validation col-sm-6 border border-white rounded" th:action="@{/login}"
+    <div class="row justify-content-center">
+        <form class="needs-validation col-sm-6" th:action="@{/login}"
               method="post" novalidate>
             <div class="form-group mt-3">
                 <label for="username">이메일 (또는 닉네임)</label>

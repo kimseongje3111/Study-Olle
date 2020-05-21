@@ -20,6 +20,11 @@ public class MainController {
 
     @GetMapping("/login")
     public String login() {
-        return "login";
+        return "main/login";
+    }
+
+    @GetMapping("/email-login")
+    public String emailLogin() {
+        return "main/email-login";
     }
 }

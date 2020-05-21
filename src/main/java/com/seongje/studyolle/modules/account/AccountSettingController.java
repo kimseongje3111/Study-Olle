@@ -134,9 +134,11 @@ public class AccountSettingController {
                                           Model model,
                                           RedirectAttributes attributes) {
 
+        String view = "settings/account";
+
         if (errors.hasErrors()) {
             model.addAttribute(account);
-            return "settings/account";
+            return view;
         }
 
         if (!accountService.updateNickname(account, accountForm.getNickname())) {
@@ -144,7 +146,7 @@ public class AccountSettingController {
             model.addAttribute(modelMapper.map(account, AccountForm.class));
             model.addAttribute("error", "닉네임 변경은 하루에 한번만 가능합니다.");
 
-            return "settings/account";
+            return view;
         }
 
         attributes.addFlashAttribute("message", "닉네임이 변경되었습니다.");

@@ -2,7 +2,6 @@ package com.seongje.studyolle.modules.account;
 
 import com.seongje.studyolle.modules.account.authentication.UserAccount;
 import com.seongje.studyolle.modules.account.form.NotificationsForm;
-import com.seongje.studyolle.modules.account.form.PasswordForm;
 import com.seongje.studyolle.modules.account.form.ProfileForm;
 import com.seongje.studyolle.modules.account.form.SignUpForm;
 import com.seongje.studyolle.domain.Account;
@@ -50,6 +49,16 @@ public class AccountService implements UserDetailsService {
 
     public void resendSignUpConfirmEmail(Account newAccount) {
         sendSignUpConfirmEmail(newAccount);
+    }
+
+    @Transactional
+    public void sendEmailLoginLink(Account account) {
+        account.generateCheckEmailToken();
+        sendLoginEmail(account);
+    }
+
+    public void completeEmailLogin(Account account) {
+        login(account);
     }
 
     @Override
@@ -123,6 +132,16 @@ public class AccountService implements UserDetailsService {
         simpleMailMessage.setSubject("[스터디올래] 회원 가입 완료를 위한 계정 인증 메일입니다.");
         simpleMailMessage.setText("/check-email-token?token=" + newAccount.getEmailCheckToken()
                 + "&email=" + newAccount.getEmail());
+
+        javaMailSender.send(simpleMailMessage);
+    }
+
+    private void sendLoginEmail(Account account) {
+        SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+        simpleMailMessage.setTo(account.getEmail());
+        simpleMailMessage.setSubject("[스터디올래] 이메일 로그인 링크입니다.");
+        simpleMailMessage.setText("/login-by-email?token=" + account.getEmailCheckToken()
+                + "&email=" + account.getEmail());
 
         javaMailSender.send(simpleMailMessage);
     }
