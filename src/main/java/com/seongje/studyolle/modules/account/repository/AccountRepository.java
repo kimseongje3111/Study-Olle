@@ -1,4 +1,4 @@
-package com.seongje.studyolle.modules.account;
+package com.seongje.studyolle.modules.account.repository;
 
 import com.seongje.studyolle.domain.Account;
 import org.springframework.data.jpa.repository.JpaRepository;

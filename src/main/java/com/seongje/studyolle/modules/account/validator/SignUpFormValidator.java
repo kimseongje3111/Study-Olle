@@ -1,6 +1,6 @@
 package com.seongje.studyolle.modules.account.validator;
 
-import com.seongje.studyolle.modules.account.AccountRepository;
+import com.seongje.studyolle.modules.account.repository.AccountRepository;
 import com.seongje.studyolle.modules.account.form.SignUpForm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

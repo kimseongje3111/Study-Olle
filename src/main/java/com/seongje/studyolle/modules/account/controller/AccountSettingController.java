@@ -1,6 +1,10 @@
-package com.seongje.studyolle.modules.account;
+package com.seongje.studyolle.modules.account.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seongje.studyolle.domain.Account;
+import com.seongje.studyolle.domain.Tag;
+import com.seongje.studyolle.modules.account.AccountService;
 import com.seongje.studyolle.modules.account.authentication.CurrentUser;
 import com.seongje.studyolle.modules.account.form.AccountForm;
 import com.seongje.studyolle.modules.account.form.NotificationsForm;
@@ -8,28 +12,32 @@ import com.seongje.studyolle.modules.account.form.PasswordForm;
 import com.seongje.studyolle.modules.account.form.ProfileForm;
 import com.seongje.studyolle.modules.account.validator.AccountFormValidator;
 import com.seongje.studyolle.modules.account.validator.PasswordFormValidator;
+import com.seongje.studyolle.modules.tag.TagForm;
+import com.seongje.studyolle.modules.tag.TagService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
+import java.util.List;
+import java.util.Set;
 
 @Controller
 @RequiredArgsConstructor
 public class AccountSettingController {
 
     private final AccountService accountService;
+    private final TagService tagService;
     private final PasswordFormValidator passwordFormValidator;
     private final AccountFormValidator accountFormValidator;
     private final ModelMapper modelMapper;
+    private final ObjectMapper objectMapper;
 
     @InitBinder("passwordForm")
     public void initBinderOfPasswordForm(WebDataBinder webDataBinder) {
@@ -117,6 +125,42 @@ public class AccountSettingController {
         attributes.addFlashAttribute("message", "변경 사항이 저장되었습니다.");
 
         return "redirect:/settings/notifications";
+    }
+
+    @GetMapping("settings/tags")
+    public String updateTagForm(@CurrentUser Account account, Model model) throws JsonProcessingException {
+        List<String> allTags = tagService.getAllTags();
+        Set<String> userTags = accountService.getUserTags(account);
+
+        model.addAttribute(account);
+        model.addAttribute("tags", userTags);
+        model.addAttribute("whitelist", objectMapper.writeValueAsString(allTags));
+
+        return "settings/tags";
+    }
+
+    @PostMapping("settings/tags/add")
+    @ResponseBody
+    public ResponseEntity addTag(@CurrentUser Account account, @RequestBody TagForm tagForm) {
+        Tag findOrNewTag = tagService.findOrCreateTag(tagForm.getTagTitle());
+
+        accountService.addTag(account, findOrNewTag);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("settings/tags/remove")
+    @ResponseBody
+    public ResponseEntity removeTag(@CurrentUser Account account, @RequestBody TagForm tagForm) {
+        Tag findTag = tagService.findByTagTitle(tagForm.getTagTitle());
+
+        if (findTag == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        accountService.removeTag(account, findTag);
+
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/settings/account")

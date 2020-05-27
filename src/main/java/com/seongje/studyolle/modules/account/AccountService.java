@@ -1,10 +1,15 @@
 package com.seongje.studyolle.modules.account;
 
+import com.seongje.studyolle.domain.Tag;
+import com.seongje.studyolle.domain.TagItem;
 import com.seongje.studyolle.modules.account.authentication.UserAccount;
 import com.seongje.studyolle.modules.account.form.NotificationsForm;
 import com.seongje.studyolle.modules.account.form.ProfileForm;
 import com.seongje.studyolle.modules.account.form.SignUpForm;
 import com.seongje.studyolle.domain.Account;
+import com.seongje.studyolle.modules.account.repository.AccountRepository;
+import com.seongje.studyolle.modules.account.repository.TagItemRepository;
+import com.seongje.studyolle.modules.tag.TagRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.mail.SimpleMailMessage;
@@ -21,6 +26,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +37,8 @@ import java.util.Collections;
 public class AccountService implements UserDetailsService {
 
     private final AccountRepository accountRepository;
+    private final TagItemRepository tagItemRepository;
+    private final TagRepository tagRepository;
     private final JavaMailSender javaMailSender;
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
@@ -108,6 +119,34 @@ public class AccountService implements UserDetailsService {
         login(account);     // principal update
 
         return true;
+    }
+
+    @Transactional
+    public void addTag(Account account, Tag tag) {
+        Account findAccount = accountRepository.findByEmail(account.getEmail());
+        Tag findTag = tagRepository.findByTitle(tag.getTitle());
+
+        if (findAccount != null) {
+            TagItem newTagItem = tagItemRepository.save(TagItem.createTagItem(findAccount, findTag));
+            findAccount.addTagItem(newTagItem);
+        }
+    }
+
+    @Transactional
+    public void removeTag(Account account, Tag tag) {
+        Account findAccount = accountRepository.findByEmail(account.getEmail());
+        Tag findTag = tagRepository.findByTitle(tag.getTitle());
+
+        if (findAccount != null) {
+            findAccount.removeTagItem(findTag);
+        }
+    }
+
+    public Set<String> getUserTags(Account account) throws IllegalStateException {
+        Optional<Account> findAccount = accountRepository.findById(account.getId());
+        Set<TagItem> tags = findAccount.orElseThrow(IllegalStateException::new).getTags();
+
+        return tags.stream().map(tagItem -> tagItem.getTag().getTitle()).sorted().collect(Collectors.toSet());
     }
 
     private Account helloNewAccount(SignUpForm signUpForm) {

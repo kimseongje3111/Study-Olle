@@ -10,6 +10,7 @@
 
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="/node_modules/font-awesome/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="/node_modules/@yaireo/tagify/dist/tagify.css">
 
     <script src="/node_modules/jquery/dist/jquery.min.js"></script>
     <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
@@ -18,6 +19,12 @@
     <style>
         .container {
             max-width: 100%;
+        }
+
+        .tagify-outside {
+            border: 0;
+            padding: 0;
+            margin: 0;
         }
     </style>
 </head>
@@ -74,7 +81,8 @@
             <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
                 <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown"
                    aria-haspopup="true" aria-expanded="false">
-                    <svg th:if="${#strings.isEmpty(account?.profileImg)}" th:data-jdenticon-value="${#authentication.name}"
+                    <svg th:if="${#strings.isEmpty(account?.profileImg)}"
+                         th:data-jdenticon-value="${#authentication.name}"
                          width="24" height="24" class="rounded border bg-light"></svg>
                     <img th:if="${!#strings.isEmpty(account?.profileImg)}" th:src="${account.profileImg}"
                          width="24" height="24" class="rounded border"/>
@@ -98,12 +106,18 @@
 
 <!-- setting menu -->
 <div th:fragment="settings-menu (currentMenu)" class="list-group">
-    <a class="list-group-item list-group-item-action" th:classappend="${currentMenu == 'profile'}? active" th:href="@{/settings/profile}">프로필</a>
-    <a class="list-group-item list-group-item-action" th:classappend="${currentMenu == 'password'}? active" th:href="@{/settings/password}">패스워드</a>
-    <a class="list-group-item list-group-item-action" th:classappend="${currentMenu == 'notifications'}? active" th:href="@{/settings/notifications}">알림</a>
-    <a class="list-group-item list-group-item-action" th:classappend="${currentMenu == 'tags'}? active" th:href="@{/settings/tags}">관심 주제</a>
-    <a class="list-group-item list-group-item-action" th:classappend="${currentMenu == 'zones'}? active" th:href="@{/settings/zones}">활동 지역</a>
-    <a class="list-group-item list-group-item-action list-group-item-danger" th:classappend="${currentMenu == 'account'}? active" th:href="@{/settings/account}">계정</a>
+    <a class="list-group-item list-group-item-action" th:classappend="${currentMenu == 'profile'}? active"
+       th:href="@{/settings/profile}">프로필</a>
+    <a class="list-group-item list-group-item-action" th:classappend="${currentMenu == 'password'}? active"
+       th:href="@{/settings/password}">패스워드</a>
+    <a class="list-group-item list-group-item-action" th:classappend="${currentMenu == 'notifications'}? active"
+       th:href="@{/settings/notifications}">알림</a>
+    <a class="list-group-item list-group-item-action" th:classappend="${currentMenu == 'tags'}? active"
+       th:href="@{/settings/tags}">관심 주제</a>
+    <a class="list-group-item list-group-item-action" th:classappend="${currentMenu == 'zones'}? active"
+       th:href="@{/settings/zones}">활동 지역</a>
+    <a class="list-group-item list-group-item-action list-group-item-danger"
+       th:classappend="${currentMenu == 'account'}? active" th:href="@{/settings/account}">계정</a>
 </div>
 
 <!-- form validation by script -->
@@ -128,4 +142,17 @@
         }, false)
     }())
 </script>
+
+<!-- Send crsf token in ajax request -->
+<script type="application/javascript" th:inline="javascript" th:fragment="ajax-csrf-header">
+    $(function () {
+        var csrfToken = /*[[${_csrf.token}]]*/ null;
+        var csrfHeader = /*[[${_csrf.headerName}]]*/ null;
+
+        $(document).ajaxSend(function (e, xhr, options) {
+            xhr.setRequestHeader(csrfHeader, csrfToken);
+        });
+    });
+</script>
+
 </html>

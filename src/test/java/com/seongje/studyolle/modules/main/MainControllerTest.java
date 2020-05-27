@@ -1,6 +1,6 @@
 package com.seongje.studyolle.modules.main;
 
-import com.seongje.studyolle.modules.account.AccountRepository;
+import com.seongje.studyolle.modules.account.repository.AccountRepository;
 import com.seongje.studyolle.modules.account.AccountService;
 import com.seongje.studyolle.modules.account.form.SignUpForm;
 import org.junit.jupiter.api.AfterEach;

@@ -1,7 +1,7 @@
 package com.seongje.studyolle.modules.account;
 
 import com.seongje.studyolle.domain.Account;
-import com.seongje.studyolle.modules.account.AccountRepository;
+import com.seongje.studyolle.modules.account.repository.AccountRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

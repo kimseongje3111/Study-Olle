@@ -1,7 +1,9 @@
-package com.seongje.studyolle.modules.account;
+package com.seongje.studyolle.modules.account.controller;
 
+import com.seongje.studyolle.modules.account.AccountService;
 import com.seongje.studyolle.modules.account.authentication.CurrentUser;
 import com.seongje.studyolle.modules.account.form.SignUpForm;
+import com.seongje.studyolle.modules.account.repository.AccountRepository;
 import com.seongje.studyolle.modules.account.validator.SignUpFormValidator;
 import com.seongje.studyolle.domain.Account;
 import lombok.RequiredArgsConstructor;

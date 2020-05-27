@@ -12,8 +12,11 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.security.web.header.writers.frameoptions.WhiteListedAllowFromStrategy;
+import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 
 import javax.sql.DataSource;
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -34,6 +37,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .mvcMatchers("/", "/login", "/sign-up", "/check-email-token",
                         "/email-login", "/login-by-email").permitAll()
                 .mvcMatchers(HttpMethod.GET, "/profile/*").permitAll()
+                .antMatchers("/h2-console/**").permitAll()
                 .anyRequest().authenticated();
 
         // Custom login & logout page //
@@ -47,6 +51,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.rememberMe()
                 .userDetailsService(accountService)      // User details service
                 .tokenRepository(tokenRepository());     // Token in DB
+
+        http.csrf().ignoringAntMatchers("/h2-console/**");
+
+        http.headers()
+                .addHeaderWriter(
+                        new XFrameOptionsHeaderWriter(
+                                new WhiteListedAllowFromStrategy(Arrays.asList("localhost"))
+                        )
+                ).frameOptions().sameOrigin();
     }
 
     @Override

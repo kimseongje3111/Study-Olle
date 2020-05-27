@@ -1,6 +1,7 @@
 package com.seongje.studyolle.modules.account;
 
 import com.seongje.studyolle.domain.Account;
+import com.seongje.studyolle.modules.account.repository.AccountRepository;
 import com.seongje.studyolle.modules.authentication.WithAccount;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,7 +14,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;

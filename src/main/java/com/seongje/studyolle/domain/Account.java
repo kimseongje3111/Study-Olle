@@ -4,6 +4,8 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -12,6 +14,7 @@ import java.util.UUID;
 public class Account {
 
     @Id @GeneratedValue
+    @Column(name = "account_id")
     private Long id;
 
     // 가입 정보 //
@@ -60,6 +63,32 @@ public class Account {
     private boolean studyUpdatedByEmail;
 
     private boolean studyUpdatedByWeb;
+
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<TagItem> tags = new HashSet<>();
+
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<ZoneItem> zones = new HashSet<>();
+
+    // 연관 관계 편의 메서드 //
+
+    public void addTagItem(TagItem tagItem) {
+        this.tags.add(tagItem);
+        tagItem.setAccount(this);
+    }
+
+    public void removeTagItem(Tag tag) {
+        this.tags.removeIf(tagItem -> tagItem.getTag().equals(tag));
+    }
+
+    public void addZoneItem(ZoneItem zoneItem) {
+        this.zones.add(zoneItem);
+        zoneItem.setAccount(this);
+    }
+
+    public void removeZoneItem(Zone zone) {
+        this.zones.removeIf(zoneItem -> zoneItem.getZone().equals(zone));
+    }
 
     // 비지니스 메서드 //
 
