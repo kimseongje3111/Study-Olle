@@ -1,15 +1,15 @@
 package com.seongje.studyolle.modules.account;
 
-import com.seongje.studyolle.domain.Tag;
-import com.seongje.studyolle.domain.TagItem;
+import com.seongje.studyolle.domain.*;
 import com.seongje.studyolle.modules.account.authentication.UserAccount;
 import com.seongje.studyolle.modules.account.form.NotificationsForm;
 import com.seongje.studyolle.modules.account.form.ProfileForm;
 import com.seongje.studyolle.modules.account.form.SignUpForm;
-import com.seongje.studyolle.domain.Account;
 import com.seongje.studyolle.modules.account.repository.AccountRepository;
 import com.seongje.studyolle.modules.account.repository.TagItemRepository;
+import com.seongje.studyolle.modules.account.repository.ZoneItemRepository;
 import com.seongje.studyolle.modules.tag.TagRepository;
+import com.seongje.studyolle.modules.zone.ZoneRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.mail.SimpleMailMessage;
@@ -39,15 +39,18 @@ public class AccountService implements UserDetailsService {
     private final AccountRepository accountRepository;
     private final TagItemRepository tagItemRepository;
     private final TagRepository tagRepository;
-    private final JavaMailSender javaMailSender;
+    private final ZoneItemRepository zoneItemRepository;
+    private final ZoneRepository zoneRepository;
+
     private final PasswordEncoder passwordEncoder;
+    private final JavaMailSender javaMailSender;
+
     private final ModelMapper modelMapper;
 
     @Transactional
     public void processNewAccount(SignUpForm signUpForm) {
         Account newAccount = helloNewAccount(signUpForm);
 
-        newAccount.generateCheckEmailToken();
         sendSignUpConfirmEmail(newAccount);
         login(newAccount);
     }
@@ -58,8 +61,8 @@ public class AccountService implements UserDetailsService {
         login(newAccount);
     }
 
-    public void resendSignUpConfirmEmail(Account newAccount) {
-        sendSignUpConfirmEmail(newAccount);
+    public void resendSignUpConfirmEmail(Account account) {
+        sendSignUpConfirmEmail(account);
     }
 
     @Transactional
@@ -146,23 +149,44 @@ public class AccountService implements UserDetailsService {
         Optional<Account> findAccount = accountRepository.findById(account.getId());
         Set<TagItem> tags = findAccount.orElseThrow(IllegalStateException::new).getTags();
 
-        return tags.stream().map(tagItem -> tagItem.getTag().getTitle()).sorted().collect(Collectors.toSet());
+        return tags.stream().map(tagItem -> tagItem.getTag().getTitle()).collect(Collectors.toSet());
+    }
+
+    @Transactional
+    public void addZone(Account account, Zone zone) {
+        Account findAccount = accountRepository.findByEmail(account.getEmail());
+        Zone findZone = zoneRepository.findByCityAndLocalNameOfCity(zone.getCity(), zone.getLocalNameOfCity());
+
+        if (findAccount != null) {
+            ZoneItem newZoneItem = zoneItemRepository.save(ZoneItem.createZoneItem(findAccount, findZone));
+            findAccount.addZoneItem(newZoneItem);
+        }
+    }
+
+    @Transactional
+    public void removeZone(Account account, Zone zone) {
+        Account findAccount = accountRepository.findByEmail(account.getEmail());
+        Zone findZone = zoneRepository.findByCityAndLocalNameOfCity(zone.getCity(), zone.getLocalNameOfCity());
+
+        if (findAccount != null) {
+            findAccount.removeZoneItem(findZone);
+        }
+    }
+
+    public Set<String> getUserZones(Account account) throws IllegalStateException {
+        Optional<Account> findAccount = accountRepository.findById(account.getId());
+        Set<ZoneItem> zones = findAccount.orElseThrow(IllegalStateException::new).getZones();
+
+        return zones.stream().map(zoneItem -> zoneItem.getZone().toString()).collect(Collectors.toSet());
     }
 
     private Account helloNewAccount(SignUpForm signUpForm) {
-        Account newAccount = Account.builder()
-                .nickname(signUpForm.getNickname())
-                .email(signUpForm.getEmail())
-                .password(passwordEncoder.encode(signUpForm.getPassword()))
-                .nicknameLastChangedAt(LocalDateTime.now())
-                .studyCreatedByWeb(true)
-                .studyEnrollmentResultByWeb(true)
-                .studyUpdatedByWeb(true)
-                .build();
+        signUpForm.setPassword(passwordEncoder.encode(signUpForm.getPassword()));
+        Account newAccount = modelMapper.map(signUpForm, Account.class);
 
-        accountRepository.save(newAccount);
+        newAccount.generateCheckEmailToken();
 
-        return newAccount;
+        return accountRepository.save(newAccount);
     }
 
     private void sendSignUpConfirmEmail(Account newAccount) {
@@ -179,7 +203,7 @@ public class AccountService implements UserDetailsService {
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
         simpleMailMessage.setTo(account.getEmail());
         simpleMailMessage.setSubject("[스터디올래] 이메일 로그인 링크입니다.");
-        simpleMailMessage.setText("/login-by-email?token=" + account.getEmailCheckToken()
+        simpleMailMessage.setText("/email-login-confirm?token=" + account.getEmailCheckToken()
                 + "&email=" + account.getEmail());
 
         javaMailSender.send(simpleMailMessage);

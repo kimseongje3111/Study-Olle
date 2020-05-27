@@ -8,7 +8,7 @@
 <div class="container">
     <div class="row mt-5 justify-content-center">
         <div class="col-2 mr-5">
-            <div th:replace="fragments.html :: settings-menu(currentMenu='tags')"></div>
+            <div th:replace="fragments.html :: settings-menu (currentMenu='tags')"></div>
         </div>
 
         <div class="col-8">
@@ -23,15 +23,15 @@
                         <p>해당 주제의 스터디가 등록되면 <strong>알림</strong>을 받을 수 있습니다.</p>
                     </div>
 
-                    <small id="tagHelp" class="text-muted ml-1">
+                    <small id="tagsHelp" class="text-muted ml-1">
                         태그를 입력하고 엔터를 눌러 등록하세요. 또한 입력 창을 클릭하여 이미 등록된 태그들을 확인할 수 있습니다.
                     </small>
 
-                    <!-- white list biding -->
+                    <!-- white list binding -->
                     <div id="whitelist" th:text="${whitelist}" hidden></div>
 
                     <input id="tags" type="text" name="tags-outside" class="tagify-outside"
-                           th:value="${#strings.listJoin(tags, ',')}" aria-describedby="tagHelp"/>
+                           th:value="${#strings.listJoin(tags, ',')}" aria-describedby="tagsHelp"/>
                 </div>
             </div>
         </div>
@@ -41,55 +41,6 @@
 </div>
 
 <script th:replace="fragments.html :: ajax-csrf-header"></script>
-<script src="/node_modules/@yaireo/tagify/dist/tagify.min.js"></script>
-<script type="application/javascript" th:inline="javascript">
-    $(function () {
-        function tagRequest(url, tagTitle) {
-            $.ajax({
-                dataType: "json",
-                autocomplete: {
-                    enabled: true,
-                    rightKey: true
-                },
-                contentType: "application/json; charset=utf-8",
-                method: "POST",
-                url: "/settings/tags" + url,
-                data: JSON.stringify({'tagTitle': tagTitle})
-
-            }).done(function (data, status) {
-                console.log("${data} and status is ${status}");
-            });
-        }
-
-        function onAdd(e) {
-            tagRequest("/add", e.detail.data.value);
-        }
-
-        function onRemove(e) {
-            tagRequest("/remove", e.detail.data.value);
-        }
-
-        var tagInput = document.querySelector("#tags");
-        var tagify = new Tagify(tagInput, {
-            pattern: /^.{0,20}$/,
-            whitelist : JSON.parse(document.querySelector("#whitelist").textContent),
-            dropdown: {
-                // suggest tags after a single character input
-                position: "input",
-                maxItems: Infinity,
-                enabled: 0
-            }
-        });
-
-        tagify.on("add", onAdd);
-        tagify.on("remove", onRemove);
-
-        // add a class to Tagify's input element
-        tagify.DOM.input.classList.add('form-control');
-
-        // re-place Tagify's input element outside of the element (tagify.DOM.scope), just before it
-        tagify.DOM.scope.parentNode.insertBefore(tagify.DOM.input, tagify.DOM.scope);
-    });
-</script>
+<div th:replace="fragments.html :: update-tags (baseUrl='/settings/tags')"></div>
 </body>
 </html>

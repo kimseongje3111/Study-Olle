@@ -23,4 +23,13 @@ public class Zone {
     private String localNameOfCity;
 
     private String province;
+
+    @Override
+    public String toString() {
+        if (province == null) {
+            return String.format("%s (%s)", city, localNameOfCity);
+        }
+
+        return String.format("%s (%s) / %s", city, localNameOfCity, province);
+    }
 }

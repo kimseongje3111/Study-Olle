@@ -54,15 +54,15 @@ public class Account {
 
     private boolean studyCreatedByEmail;
 
-    private boolean studyCreatedByWeb;
+    private boolean studyCreatedByWeb = true;
 
     private boolean studyEnrollmentResultByEmail;
 
-    private boolean studyEnrollmentResultByWeb;
+    private boolean studyEnrollmentResultByWeb = true;
 
     private boolean studyUpdatedByEmail;
 
-    private boolean studyUpdatedByWeb;
+    private boolean studyUpdatedByWeb = true;
 
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<TagItem> tags = new HashSet<>();
@@ -115,7 +115,7 @@ public class Account {
         return this.emailCheckToken.equals(token);
     }
 
-    public boolean canResendConfirmEmail() {
+    public boolean canResendCheckEmail() {
         return this.emailCheckTokenGeneratedAt.isBefore(LocalDateTime.now().minusHours(1));
     }
 

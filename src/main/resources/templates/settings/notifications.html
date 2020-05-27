@@ -8,7 +8,7 @@
 <div class="container">
     <div class="row mt-5 justify-content-center">
         <div class="col-2 mr-5">
-            <div th:replace="fragments.html :: settings-menu(currentMenu='notifications')"></div>
+            <div th:replace="fragments.html :: settings-menu (currentMenu='notifications')"></div>
         </div>
 
         <div class="col-8">
@@ -28,8 +28,8 @@
                       method="post" novalidate>
                     <div class="alert alert-light" role="alert">
                         <strong>
-                            <a th:href="@{/settings/locations}">주요 활동 지역</a>에
-                            <a th:href="@{/settings/keywords}">관심있는 주제</a>의 스터디가 만들어졌을 때,
+                            <a th:href="@{/settings/zones}">주요 활동 지역</a>에
+                            <a th:href="@{/settings/tags}">관심있는 주제</a>의 스터디가 만들어졌을 때,
                         </strong>
                         알림을 받을 방법을 설정하세요.
                     </div>

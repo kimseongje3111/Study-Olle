@@ -1,14 +1,13 @@
 package com.seongje.studyolle.domain;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "zone_item")
 @Getter @Setter @EqualsAndHashCode(of = "id")
+@Builder @AllArgsConstructor @NoArgsConstructor
 public class ZoneItem {
 
     @Id @GeneratedValue
@@ -23,4 +22,9 @@ public class ZoneItem {
     @JoinColumn(name = "zone_id")
     private Zone zone;
 
+    // 생성 메서드 //
+
+    public static ZoneItem createZoneItem(Account account, Zone zone) {
+        return ZoneItem.builder().account(account).zone(zone).build();
+    }
 }

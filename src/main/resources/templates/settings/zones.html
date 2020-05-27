@@ -1,10 +1,46 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments.html :: header"></head>
 
+<body class="bg-light">
+<div th:replace="fragments.html :: main-nav"></div>
+
+<div class="container">
+    <div class="row mt-5 justify-content-center">
+        <div class="col-2 mr-5">
+            <div th:replace="fragments.html :: settings-menu (currentMenu='zones')"></div>
+        </div>
+
+        <div class="col-8">
+            <div class="row">
+                <h2 class="col-sm-12">주요 활동 지역</h2>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-8">
+                    <div class="alert alert-info ml-1 mb-3" role="alert">
+                        <p><strong>주요 활동 지역</strong>를 태그로 등록해보세요.</p>
+                        <p>해당 지역에 스터디가 등록되면 <strong>알림</strong>을 받을 수 있습니다.</p>
+                    </div>
+
+                    <small id="zonesHelp" class="text-muted ml-1">
+                        시스템에 등록된 지역만 선택할 수 있습니다. 입력 창을 클릭하여 확인하세요.
+                    </small>
+
+                    <!-- white list binding -->
+                    <div id="whitelist" th:text="${whitelist}" hidden></div>
+
+                    <input id="zones" type="text" name="tags-outside" class="tagify-outside"
+                           th:value="${#strings.listJoin(zones, ',')}" aria-describedby="zonesHelp"/>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="fragments.html :: footer"></div>
+</div>
+
+<script th:replace="fragments.html :: ajax-csrf-header"></script>
+<div th:replace="fragments.html :: update-zones (baseUrl='/settings/zones')"></div>
 </body>
 </html>

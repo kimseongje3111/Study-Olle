@@ -1,14 +1,13 @@
 package com.seongje.studyolle.domain;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "tag_item")
 @Getter @Setter @EqualsAndHashCode(of = "id")
+@Builder @AllArgsConstructor @NoArgsConstructor
 public class TagItem {
 
     @Id @GeneratedValue
@@ -24,11 +23,8 @@ public class TagItem {
     private Tag tag;
 
     // 생성 메서드 //
-    public static TagItem createTagItem(Account account, Tag tag) {
-        TagItem newTagItem = new TagItem();
-        newTagItem.setAccount(account);
-        newTagItem.setTag(tag);
 
-        return newTagItem;
+    public static TagItem createTagItem(Account account, Tag tag) {
+        return TagItem.builder().account(account).tag(tag).build();
     }
 }

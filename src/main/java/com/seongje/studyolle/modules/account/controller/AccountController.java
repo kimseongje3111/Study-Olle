@@ -18,11 +18,21 @@ import javax.validation.Valid;
 
 @Controller
 @RequiredArgsConstructor
+@RequestMapping("/")
 public class AccountController {
 
-    private final SignUpFormValidator signUpFormValidator;
+    static final String MAIN_PATH = "main/";
+    static final String ACCOUNT_PATH = "account/";
+    static final String SIGN_UP = "sign-up";
+    static final String CHECK_EMAIL = "check-email";
+    static final String CHECKED_EMAIL = "checked-email";
+    static final String EMAIL_LOGIN = "email-login";
+    static final String USER_PROFILE = "profile";
+
     private final AccountService accountService;
     private final AccountRepository accountRepository;
+
+    private final SignUpFormValidator signUpFormValidator;
 
     @InitBinder("signUpForm")
     public void initBinder(WebDataBinder webDataBinder) {
@@ -32,17 +42,17 @@ public class AccountController {
         webDataBinder.addValidators(signUpFormValidator);
     }
 
-    @GetMapping("/sign-up")
+    @GetMapping(SIGN_UP)
     public String signUpForm(Model model) {
         model.addAttribute(new SignUpForm());
 
-        return "account/sign-up";
+        return ACCOUNT_PATH + SIGN_UP;
     }
 
-    @PostMapping("/sign-up")
+    @PostMapping(SIGN_UP)
     public String signUpSubmit(@Valid SignUpForm signUpForm, Errors errors) {
         if (errors.hasErrors()) {
-            return "account/sign-up";
+            return ACCOUNT_PATH + SIGN_UP;
         }
 
         accountService.processNewAccount(signUpForm);
@@ -50,21 +60,20 @@ public class AccountController {
         return "redirect:/";
     }
 
-    @GetMapping("/check-email")
+    @GetMapping(CHECK_EMAIL)
     public String checkEmail(@CurrentUser Account account, Model model) {
         model.addAttribute("email", account.getEmail());
 
-        return "account/check-email";
+        return ACCOUNT_PATH + CHECK_EMAIL;
     }
 
-    @GetMapping("/check-email-token")
+    @GetMapping(CHECK_EMAIL + "-token")
     public String checkEmailToken(String token, String email, Model model) {
         Account findAccount = accountRepository.findByEmail(email);
-        String view = "account/checked-email";
 
         if (findAccount == null || !findAccount.isValidToken(token)) {
             model.addAttribute("error", "wrong.emailOrToken");
-            return view;
+            return ACCOUNT_PATH + CHECKED_EMAIL;
         }
 
         accountService.completeSignUpAndCheckEmail(findAccount);
@@ -72,16 +81,16 @@ public class AccountController {
         model.addAttribute("numberOfUser", accountRepository.count());
         model.addAttribute("nickname", findAccount.getNickname());
 
-        return view;
+        return ACCOUNT_PATH + CHECKED_EMAIL;
     }
 
-    @GetMapping("/resend-confirm-email")
-    public String resendConfirmEmail(@CurrentUser Account account, Model model) {
-        if (!account.canResendConfirmEmail()) {
+    @GetMapping(CHECK_EMAIL + "-resend")
+    public String resendCheckEmail(@CurrentUser Account account, Model model) {
+        if (!account.canResendCheckEmail()) {
             model.addAttribute("error", "인증 이메일은 1시간에 한번만 전송할 수 있습니다.");
             model.addAttribute("email", account.getEmail());
 
-            return "account/check-email";
+            return ACCOUNT_PATH + CHECK_EMAIL;
         }
 
         accountService.resendSignUpConfirmEmail(account);
@@ -89,7 +98,7 @@ public class AccountController {
         return "redirect:/";
     }
 
-    @GetMapping("/profile/{nickname}")
+    @GetMapping(USER_PROFILE + "/{nickname}")
     public String viewProfile(@PathVariable String nickname, Model model,
                               @CurrentUser Account account) {
         Account findAccount = accountRepository.findByNickname(nickname);
@@ -101,48 +110,46 @@ public class AccountController {
         model.addAttribute(findAccount);        // TODO : 엔티티 외부 노출
         model.addAttribute("isOwner", findAccount.equals(account));
 
-        return "account/profile";
+        return ACCOUNT_PATH + USER_PROFILE;
     }
 
-    @PostMapping("/email-login")
+    @PostMapping(EMAIL_LOGIN)
     public String sendEmailLoginLink(String email, Model model, RedirectAttributes attributes) {
         Account findAccount = accountRepository.findByEmail(email);
-        String view = "main/email-login";
 
         if (findAccount == null) {
             model.addAttribute("error", "유효하지 않은 이메일입니다.");
-            return view;
+            return MAIN_PATH + EMAIL_LOGIN;
         }
 
         if (!findAccount.isEmailVerified()) {
             model.addAttribute("error", "인증되지 않은 이메일입니다. 먼저 이메일 인증을 완료해주세요.");
-            return view;
+            return MAIN_PATH + EMAIL_LOGIN;
         }
 
-        if (!findAccount.canResendConfirmEmail()) {
+        if (!findAccount.canResendCheckEmail()) {
             model.addAttribute("error", "이메일 로그인은 1시간에 한 번만 가능합니다.");
-            return view;
+            return MAIN_PATH + EMAIL_LOGIN;
         }
 
         accountService.sendEmailLoginLink(findAccount);
         model.addAttribute("email", email);
         attributes.addFlashAttribute("message", "로그인 링크를 이메일로 전송했습니다.");
 
-        return "redirect:/email-login";
+        return "redirect:/" + EMAIL_LOGIN;
     }
 
-    @GetMapping("/login-by-email")
+    @GetMapping(EMAIL_LOGIN + "-confirm")
     public String loginByEmail(String token, String email, Model model) {
         Account findAccount = accountRepository.findByEmail(email);
-        String view = "account/login-by-email";
 
         if (findAccount == null || !findAccount.isValidToken(token)) {
             model.addAttribute("error", "wrong.emailOrToken");
-            return view;
+            return ACCOUNT_PATH + EMAIL_LOGIN + "-confirm";
         }
 
         accountService.completeEmailLogin(findAccount);
 
-        return view;
+        return ACCOUNT_PATH + EMAIL_LOGIN + "-confirm";
     }
 }
