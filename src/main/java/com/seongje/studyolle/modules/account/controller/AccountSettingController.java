@@ -2,7 +2,7 @@ package com.seongje.studyolle.modules.account.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.seongje.studyolle.domain.Account;
+import com.seongje.studyolle.domain.account.Account;
 import com.seongje.studyolle.domain.Tag;
 import com.seongje.studyolle.domain.Zone;
 import com.seongje.studyolle.modules.account.AccountService;

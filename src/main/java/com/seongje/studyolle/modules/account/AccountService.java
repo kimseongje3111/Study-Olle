@@ -1,6 +1,9 @@
 package com.seongje.studyolle.modules.account;
 
 import com.seongje.studyolle.domain.*;
+import com.seongje.studyolle.domain.account.Account;
+import com.seongje.studyolle.domain.account.TagItem;
+import com.seongje.studyolle.domain.account.ZoneItem;
 import com.seongje.studyolle.infra.config.AppProperties;
 import com.seongje.studyolle.infra.mail.EmailMessage;
 import com.seongje.studyolle.infra.mail.MailService;
@@ -27,7 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
-import javax.mail.MessagingException;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;

@@ -1,7 +1,7 @@
 package com.seongje.studyolle.modules.main;
 
 import com.seongje.studyolle.modules.account.authentication.CurrentUser;
-import com.seongje.studyolle.domain.Account;
+import com.seongje.studyolle.domain.account.Account;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;

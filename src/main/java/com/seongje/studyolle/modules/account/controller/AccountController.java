@@ -5,7 +5,7 @@ import com.seongje.studyolle.modules.account.authentication.CurrentUser;
 import com.seongje.studyolle.modules.account.form.SignUpForm;
 import com.seongje.studyolle.modules.account.repository.AccountRepository;
 import com.seongje.studyolle.modules.account.validator.SignUpFormValidator;
-import com.seongje.studyolle.domain.Account;
+import com.seongje.studyolle.domain.account.Account;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

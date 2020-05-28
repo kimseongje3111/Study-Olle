@@ -1,6 +1,6 @@
 package com.seongje.studyolle.modules.account;
 
-import com.seongje.studyolle.domain.Account;
+import com.seongje.studyolle.domain.account.Account;
 import com.seongje.studyolle.modules.account.repository.AccountRepository;
 import com.seongje.studyolle.modules.authentication.WithAccount;
 import org.junit.jupiter.api.AfterEach;

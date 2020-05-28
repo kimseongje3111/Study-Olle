@@ -1,8 +1,6 @@
 package com.seongje.studyolle.modules.account.form;
 
-import com.seongje.studyolle.domain.Account;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
 public class NotificationsForm {
