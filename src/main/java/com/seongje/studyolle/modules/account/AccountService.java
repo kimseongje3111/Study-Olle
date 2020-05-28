@@ -1,6 +1,9 @@
 package com.seongje.studyolle.modules.account;
 
 import com.seongje.studyolle.domain.*;
+import com.seongje.studyolle.infra.config.AppProperties;
+import com.seongje.studyolle.infra.mail.EmailMessage;
+import com.seongje.studyolle.infra.mail.MailService;
 import com.seongje.studyolle.modules.account.authentication.UserAccount;
 import com.seongje.studyolle.modules.account.form.NotificationsForm;
 import com.seongje.studyolle.modules.account.form.ProfileForm;
@@ -12,8 +15,6 @@ import com.seongje.studyolle.modules.tag.TagRepository;
 import com.seongje.studyolle.modules.zone.ZoneRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,10 +24,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
-import java.time.LocalDateTime;
+import javax.mail.MessagingException;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -43,7 +45,9 @@ public class AccountService implements UserDetailsService {
     private final ZoneRepository zoneRepository;
 
     private final PasswordEncoder passwordEncoder;
-    private final JavaMailSender javaMailSender;
+    private final MailService mailService;
+    private final TemplateEngine templateEngine;
+    private final AppProperties appProperties;
 
     private final ModelMapper modelMapper;
 
@@ -190,23 +194,48 @@ public class AccountService implements UserDetailsService {
     }
 
     private void sendSignUpConfirmEmail(Account newAccount) {
-        SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
-        simpleMailMessage.setTo(newAccount.getEmail());
-        simpleMailMessage.setSubject("[스터디올래] 회원 가입 완료를 위한 계정 인증 메일입니다.");
-        simpleMailMessage.setText("/check-email-token?token=" + newAccount.getEmailCheckToken()
-                + "&email=" + newAccount.getEmail());
+        EmailMessage emailMessage = EmailMessage.builder()
+                .to(newAccount.getEmail())
+                .subject("[스터디올래] 회원 가입 완료를 위한 계정 인증 메일입니다.")
+                .text(getSignUpConfirmEmail(newAccount))
+                .build();
 
-        javaMailSender.send(simpleMailMessage);
+        mailService.send(emailMessage);
     }
 
     private void sendLoginEmail(Account account) {
-        SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
-        simpleMailMessage.setTo(account.getEmail());
-        simpleMailMessage.setSubject("[스터디올래] 이메일 로그인 링크입니다.");
-        simpleMailMessage.setText("/email-login-confirm?token=" + account.getEmailCheckToken()
-                + "&email=" + account.getEmail());
+        EmailMessage emailMessage = EmailMessage.builder()
+                .to(account.getEmail())
+                .subject("[스터디올래] 이메일 로그인 링크입니다.")
+                .text(getLoginEmail(account))
+                .build();
 
-        javaMailSender.send(simpleMailMessage);
+        mailService.send(emailMessage);
+    }
+
+    private String getSignUpConfirmEmail(Account account) {
+
+        // thymeleaf context //
+
+        Context context = new Context();
+        context.setVariable("nickname", account.getNickname());
+        context.setVariable("message", "스터디올래 서비스를 사용하기 위해 아래 링크를 클릭하여 인증을 완료해주세요.");
+        context.setVariable("link", "/check-email-token?token=" + account.getEmailCheckToken() + "&email=" + account.getEmail());
+        context.setVariable("linkName", "이메일 인증하기");
+        context.setVariable("host", appProperties.getHost());
+
+        return templateEngine.process("mail/simple-email-template", context);
+    }
+
+    private String getLoginEmail(Account account) {
+        Context context = new Context();
+        context.setVariable("nickname", account.getNickname());
+        context.setVariable("message", "로그인 하려면 아래 링크를 클릭하세요.");
+        context.setVariable("link", "/email-login-confirm?token=" + account.getEmailCheckToken() + "&email=" + account.getEmail());
+        context.setVariable("linkName", "스터디올래 로그인하기");
+        context.setVariable("host", appProperties.getHost());
+
+        return templateEngine.process("mail/simple-email-template", context);
     }
 
     private void login(Account newAccount) {

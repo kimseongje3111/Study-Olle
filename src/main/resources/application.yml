@@ -7,7 +7,6 @@ spring:
       ddl-auto: create-drop
     properties:
       hibernate:
-        format_sql: true
         default_batch_fetch_size : 1000
 
   h2:
@@ -17,3 +16,5 @@ spring:
 logging:
   level:
     org.hibernate.SQL: debug
+
+app.host: http://localhost:8080
