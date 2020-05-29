@@ -7,7 +7,7 @@ import com.seongje.studyolle.domain.account.ZoneItem;
 import com.seongje.studyolle.infra.config.AppProperties;
 import com.seongje.studyolle.infra.mail.EmailMessage;
 import com.seongje.studyolle.infra.mail.MailService;
-import com.seongje.studyolle.modules.account.authentication.UserAccount;
+import com.seongje.studyolle.modules.authentication.UserAccount;
 import com.seongje.studyolle.modules.account.form.NotificationsForm;
 import com.seongje.studyolle.modules.account.form.ProfileForm;
 import com.seongje.studyolle.modules.account.form.SignUpForm;
@@ -45,12 +45,10 @@ public class AccountService implements UserDetailsService {
     private final TagRepository tagRepository;
     private final ZoneItemRepository zoneItemRepository;
     private final ZoneRepository zoneRepository;
-
     private final PasswordEncoder passwordEncoder;
     private final MailService mailService;
     private final TemplateEngine templateEngine;
     private final AppProperties appProperties;
-
     private final ModelMapper modelMapper;
 
     @Transactional

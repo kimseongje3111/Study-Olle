@@ -1,7 +1,7 @@
 package com.seongje.studyolle.modules.account.controller;
 
 import com.seongje.studyolle.modules.account.AccountService;
-import com.seongje.studyolle.modules.account.authentication.CurrentUser;
+import com.seongje.studyolle.modules.authentication.CurrentUser;
 import com.seongje.studyolle.modules.account.form.SignUpForm;
 import com.seongje.studyolle.modules.account.repository.AccountRepository;
 import com.seongje.studyolle.modules.account.validator.SignUpFormValidator;
@@ -31,7 +31,6 @@ public class AccountController {
 
     private final AccountService accountService;
     private final AccountRepository accountRepository;
-
     private final SignUpFormValidator signUpFormValidator;
 
     @InitBinder("signUpForm")

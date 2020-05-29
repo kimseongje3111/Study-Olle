@@ -26,4 +26,14 @@ public class StudyMember {
 
     @Enumerated(EnumType.STRING)
     private ManagementLevel managementLevel;
+
+    // 생성 메서드 //
+
+    public static StudyMember createStudyMember(Study study, Account account, ManagementLevel managementLevel) {
+        return StudyMember.builder()
+                .study(study)
+                .account(account)
+                .managementLevel(managementLevel)
+                .build();
+    }
 }

@@ -6,7 +6,7 @@ import com.seongje.studyolle.domain.account.Account;
 import com.seongje.studyolle.domain.Tag;
 import com.seongje.studyolle.domain.Zone;
 import com.seongje.studyolle.modules.account.AccountService;
-import com.seongje.studyolle.modules.account.authentication.CurrentUser;
+import com.seongje.studyolle.modules.authentication.CurrentUser;
 import com.seongje.studyolle.modules.account.form.AccountForm;
 import com.seongje.studyolle.modules.account.form.NotificationsForm;
 import com.seongje.studyolle.modules.account.form.PasswordForm;
@@ -46,10 +46,8 @@ public class AccountSettingController {
     private final AccountService accountService;
     private final TagService tagService;
     private final ZoneService zoneService;
-
     private final PasswordFormValidator passwordFormValidator;
     private final AccountFormValidator accountFormValidator;
-
     private final ModelMapper modelMapper;
     private final ObjectMapper objectMapper;
 

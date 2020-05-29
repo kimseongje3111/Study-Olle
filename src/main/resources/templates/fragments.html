@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="/node_modules/font-awesome/css/font-awesome.min.css"/>
     <link rel="stylesheet" href="/node_modules/@yaireo/tagify/dist/tagify.css">
+    <link rel="stylesheet" href="/node_modules/summernote/dist/summernote-bs4.min.css">
 
     <script src="/node_modules/jquery/dist/jquery.min.js"></script>
     <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
@@ -188,7 +189,7 @@
             var tagInput = document.querySelector("#tags");
             var tagify = new Tagify(tagInput, {
                 pattern: /^.{0,20}$/,
-                whitelist : JSON.parse(document.querySelector("#whitelist").textContent),
+                whitelist: JSON.parse(document.querySelector("#whitelist").textContent),
                 dropdown: {
                     position: "input",
                     maxItems: Infinity,
@@ -241,7 +242,7 @@
             var tagInput = document.querySelector("#zones");
             var tagify = new Tagify(tagInput, {
                 enforceWhitelist: true,
-                whitelist : JSON.parse(document.querySelector("#whitelist").textContent),
+                whitelist: JSON.parse(document.querySelector("#whitelist").textContent),
                 dropdown: {
                     position: "input",
                     maxItems: Infinity,
@@ -259,6 +260,172 @@
             tagify.DOM.scope.parentNode.insertBefore(tagify.DOM.input, tagify.DOM.scope);
         });
     </script>
+</div>
+
+<!-- editor -->
+<div th:fragment="editor-script">
+    <script src="/node_modules/summernote/dist/summernote-bs4.js"></script>
+    <script type="application/javascript">
+        $(function () {
+            $('.editor').summernote({
+                fontNames: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Noto Sans KR', 'Merriweather'],
+                height: 300
+            });
+        });
+    </script>
+</div>
+
+<!-- tooltip -->
+<script th:fragment="tooltip" type="application/javascript">
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+</script>
+
+<!-- study banner -->
+<div th:fragment="study-banner" th:if="${study.useBanner}" class="row" id="study-logo">
+    <img th:src="${study.bannerImg}"/>
+</div>
+
+<!-- study info -->
+<div th:fragment="study-info">
+    <div class="row pt-4 text-left justify-content-center bg-light">
+        <div class="col-6">
+            <a class="text-decoration-none" th:href="@{'/study/' + ${study.path}}">
+                <span class="h2" th:text="${study.title}">스터디 이름</span>
+            </a>
+        </div>
+
+        <div class="col-4 text-right justify-content-end">
+            <!-- study state -->
+            <span th:if="${study.published}" class="d-inline-block" tabindex="0" data-toggle="tooltip"
+                  data-placement="bottom" title="스터디 공개 중">
+                    <button class="btn btn-success btn-sm" style="pointer-events: none;" type="button" disabled>
+                        STUDY-OPEN
+                    </button>
+            </span>
+            <span th:if="${!study.published}" class="d-inline-block" tabindex="0" data-toggle="tooltip"
+                  data-placement="bottom" title="스터디 공개 준비 중">
+                    <button class="btn btn-warning btn-sm" style="pointer-events: none;" type="button" disabled>
+                        STUDY-DRAFT
+                    </button>
+            </span>
+            <span th:if="${study.closed}" class="d-inline-block" tabindex="0" data-toggle="tooltip"
+                  data-placement="bottom" title="스터디 종료함">
+                    <button class="btn btn-danger btn-sm" style="pointer-events: none;" type="button" disabled>
+                        STUDY-CLOSED
+                    </button>
+            </span>
+
+            <!-- recruiting state -->
+            <span th:if="${study.recruiting}" class="d-inline-block ml-1" tabindex="0" data-toggle="tooltip"
+                  data-placement="bottom" title="팀원 모집 중">
+                    <button class="btn btn-success btn-sm" style="pointer-events: none;" type="button" disabled>
+                        APPLY-ON
+                    </button>
+            </span>
+            <span th:if="${!study.recruiting}" class="d-inline-block ml-1" tabindex="0" data-toggle="tooltip"
+                  data-placement="bottom" title="팀원 모집 중 아님">
+                    <button class="btn btn-warning btn-sm" style="pointer-events: none;" type="button" disabled>
+                        APPLY-OFF
+                    </button>
+            </span>
+
+            <!-- member menu -->
+            <span sec:authorize="isAuthenticated()"
+                  th:if="${study.isJoinable(#authentication.principal)}" class="btn-group ml-1" role="group">
+                    <a class="btn btn-info mr-1" th:href="@{'/study/' + ${study.path} + '/join'}">스터디 가입</a>
+                    <a class="btn btn-outline-primary" th:href="@{'/study/' + ${study.path} + '/members'}"
+                       th:text="${study.memberCount}" data-toggle="tooltip" title="참여 중인 인원">0</a>
+            </span>
+            <span sec:authorize="isAuthenticated()"
+                  th:if="${!study.closed && study.isMember(#authentication.principal)}" class="btn-group ml-"
+                  role="group">
+                    <a class="btn btn-outline-danger mr-1" th:href="@{'/study/' + ${study.path} + '/leave'}">스터디 탈퇴</a>
+                    <a class="btn btn-outline-primary" th:href="@{'/study/' + ${study.path} + '/members'}"
+                       th:text="${study.memberCount}" data-toggle="tooltip" title="참여 중인 인원">0</a>
+            </span>
+
+            <!-- manager menu -->
+            <span sec:authorize="isAuthenticated()"
+                  th:if="${study.published && !study.closed && study.isManager(#authentication.principal)}">
+                    <a class="btn btn-outline-primary ml-1" th:href="@{'/study/' + ${study.path} + '/new-event'}">
+                        <i class="fa fa-plus"></i> 모임 만들기
+                    </a>
+            </span>
+        </div>
+    </div>
+
+    <div class="row justify-content-center bg-light mt-2">
+        <div class="col-10">
+            <p class="lead" th:text="${study.shortDescription}"></p>
+        </div>
+    </div>
+
+    <div class="row justify-content-center bg-light mt-1">
+        <div class="col-10">
+            <p>
+                <span th:each="tag: ${study.tags}"
+                      class="font-weight-light text-monospace badge badge-pill badge-info mr-3">
+                    <a th:href="@{'/search/tag/' + ${tag.title}}" class="text-decoration-none text-white">
+                        <i class="fa fa-tag"></i> <span th:text="${tag.title}">Tag</span>
+                    </a>
+                </span>
+
+                <span th:each="zone: ${study.zones}" class="font-weight-light text-monospace badge badge-primary mr-3">
+                    <a th:href="@{'/search/zone/' + ${zone.id}}" class="text-decoration-none text-white">
+                        <i class="fa fa-globe"></i> <span th:text="${zone.localNameOfCity}">City</span>
+                    </a>
+                </span>
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- study menu -->
+<div th:fragment="study-menu (studyMenu)" class="row px-3 justify-content-center bg-light mt-2">
+    <nav class="col-10 nav nav-tabs">
+        <a class="nav-item nav-link" th:classappend="${studyMenu == 'info'}? active"
+           th:href="@{'/study/' + ${study.path}}">
+            <i class="fa fa-info-circle"></i> 소개
+        </a>
+        <a class="nav-item nav-link" th:classappend="${studyMenu == 'members'}? active"
+           th:href="@{'/study/' + ${study.path} + '/members'}">
+            <i class="fa fa-user"></i> 구성원
+        </a>
+        <a class="nav-item nav-link" th:classappend="${studyMenu == 'events'}? active"
+           th:href="@{'/study/' + ${study.path} + '/events'}">
+            <i class="fa fa-calendar"></i> 모임
+        </a>
+        <a sec:authorize="isAuthenticated()" th:if="${study.isManager(#authentication.principal)}"
+           class="nav-item nav-link" th:classappend="${studyMenu == 'settings'}? active"
+           th:href="@{'/study/' + ${study.path} + '/settings/description'}">
+            <i class="fa fa-cog"></i> 설정
+        </a>
+    </nav>
+</div>
+
+<!-- member list -->
+<div th:fragment="member-list (members)" class="row px-3 justify-content-center">
+    <ul class="list-unstyled col-10 bg-white">
+        <li class="media mt-3" th:each="member: ${members}">
+            <svg th:if="${#strings.isEmpty(member.account?.profileImg)}"
+                 th:data-jdenticon-value="${member.account.nickname}"
+                 width="64" height="64" class="rounded border bg-light mr-3"></svg>
+            <img th:if="${!#strings.isEmpty(member.account?.profileImg)}" th:src="${member.account?.profileImg}"
+                 width="64" height="64" class="rounded border mr-3"/>
+
+            <div class="media-body">
+                <h5 class="mt-0 mb-1">
+                    <span class="font-italic" th:text="${member.account.nickname}">닉네임</span>
+                    <span th:if="${#strings.equals(member.managementLevel, 'MANAGER')}" class="badge badge-primary">
+                        관리자
+                    </span>
+                </h5>
+                <span th:text="${member.account.aboutMe}"></span>
+            </div>
+        </li>
+    </ul>
 </div>
 
 </html>
