@@ -23,7 +23,7 @@
     </div>
 
     <div class="row justify-content-center">
-        <form class="needs-validation col-sm-6" th:action="@{/email-login}"
+        <form class="needs-validation col-sm-6" th:action="@{/account/email-login}"
               method="post" novalidate>
             <div class="form-group mt-3">
                 <label for="email">이메일</label>
@@ -37,7 +37,7 @@
 
             <div class="form-group mt-4">
                 <small id="submitHelp" class="form-text text-muted">
-                    스터디올래에 처음 오셨다면, <a th:href="@{/sign-up}">계정을 먼저 만드세요.</a>
+                    스터디올래에 처음 오셨다면, <a th:href="@{/account/sign-up}">계정을 먼저 만드세요.</a>
                 </small>
                 <button class="btn btn-success btn-block" type="submit" aria-describedby="submitHelp">로그인 링크 보내기</button>
             </div>

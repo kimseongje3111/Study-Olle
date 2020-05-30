@@ -17,14 +17,4 @@ public class MainController {
 
         return "index";
     }
-
-    @GetMapping("/login")
-    public String login() {
-        return "main/login";
-    }
-
-    @GetMapping("/email-login")
-    public String emailLogin() {
-        return "main/email-login";
-    }
 }

@@ -17,7 +17,9 @@
     <!-- email check complete -->
     <div class="py-5 text-center" th:if="${error == null}">
         <h3>이메일로 로그인 했습니다.</h3>
-        <p class="text-info">먼저 <a th:href="@{/settings/password}">패스워드를 변경</a>해주세요.</p>
+        <p class="text-info">
+            먼저 <a th:href="@{/account/settings/password}">패스워드를 변경</a>해주세요.
+        </p>
     </div>
 
     <div th:replace="fragments.html :: footer"></div>

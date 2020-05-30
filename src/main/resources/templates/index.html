@@ -6,7 +6,7 @@
 <div th:replace="fragments.html :: main-nav"></div>
 
 <div class="alert alert-warning" role="alert" th:if="${account != null && !account?.emailVerified}">
-    스터디올레 가입을 완료하려면 <a class="alert-link" th:href="@{/check-email}">계정 인증 이메일을 확인</a>하세요.
+    스터디올레 가입을 완료하려면 <a class="alert-link" th:href="@{/account/check-email}">계정 인증 이메일을 확인</a>하세요.
 </div>
 
 <div class="container">

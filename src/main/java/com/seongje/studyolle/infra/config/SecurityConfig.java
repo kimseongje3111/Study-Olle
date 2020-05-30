@@ -34,15 +34,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // Request authority //
 
         http.authorizeRequests()
-                .mvcMatchers("/", "/login", "/sign-up", "/check-email-token",
-                        "/email-login", "/email-login-confirm").permitAll()
-                .mvcMatchers(HttpMethod.GET, "/profile/*").permitAll()
-                .antMatchers("/h2-console/**").permitAll()
+                .mvcMatchers("/", "/account/login", "/account/sign-up", "/account/check-email-token",
+                        "/account/email-login", "/account/email-login-confirm").permitAll()
+                .mvcMatchers(HttpMethod.GET, "/account/profile/*").permitAll()
                 .anyRequest().authenticated();
 
         // Custom login & logout page //
 
-        http.formLogin().loginPage("/login").permitAll();
+        http.formLogin().loginPage("/account/login").permitAll();
 
         http.logout().logoutSuccessUrl("/");
 
@@ -51,15 +50,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.rememberMe()
                 .userDetailsService(accountService)      // User details service
                 .tokenRepository(tokenRepository());     // Token in DB
-
-        http.csrf().ignoringAntMatchers("/h2-console/**");
-
-        http.headers()
-                .addHeaderWriter(
-                        new XFrameOptionsHeaderWriter(
-                                new WhiteListedAllowFromStrategy(Arrays.asList("localhost"))
-                        )
-                ).frameOptions().sameOrigin();
     }
 
     @Override

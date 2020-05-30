@@ -51,6 +51,24 @@ public class AccountService implements UserDetailsService {
     private final AppProperties appProperties;
     private final ModelMapper modelMapper;
 
+    public Account findByEmail(String email) {
+        return accountRepository.findByEmail(email);
+    }
+
+    public Account findByNickname(String nickname) {
+        Account findAccount = accountRepository.findByNickname(nickname);
+
+        if (findAccount == null) {
+            throw new IllegalArgumentException(nickname + "에 해당하는 사용자가 없습니다.");
+        }
+
+        return findAccount;
+    }
+
+    public long usersTotalCount() {
+        return accountRepository.count();
+    }
+
     @Transactional
     public void processNewAccount(SignUpForm signUpForm) {
         Account newAccount = helloNewAccount(signUpForm);
@@ -203,16 +221,6 @@ public class AccountService implements UserDetailsService {
         mailService.send(emailMessage);
     }
 
-    private void sendLoginEmail(Account account) {
-        EmailMessage emailMessage = EmailMessage.builder()
-                .to(account.getEmail())
-                .subject("[스터디올래] 이메일 로그인 링크입니다.")
-                .text(getLoginEmail(account))
-                .build();
-
-        mailService.send(emailMessage);
-    }
-
     private String getSignUpConfirmEmail(Account account) {
 
         // thymeleaf context //
@@ -220,19 +228,8 @@ public class AccountService implements UserDetailsService {
         Context context = new Context();
         context.setVariable("nickname", account.getNickname());
         context.setVariable("message", "스터디올래 서비스를 사용하기 위해 아래 링크를 클릭하여 인증을 완료해주세요.");
-        context.setVariable("link", "/check-email-token?token=" + account.getEmailCheckToken() + "&email=" + account.getEmail());
+        context.setVariable("link", "/account/check-email-token?token=" + account.getEmailCheckToken() + "&email=" + account.getEmail());
         context.setVariable("linkName", "이메일 인증하기");
-        context.setVariable("host", appProperties.getHost());
-
-        return templateEngine.process("mail/simple-email-template", context);
-    }
-
-    private String getLoginEmail(Account account) {
-        Context context = new Context();
-        context.setVariable("nickname", account.getNickname());
-        context.setVariable("message", "로그인 하려면 아래 링크를 클릭하세요.");
-        context.setVariable("link", "/email-login-confirm?token=" + account.getEmailCheckToken() + "&email=" + account.getEmail());
-        context.setVariable("linkName", "스터디올래 로그인하기");
         context.setVariable("host", appProperties.getHost());
 
         return templateEngine.process("mail/simple-email-template", context);
@@ -249,5 +246,26 @@ public class AccountService implements UserDetailsService {
         );
 
         SecurityContextHolder.getContext().setAuthentication(token);
+    }
+
+    private void sendLoginEmail(Account account) {
+        EmailMessage emailMessage = EmailMessage.builder()
+                .to(account.getEmail())
+                .subject("[스터디올래] 이메일 로그인 링크입니다.")
+                .text(getLoginEmail(account))
+                .build();
+
+        mailService.send(emailMessage);
+    }
+
+    private String getLoginEmail(Account account) {
+        Context context = new Context();
+        context.setVariable("nickname", account.getNickname());
+        context.setVariable("message", "로그인 하려면 아래 링크를 클릭하세요.");
+        context.setVariable("link", "/account/email-login-confirm?token=" + account.getEmailCheckToken() + "&email=" + account.getEmail());
+        context.setVariable("linkName", "스터디올래 로그인하기");
+        context.setVariable("host", appProperties.getHost());
+
+        return templateEngine.process("mail/simple-email-template", context);
     }
 }

@@ -36,12 +36,14 @@ import java.util.Set;
 @RequestMapping("/")
 public class AccountSettingController {
 
-    static final String PROFILE = "settings/profile";
-    static final String PASSWORD = "settings/password";
-    static final String NOTIFICATIONS = "settings/notifications";
-    static final String TAGS = "settings/tags";
-    static final String ZONES = "settings/zones";
-    static final String ACCOUNT = "settings/account";
+    static final String REDIRECT= "redirect:/";
+    static final String SETTINGS = "account/settings";
+    static final String PROFILE = SETTINGS + "/profile";
+    static final String PASSWORD = SETTINGS + "/password";
+    static final String NOTIFICATIONS = SETTINGS + "/notifications";
+    static final String TAGS = SETTINGS + "/tags";
+    static final String ZONES = SETTINGS + "/zones";
+    static final String ACCOUNT = SETTINGS + "/account";
 
     private final AccountService accountService;
     private final TagService tagService;
@@ -63,7 +65,7 @@ public class AccountSettingController {
 
     @GetMapping(PROFILE)
     public String updateProfileForm(@CurrentUser Account account, Model model) {
-        model.addAttribute(account);        // TODO : 엔티티 외부 노출
+        model.addAttribute(account);
         model.addAttribute(modelMapper.map(account, ProfileForm.class));
 
         return PROFILE;
@@ -77,14 +79,14 @@ public class AccountSettingController {
                                           RedirectAttributes attributes) {
 
         if (errors.hasErrors()) {
-            model.addAttribute(account);        // TODO : 엔티티 외부 노출
-            return "settings/profile";
+            model.addAttribute(account);
+            return PROFILE;
         }
 
         accountService.updateProfile(account, profileForm);
         attributes.addFlashAttribute("message", "프로필이 수정되었습니다.");
 
-        return "redirect:/" + PROFILE;
+        return REDIRECT + PROFILE;
     }
 
     @GetMapping(PASSWORD)
@@ -110,7 +112,7 @@ public class AccountSettingController {
         accountService.updatePassword(account, passwordForm.getNewPassword());
         attributes.addFlashAttribute("message", "패스워드가 변경되었습니다.");
 
-        return "redirect:/" + PASSWORD;
+        return REDIRECT + PASSWORD;
     }
 
     @GetMapping(NOTIFICATIONS)
@@ -136,7 +138,7 @@ public class AccountSettingController {
         accountService.updateNotifications(account, notificationsForm);
         attributes.addFlashAttribute("message", "변경 사항이 저장되었습니다.");
 
-        return "redirect:/" + NOTIFICATIONS;
+        return REDIRECT + NOTIFICATIONS;
     }
 
     @GetMapping(TAGS)
@@ -245,6 +247,6 @@ public class AccountSettingController {
 
         attributes.addFlashAttribute("message", "닉네임이 변경되었습니다.");
 
-        return "redirect:/" + ACCOUNT;
+        return REDIRECT + ACCOUNT;
     }
 }

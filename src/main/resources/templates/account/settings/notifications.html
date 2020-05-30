@@ -24,12 +24,12 @@
             </div>
 
             <div class="row mt-3">
-                <form class="col-8" th:action="@{/settings/notifications}" th:object="${notificationsForm}"
+                <form class="col-8" th:action="@{/account/settings/notifications}" th:object="${notificationsForm}"
                       method="post" novalidate>
                     <div class="alert alert-light" role="alert">
                         <strong>
-                            <a th:href="@{/settings/zones}">주요 활동 지역</a>에
-                            <a th:href="@{/settings/tags}">관심있는 주제</a>의 스터디가 만들어졌을 때,
+                            <a th:href="@{/account/settings/zones}">주요 활동 지역</a>에
+                            <a th:href="@{/account/settings/tags}">관심있는 주제</a>의 스터디가 만들어졌을 때,
                         </strong>
                         알림을 받을 방법을 설정하세요.
                     </div>

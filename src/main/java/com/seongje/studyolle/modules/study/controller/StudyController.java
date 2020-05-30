@@ -23,9 +23,11 @@ import java.net.URLEncoder;
 @RequestMapping("/")
 public class StudyController {
 
-    static final String STUDY_PATH = "study/";
-    static final String NEW_STUDY = "new-study";
-    static final String STUDY_URL = "study/{path}";
+    static final String REDIRECT = "redirect:/";
+    static final String NEW_STUDY = "study/new-study";
+    static final String STUDIES = "study/studies";
+    static final String STUDY_HOME = STUDIES + "/{path}";
+    static final String STUDY_MEMBERS = STUDY_HOME + "/members";
 
     private final StudyService studyService;
     private final StudyFormValidator studyFormValidator;
@@ -41,7 +43,7 @@ public class StudyController {
         model.addAttribute(account);
         model.addAttribute(new StudyForm());
 
-        return STUDY_PATH + NEW_STUDY;
+        return NEW_STUDY;
     }
 
     @PostMapping(NEW_STUDY)
@@ -52,31 +54,31 @@ public class StudyController {
 
         if (errors.hasErrors()) {
             model.addAttribute(account);
-            return STUDY_PATH + NEW_STUDY;
+            return NEW_STUDY;
         }
 
         Study newStudy = studyService.createNewStudy(modelMapper.map(studyForm, Study.class), account);
 
-        return "redirect:/" + STUDY_PATH + URLEncoder.encode(newStudy.getPath(), "UTF-8");
+        return REDIRECT + STUDIES + "/" + URLEncoder.encode(newStudy.getPath(), "UTF-8");
     }
 
-    @GetMapping(STUDY_URL)
+    @GetMapping(STUDY_HOME)
     public String studyHome(@CurrentUser Account account, @PathVariable String path, Model model) {
         Study findStudy = studyService.findStudy(path);
 
         model.addAttribute(account);
         model.addAttribute(findStudy);
 
-        return STUDY_PATH + "study-home";
+        return "study/study-home";
     }
 
-    @GetMapping(STUDY_URL + "/members")
+    @GetMapping(STUDY_MEMBERS)
     public String studyMembers(@CurrentUser Account account, @PathVariable String path, Model model) {
         Study findStudy = studyService.findStudy(path);
 
         model.addAttribute(account);
         model.addAttribute(findStudy);
 
-        return STUDY_PATH + "study-members";
+        return "study/study-members";
     }
 }
