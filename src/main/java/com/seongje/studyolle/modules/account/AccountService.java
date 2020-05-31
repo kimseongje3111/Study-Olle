@@ -59,7 +59,7 @@ public class AccountService implements UserDetailsService {
         Account findAccount = accountRepository.findByNickname(nickname);
 
         if (findAccount == null) {
-            throw new IllegalArgumentException(nickname + "에 해당하는 사용자가 없습니다.");
+            throw new IllegalStateException(nickname + "에 해당하는 사용자가 없습니다.");
         }
 
         return findAccount;

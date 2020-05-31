@@ -11,7 +11,7 @@
         <div class="alert alert-danger" role="alert" th:text="${error}"></div>
 
         <div>
-            <p class="lead" th:text="${email}">your@email.com</p>
+            <p class="lead" th:text="${account.email}">your@email.com</p>
             <a class="btn btn-outline-info" th:href="@{/}">메인으로</a>
         </div>
     </div>
@@ -20,7 +20,7 @@
         <h3>스터디올래 서비스를 이용하기 위해 전송된 계정 인증 이메일을 확인해주세요.</h3>
 
         <div>
-            <p class="lead" th:text="${email}">your@email.com</p>
+            <p class="lead" th:text="${account.email}">your@email.com</p>
             <a class="btn btn-outline-info" th:href="@{/account/check-email-resend}">계정 인증 이메일 재전송</a>
         </div>
     </div>

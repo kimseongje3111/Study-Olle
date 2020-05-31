@@ -62,7 +62,7 @@ public class AccountController {
 
     @GetMapping(CHECK_EMAIL)
     public String checkEmail(@CurrentUser Account account, Model model) {
-        model.addAttribute("email", account.getEmail());
+        model.addAttribute(account);
         return CHECK_EMAIL;
     }
 
@@ -77,8 +77,8 @@ public class AccountController {
 
         accountService.completeSignUpAndCheckEmail(findAccount);
 
+        model.addAttribute(findAccount);
         model.addAttribute("numberOfUser", accountService.usersTotalCount());
-        model.addAttribute("nickname", findAccount.getNickname());
 
         return CHECKED_EMAIL;
     }
@@ -87,7 +87,7 @@ public class AccountController {
     public String resendCheckEmail(@CurrentUser Account account, Model model) {
         if (!account.canResendCheckEmail()) {
             model.addAttribute("error", "인증 이메일은 1시간에 한번만 전송할 수 있습니다.");
-            model.addAttribute("email", account.getEmail());
+            model.addAttribute(account);
 
             return CHECK_EMAIL;
         }
@@ -128,7 +128,7 @@ public class AccountController {
 
         accountService.sendEmailLoginLink(findAccount);
 
-        model.addAttribute("email", email);
+        model.addAttribute(findAccount);
         attributes.addFlashAttribute("message", "로그인 링크를 이메일로 전송했습니다.");
 
         return REDIRECT + EMAIL_LOGIN;
@@ -144,6 +144,7 @@ public class AccountController {
         }
 
         accountService.completeEmailLogin(findAccount);
+        model.addAttribute(findAccount);
 
         return EMAIL_LOGIN_CONFIRM;
     }

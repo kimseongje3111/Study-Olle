@@ -7,6 +7,8 @@ import com.seongje.studyolle.modules.authentication.UserAccount;
 import lombok.*;
 
 import javax.persistence.*;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -114,5 +116,19 @@ public class Study {
         }
 
         return false;
+    }
+
+    public boolean isManagerBy(Account account) {
+        for (StudyMember studyMember : this.members) {
+            if (account.equals(studyMember.getAccount())) {
+                return (studyMember.getManagementLevel() == MANAGER);
+            }
+        }
+
+        return false;
+    }
+
+    public String getEncodedPath() throws UnsupportedEncodingException {
+        return URLEncoder.encode(this.path, "UTF-8");
     }
 }

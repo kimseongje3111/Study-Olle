@@ -7,6 +7,7 @@ import com.seongje.studyolle.modules.study.StudyService;
 import com.seongje.studyolle.modules.study.form.StudyForm;
 import com.seongje.studyolle.modules.study.validator.StudyFormValidator;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,7 +24,7 @@ import java.net.URLEncoder;
 @RequestMapping("/")
 public class StudyController {
 
-    static final String REDIRECT = "redirect:/";
+    static final String REDIRECT = "redirect:/study/studies/";
     static final String NEW_STUDY = "study/new-study";
     static final String STUDIES = "study/studies";
     static final String STUDY_HOME = STUDIES + "/{path}";
@@ -46,11 +47,12 @@ public class StudyController {
         return NEW_STUDY;
     }
 
+    @SneakyThrows
     @PostMapping(NEW_STUDY)
     public String newStudySubmit(@CurrentUser Account account,
                                  @Valid StudyForm studyForm,
                                  Errors errors,
-                                 Model model) throws UnsupportedEncodingException {
+                                 Model model) {
 
         if (errors.hasErrors()) {
             model.addAttribute(account);
@@ -59,7 +61,7 @@ public class StudyController {
 
         Study newStudy = studyService.createNewStudy(modelMapper.map(studyForm, Study.class), account);
 
-        return REDIRECT + STUDIES + "/" + URLEncoder.encode(newStudy.getPath(), "UTF-8");
+        return REDIRECT + newStudy.getEncodedPath();
     }
 
     @GetMapping(STUDY_HOME)
@@ -81,4 +83,6 @@ public class StudyController {
 
         return "study/study-members";
     }
+
+    // TODO : 모임 설정
 }
