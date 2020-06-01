@@ -17,4 +17,8 @@ logging:
   level:
     org.hibernate.SQL: debug
 
+server:
+  tomcat:
+    max-http-form-post-size: 5MB
+
 app.host: http://localhost:8080

@@ -11,13 +11,135 @@
 
     <div th:replace="fragments.html :: study-menu (studyMenu='settings')"></div>
 
-    <div class="row mt-3 justify-content-center">
-        <div class="col-2">
+    <div class="row px-3 justify-content-center">
+        <div class="col-2 pl-3 pt-5 bg-white rounded-bottom">
             <div th:replace="fragments.html :: study-settings-menu (currentMenu='banner')"></div>
         </div>
 
-        <div class="col-8">
+        <div class="col-8 pt-5 px-5 bg-white rounded-bottom">
+            <div class="row">
+                <h2 class="col-sm-12">배너 이미지 사용</h2>
+            </div>
 
+            <div class="row mt-3">
+                <form th:if="${!study.useBanner}" th:action="@{'/study/studies/' + ${study.path} + '/settings/banner/enable'}"
+                      class="col-10" method="post" novalidate>
+                    <div class="alert alert-primary" role="alert">
+                        <p>스터디 배너 이미지를 사용합니다.</p>
+                        <p>스터디 배너 이미지를 설정하지 않으면 기본 배너 이미지를 사용합니다.</p>
+                    </div>
+
+                    <div class="form-group mt-4">
+                        <button class="btn btn-outline-primary btn-block" type="submit" aria-describedby="submitHelp">
+                            배너 이미지 사용하기
+                        </button>
+                    </div>
+                </form>
+
+                <form th:if="${study.useBanner}" th:action="@{'/study/studies/' + ${study.path} + '/settings/banner/disable'}"
+                      class="col-10" method="post" novalidate>
+                    <div class="alert alert-info" role="alert">
+                        <p>스터디 배너 이미지를 사용하지 않습니다. ( 현재 배너 이미지는 삭제됩니다. )</p>
+                        <p>스터디 배너 이미지를 설정하지 않으면 스터디 목록에서는 기본 배너 이미지로 표시됩니다.</p>
+                    </div>
+
+                    <div class="form-group mt-4">
+                        <button class="btn btn-primary btn-block" type="submit" aria-describedby="submitHelp">
+                            배너 이미지 사용하기 않기
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="row mt-3" th:if="${study.useBanner}">
+                <div class="dropdown-divider col-sm-12 mt-5"></div>
+
+                <div class="col-10">
+                    <form id="bannerImageForm" th:action="@{'/study/studies/' + ${study.path} + '/settings/banner'}"
+                          method="post" novalidate>
+                        <div class="form-group">
+                            <input id="studyBannerImage" type="hidden" name="studyBannerImage" class="form-control"/>
+                        </div>
+                    </form>
+
+                    <div class="card text-center mb-3">
+                        <div class="card-header text-white bg-info">
+                            현재 배너 이미지
+                        </div>
+
+                        <div id="current-banner-image" class="mt-3 rounded">
+                            <div th:if="${#strings.isEmpty(study.bannerImg)}" class="badge badge-secondary text-wrap">
+                                현재 배너 이미지 없음
+                            </div>
+                            <img th:if="${!#strings.isEmpty(study.bannerImg)}" th:src="${study.bannerImg}"
+                                 alt="name" th:alt="${study.title}" width="720" height="150" class="rounded"/>
+                        </div>
+
+                        <div id="new-banner-image" class="mt-3 rounded"></div>
+
+                        <div class="card-body">
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="banner-image-file">
+                                <label class="custom-file-label text-muted" for="banner-image-file">변경 이미지 선택</label>
+                            </div>
+
+                            <button id="basic-banners-button" type="button" class="btn btn-outline-primary btn-block mt-3"
+                                    data-toggle="modal" data-target="#basicBannersModal">
+                                기본 배너 이미지 선택
+                            </button>
+
+                            <div id="new-banner-image-control" class="mt-3">
+                                <button class="btn btn-outline-primary btn-block" id="cut-button">자르기</button>
+                                <button class="btn btn-outline-success btn-block" id="confirm-button">확인</button>
+                                <button class="btn btn-outline-primary btn-block" id="save-button">적용</button>
+                                <button class="btn btn-outline-warning btn-block" id="reset-button">취소</button>
+                            </div>
+                        </div>
+
+                        <div id="cut-banner-image">
+                            <div class="card-footer text-white bg-info">
+                                적용 이미지
+                            </div>
+
+                            <div id="cropped-new-banner-image" class="mt-3 mb-3 rounded"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- basic banners modal -->
+    <div class="modal fade" id="basicBannersModal" tabindex="-1" role="dialog" aria-labelledby="basicBannersModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content justify-content-center">
+                <div class="modal-header">
+                    <h5 class="modal-title text-muted" id="basicBannersModalLabel">기본 배너 이미지 목록</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fa fa-times-circle" aria-hidden="true"></i>
+                    </button>
+                </div>
+
+                <div class="modal-body bg-light" style="max-height: 600px">
+                    <form id="basicBannerForm" th:action="@{'/study/studies/' + ${study.path} + '/settings/banner'}"
+                          method="post" novalidate>
+                        <div th:each="file_name : ${basic_banners}" class="row my-2">
+                            <div class="custom-control custom-radio mx-3 d-flex align-items-center">
+                                <input type="radio" th:id="${file_name}" name="basicBanner"
+                                       class="custom-control-input" th:value="${file_name}">
+                                <label class="custom-control-label" th:for="${file_name}"></label>
+                            </div>
+
+                            <img th:src="${'/images/basic_banners/' + file_name}" class="rounded" width="650" height="150">
+                        </div>
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+                    <button id="basicBannerSaveBtn" type="button" class="btn btn-primary">적용</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -25,5 +147,122 @@
 </div>
 
 <script th:replace="fragments.html :: tooltip"></script>
+
+<link  href="/node_modules/cropper/dist/cropper.min.css" rel="stylesheet">
+<script src="/node_modules/cropper/dist/cropper.min.js"></script>
+<script src="/node_modules/jquery-cropper/dist/jquery-cropper.min.js"></script>
+<script type="application/javascript">
+    $(function() {
+        cropper = '';
+        let $studyBannerImage = $("#studyBannerImage");     // form data
+
+        let $bannerImageFile = $("#banner-image-file");
+        let $currentBannerImage = $("#current-banner-image");
+        let $newBannerImage = $("#new-banner-image");
+        let $resultImage = $("#cropped-new-banner-image");
+        let $bannerCutImage = $("#cut-banner-image");
+
+        let $cutBtn = $("#cut-button");
+        let $confirmBtn = $("#confirm-button");
+        let $saveBtn = $("#save-button");
+        let $resetBtn = $("#reset-button");
+        let $basicBannersBtn = $("#basic-banners-button");
+
+        $newBannerImage.hide();
+        $bannerCutImage.hide();
+        $cutBtn.hide();
+        $confirmBtn.hide();
+        $saveBtn.hide();
+        $resetBtn.hide();
+
+        $bannerImageFile.change(function(e) {
+            if (e.target.files.length === 1) {
+                const reader = new FileReader();
+
+                reader.onload = e => {
+                    if (e.target.result) {
+                        if (!e.target.result.startsWith("data:image")) {
+                            alert("파일 확장자 오류 : 이미지 파일을 선택하세요.");
+                            return;
+                        }
+
+                        let img = document.createElement("img");
+                        img.id = 'new-banner';
+                        img.src = e.target.result;
+                        img.setAttribute('width', '99%');
+
+                        $newBannerImage.html(img);
+                        $newBannerImage.show();
+                        $currentBannerImage.hide();
+
+                        let $newImage = $(img);
+                        $newImage.cropper({aspectRatio: 13/2});
+                        cropper = $newImage.data('cropper');
+
+                        $cutBtn.show();
+                        $resetBtn.show();
+                        $confirmBtn.hide();
+                        $saveBtn.hide();
+                        $basicBannersBtn.hide();
+                    }
+                };
+
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+
+        $resetBtn.click(function() {
+            $currentBannerImage.show();
+            $basicBannersBtn.show();
+
+            $newBannerImage.hide();
+            $resultImage.hide();
+            $cutBtn.hide();
+            $confirmBtn.hide();
+            $saveBtn.hide();
+            $resetBtn.hide();
+            $bannerCutImage.hide();
+            $bannerImageFile.val('');
+            $studyBannerImage.val('');
+        });
+
+        $cutBtn.click(function() {
+            let dataUrl = cropper.getCroppedCanvas().toDataURL();
+
+            if (dataUrl.length > 1000 * 1024) {
+                alert("이미지 파일의 크기가 너무 큽니다. (1024 * 1000) 크기보다 작은 파일을 사용하세요.");
+                return;
+            }
+
+            let newImage = document.createElement("img");
+            newImage.id = "cropped-new-profile-image";
+            newImage.src = dataUrl;
+            newImage.width = 720;
+
+            $resultImage.html(newImage);
+            $resultImage.show();
+            $confirmBtn.show();
+            $bannerCutImage.show();
+
+            $confirmBtn.click(function() {
+                $newBannerImage.html(newImage);
+                $saveBtn.show();
+
+                $cutBtn.hide();
+                $confirmBtn.hide();
+                $bannerCutImage.hide();
+                $studyBannerImage.val(dataUrl);
+            });
+        });
+
+        $saveBtn.click(function() {
+            $("#bannerImageForm").submit();
+        });
+
+        $("#basicBannerSaveBtn").click(function() {
+            $("#basicBannerForm").submit();
+        });
+    });
+</script>
 </body>
 </html>

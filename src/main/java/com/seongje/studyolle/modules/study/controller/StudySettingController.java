@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
-import java.net.URLEncoder;
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -75,4 +75,58 @@ public class StudySettingController {
         return REDIRECT + findStudy.getEncodedPath()  + "/settings" + DESCRIPTIONS;
     }
 
+    @GetMapping(BANNER)
+    public String studyBannerForm(@CurrentUser Account account, @PathVariable String path, Model model) {
+        Study findStudy = studyService.findStudyForUpdate(path, account);
+        List<String> basicBanners = studyService.getBasicBannerImages();
+
+        model.addAttribute(account);
+        model.addAttribute(findStudy);
+        model.addAttribute("basic_banners", basicBanners);
+
+        return STUDY_SETTINGS + BANNER;
+    }
+
+    @SneakyThrows
+    @PostMapping(BANNER)
+    public String studyBannerFormUpdate(@CurrentUser Account account,
+                                        @PathVariable String path,
+                                        String studyBannerImage,
+                                        String basicBanner,
+                                        RedirectAttributes attributes) {
+
+        Study findStudy = studyService.findStudyForUpdate(path, account);
+
+        if (studyBannerImage != null) {
+            studyService.updateBannerImage(findStudy, studyBannerImage);
+        }
+
+        if (basicBanner != null) {
+            studyService.updateBannerImageByBasic(findStudy, basicBanner);
+        }
+
+        attributes.addFlashAttribute("message", "배너 이미지가 적용되었습니다.");
+
+        return REDIRECT + findStudy.getEncodedPath()  + "/settings" + BANNER;
+    }
+
+    @SneakyThrows
+    @PostMapping(BANNER + "/enable")
+    public String studyBannerImageEnable(@CurrentUser Account account, @PathVariable String path) {
+        Study findStudy = studyService.findStudyForUpdate(path, account);
+
+        studyService.useBannerImage(findStudy, true);
+
+        return REDIRECT + findStudy.getEncodedPath()  + "/settings" + BANNER;
+    }
+
+    @SneakyThrows
+    @PostMapping(BANNER + "/disable")
+    public String studyBannerImageDisable(@CurrentUser Account account, @PathVariable String path) {
+        Study findStudy = studyService.findStudyForUpdate(path, account);
+
+        studyService.useBannerImage(findStudy, false);
+
+        return REDIRECT + findStudy.getEncodedPath()  + "/settings" + BANNER;
+    }
 }

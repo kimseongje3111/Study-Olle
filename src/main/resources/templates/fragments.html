@@ -293,8 +293,9 @@
 </script>
 
 <!-- study banner -->
-<div th:fragment="study-banner" th:if="${study.useBanner}" class="row" id="study-logo">
-    <img th:src="${study.bannerImg}"/>
+<div th:fragment="study-banner" th:if="${study.useBanner}" class="row" id="study-logo" style="height: 150px;">
+    <img th:src="${study.bannerImg}" class="w-50 mh-100"/>
+    <img th:src="${study.bannerImg}" class="w-50 mh-100"/>
 </div>
 
 <!-- study info -->

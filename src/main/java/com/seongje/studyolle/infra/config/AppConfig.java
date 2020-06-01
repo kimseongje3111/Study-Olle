@@ -1,5 +1,7 @@
 package com.seongje.studyolle.infra.config;
 
+import eu.maxschuster.dataurl.DataUrlSerializer;
+import eu.maxschuster.dataurl.IDataUrlSerializer;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.NameTokenizers;
 import org.springframework.context.annotation.Bean;
@@ -28,5 +30,10 @@ public class AppConfig {
                 .setDestinationNameTokenizer(NameTokenizers.UNDERSCORE);
 
         return modelMapper;
+    }
+
+    @Bean
+    public IDataUrlSerializer iDataUrlSerializer() {
+        return new DataUrlSerializer();
     }
 }
