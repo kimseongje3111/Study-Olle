@@ -1,12 +1,21 @@
 package com.seongje.studyolle.modules.study;
 
+import com.seongje.studyolle.domain.Tag;
+import com.seongje.studyolle.domain.Zone;
 import com.seongje.studyolle.domain.account.Account;
 import com.seongje.studyolle.domain.study.Study;
 import com.seongje.studyolle.domain.study.StudyMember;
+import com.seongje.studyolle.domain.study.StudyTagItem;
+import com.seongje.studyolle.domain.study.StudyZoneItem;
 import com.seongje.studyolle.modules.account.repository.AccountRepository;
 import com.seongje.studyolle.modules.study.form.StudyDescriptionsForm;
 import com.seongje.studyolle.modules.study.repository.StudyMemberRepository;
 import com.seongje.studyolle.modules.study.repository.StudyRepository;
+import com.seongje.studyolle.modules.study.repository.StudyTagItemRepository;
+import com.seongje.studyolle.modules.study.repository.StudyZoneItemRepository;
+import com.seongje.studyolle.modules.tag.TagForm;
+import com.seongje.studyolle.modules.tag.TagRepository;
+import com.seongje.studyolle.modules.zone.ZoneRepository;
 import eu.maxschuster.dataurl.DataUrl;
 import eu.maxschuster.dataurl.DataUrlBuilder;
 import eu.maxschuster.dataurl.IDataUrlSerializer;
@@ -24,6 +33,8 @@ import java.io.*;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.seongje.studyolle.domain.study.ManagementLevel.*;
@@ -38,6 +49,10 @@ public class StudyService {
     private final AccountRepository accountRepository;
     private final StudyRepository studyRepository;
     private final StudyMemberRepository studyMemberRepository;
+    private final TagRepository tagRepository;
+    private final StudyTagItemRepository studyTagItemRepository;
+    private final ZoneRepository zoneRepository;
+    private final StudyZoneItemRepository studyZoneItemRepository;
     private final ModelMapper modelMapper;
     private final ResourceLoader resourceLoader;
     private final IDataUrlSerializer dataUrlSerializer;
@@ -131,6 +146,54 @@ public class StudyService {
         if (!use) {
             findStudy.setBannerImg(null);
         }
+    }
+
+    public Set<String> getStudyTags(Study study) {
+        Study findStudy = studyRepository.findByPath(study.getPath());
+        Set<StudyTagItem> studyTagItems = findStudy.getTags();
+
+        return studyTagItems.stream().map(studyTagItem -> studyTagItem.getTag().getTitle()).collect(Collectors.toSet());
+    }
+
+    @Transactional
+    public void addStudyTag(Study study, Tag tag) {
+        Study findStudy = studyRepository.findByPath(study.getPath());
+        Tag findTag = tagRepository.findByTitle(tag.getTitle());
+
+        StudyTagItem newStudyTagItem = studyTagItemRepository.save(StudyTagItem.createStudyTagItem(findStudy, findTag));
+        findStudy.addTagItem(newStudyTagItem);
+    }
+
+    @Transactional
+    public void removeStudyTag(Study study, Tag tag) {
+        Study findStudy = studyRepository.findByPath(study.getPath());
+        Tag findTag = tagRepository.findByTitle(tag.getTitle());
+
+        findStudy.removeTagItem(findTag);
+    }
+
+    public Set<String> getStudyZones(Study study) {
+        Study findStudy = studyRepository.findByPath(study.getPath());
+        Set<StudyZoneItem> zones = findStudy.getZones();
+
+        return zones.stream().map(studyZoneItem -> studyZoneItem.getZone().toString()).collect(Collectors.toSet());
+    }
+
+    @Transactional
+    public void addStudyZone(Study study, Zone zone) {
+        Study findStudy = studyRepository.findByPath(study.getPath());
+        Zone findZone = zoneRepository.findByCityAndLocalNameOfCity(zone.getCity(), zone.getLocalNameOfCity());
+
+        StudyZoneItem newStudyZoneItem = studyZoneItemRepository.save(StudyZoneItem.createStudyZoneItem(findStudy, findZone));
+        findStudy.addZoneItem(newStudyZoneItem);
+    }
+
+    @Transactional
+    public void removeStudyZone(Study study, Zone zone) {
+        Study findStudy = studyRepository.findByPath(study.getPath());
+        Zone findZone = zoneRepository.findByCityAndLocalNameOfCity(zone.getCity(), zone.getLocalNameOfCity());
+
+        findStudy.removeZoneItem(findZone);
     }
 
     private String getImageDataUrl(String basicBanner) throws IOException {

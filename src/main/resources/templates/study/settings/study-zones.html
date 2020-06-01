@@ -11,13 +11,33 @@
 
     <div th:replace="fragments.html :: study-menu (studyMenu='settings')"></div>
 
-    <div class="row mt-3 justify-content-center">
-        <div class="col-2">
+    <div class="row px-3 justify-content-center" style="height: 450px; max-height: 100%;">
+        <div class="col-2 pl-3 pt-5 bg-white rounded-bottom">
             <div th:replace="fragments.html :: study-settings-menu (currentMenu='study-zones')"></div>
         </div>
 
-        <div class="col-8">
+        <div class="col-8 pt-5 px-5 bg-white rounded-bottom">
+            <div class="row">
+                <h2 class="col-sm-12">활동 지역</h2>
+            </div>
 
+            <div class="row mt-3">
+                <div class="col-10">
+                    <div class="alert alert-info ml-1" role="alert">
+                        <p><strong>활동 지역</strong>를 태그로 등록해보세요.</p>
+                        <p>가까운 곳에 함께 스터디할 멤버가 기다리고 있습니다.</p>
+                    </div>
+
+                    <small id="zonesHelp" class="text-muted ml-1">
+                        시스템에 등록된 지역만 선택할 수 있습니다. 입력 창을 클릭하여 확인하세요.
+                    </small>
+
+                    <div id="whitelist" th:text="${whitelist}" hidden></div>
+
+                    <input id="zones" type="text" name="tags-outside" class="tagify-outside"
+                           th:value="${#strings.listJoin(zones, ',')}" aria-describedby="zonesHelp"/>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -25,5 +45,7 @@
 </div>
 
 <script th:replace="fragments.html :: tooltip"></script>
+<script th:replace="fragments.html :: ajax-csrf-header"></script>
+<div th:replace="fragments.html :: update-zones (baseUrl='/study/studies/' + ${study.path} + '/settings/study-zones')"></div>
 </body>
 </html>

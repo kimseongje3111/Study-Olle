@@ -416,7 +416,7 @@
 </div>
 
 <!-- member list -->
-<div th:fragment="member-list (members)" class="row px-3 justify-content-center">
+<div th:fragment="member-list (members)" class="row px-3 justify-content-center" style="height: 450px; max-height: 100%;">
     <ul class="list-unstyled col-10 bg-white rounded-bottom">
         <li class="media my-3" th:each="member: ${members}">
             <svg th:if="${#strings.isEmpty(member.account?.profileImg)}"

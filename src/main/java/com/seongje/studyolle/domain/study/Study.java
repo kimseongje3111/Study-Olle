@@ -76,6 +76,24 @@ public class Study {
         studyMember.setStudy(this);
     }
 
+    public void addTagItem(StudyTagItem studyTagItem) {
+        this.tags.add(studyTagItem);
+        studyTagItem.setStudy(this);
+    }
+
+    public void removeTagItem(Tag tag) {
+        this.tags.removeIf(studyTagItem -> studyTagItem.getTag().equals(tag));
+    }
+
+    public void addZoneItem(StudyZoneItem studyZoneItem) {
+        this.zones.add(studyZoneItem);
+        studyZoneItem.setStudy(this);
+    }
+
+    public void removeZoneItem(Zone zone) {
+        this.zones.removeIf(studyZoneItem -> studyZoneItem.getZone().equals(zone));
+    }
+
     // 비지니스 메서드 //
 
     public boolean isJoinable(UserAccount userAccount) {

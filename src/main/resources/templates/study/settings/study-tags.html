@@ -11,13 +11,33 @@
 
     <div th:replace="fragments.html :: study-menu (studyMenu='settings')"></div>
 
-    <div class="row mt-3 justify-content-center">
-        <div class="col-2">
+    <div class="row px-3 justify-content-center" style="height: 450px; max-height: 100%;">
+        <div class="col-2 pl-3 pt-5 bg-white rounded-bottom">
             <div th:replace="fragments.html :: study-settings-menu (currentMenu='study-tags')"></div>
         </div>
 
-        <div class="col-8">
+        <div class="col-8 pt-5 px-5 bg-white rounded-bottom">
+            <div class="row">
+                <h2 class="col-sm-12">스터디 주제</h2>
+            </div>
 
+            <div class="row mt-3">
+                <div class="col-10">
+                    <div class="alert alert-info ml-1" role="alert">
+                        <p><strong>현재 스터디에서 주로 다루는 주제</strong>를 태그로 등록해보세요.</p>
+                        <p>등록된 태그들은 활동 지역과 함께 스터디 메뉴 상단에 표시됩니다.</p>
+                    </div>
+
+                    <small id="tagsHelp" class="text-muted ml-1">
+                        태그를 입력하고 엔터를 눌러 등록하세요. 또한 입력 창을 클릭하여 이미 등록된 태그들을 확인할 수 있습니다.
+                    </small>
+
+                    <div id="whitelist" th:text="${whitelist}" hidden></div>
+
+                    <input id="tags" type="text" name="tags-outside" class="tagify-outside"
+                           th:value="${#strings.listJoin(tags, ',')}" aria-describedby="tagsHelp"/>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -25,5 +45,7 @@
 </div>
 
 <script th:replace="fragments.html :: tooltip"></script>
+<script th:replace="fragments.html :: ajax-csrf-header"></script>
+<div th:replace="fragments.html :: update-tags (baseUrl='/study/studies/' + ${study.path} + '/settings/study-tags')"></div>
 </body>
 </html>

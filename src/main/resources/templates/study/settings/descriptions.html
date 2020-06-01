@@ -16,7 +16,7 @@
             <div th:replace="fragments.html :: study-settings-menu (currentMenu='descriptions')"></div>
         </div>
 
-        <div class="col-8 pt-5 bg-white rounded-bottom">
+        <div class="col-8 pt-5 px-5 bg-white rounded-bottom">
             <div th:replace="fragments.html :: redirect-message"></div>
 
             <form class="needs-validation col-sm-10" th:action="@{'/study/studies/' + ${study.path} + '/settings/descriptions'}"
