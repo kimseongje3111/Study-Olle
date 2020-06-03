@@ -72,11 +72,8 @@ public class AccountSettingController {
     }
 
     @PostMapping(PROFILE)
-    public String updateProfileFormSubmit(@CurrentUser Account account,
-                                          @Valid ProfileForm profileForm,
-                                          Errors errors,
-                                          Model model,
-                                          RedirectAttributes attributes) {
+    public String updateProfileFormSubmit(@CurrentUser Account account, @Valid ProfileForm profileForm,
+                                          Errors errors, Model model, RedirectAttributes attributes) {
 
         if (errors.hasErrors()) {
             model.addAttribute(account);
@@ -98,11 +95,8 @@ public class AccountSettingController {
     }
 
     @PostMapping(PASSWORD)
-    public String updatePasswordFormSubmit(@CurrentUser Account account,
-                                           @Valid PasswordForm passwordForm,
-                                           Errors errors,
-                                           Model model,
-                                           RedirectAttributes attributes) {
+    public String updatePasswordFormSubmit(@CurrentUser Account account, @Valid PasswordForm passwordForm,
+                                           Errors errors, Model model, RedirectAttributes attributes) {
 
         if (errors.hasErrors()) {
             model.addAttribute(account);
@@ -124,11 +118,8 @@ public class AccountSettingController {
     }
 
     @PostMapping(NOTIFICATIONS)
-    public String updatedNotificationsFormSubmit(@CurrentUser Account account,
-                                                 @Valid NotificationsForm notificationsForm,
-                                                 Errors errors,
-                                                 Model model,
-                                                 RedirectAttributes attributes) {
+    public String updatedNotificationsFormSubmit(@CurrentUser Account account, @Valid NotificationsForm notificationsForm,
+                                                 Errors errors, Model model, RedirectAttributes attributes) {
 
         if (errors.hasErrors()) {
             model.addAttribute(account);
@@ -226,11 +217,8 @@ public class AccountSettingController {
     }
 
     @PostMapping(ACCOUNT)
-    public String updateAccountFormSubmit(@CurrentUser Account account,
-                                          @Valid AccountForm accountForm,
-                                          Errors errors,
-                                          Model model,
-                                          RedirectAttributes attributes) {
+    public String updateAccountFormSubmit(@CurrentUser Account account, @Valid AccountForm accountForm,
+                                          Errors errors, Model model, RedirectAttributes attributes) {
 
         if (errors.hasErrors()) {
             model.addAttribute(account);

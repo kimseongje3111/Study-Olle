@@ -49,10 +49,8 @@ public class StudyController {
 
     @SneakyThrows
     @PostMapping(NEW_STUDY)
-    public String newStudySubmit(@CurrentUser Account account,
-                                 @Valid StudyForm studyForm,
-                                 Errors errors,
-                                 Model model) {
+    public String newStudySubmit(@CurrentUser Account account, @Valid StudyForm studyForm,
+                                 Errors errors, Model model) {
 
         if (errors.hasErrors()) {
             model.addAttribute(account);

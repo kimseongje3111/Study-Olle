@@ -12,11 +12,11 @@
     </div>
 
     <div class="row justify-content-center">
-        <div th:if="${error}" class="alert alert-danger col-sm-6 mr-2" role="alert">
-            <p th:text="${error}">오류 메시지</p>
+        <div th:if="${error}" class="alert alert-danger col-sm-6" role="alert">
+            <span th:text="${error}">오류 메시지</span>
         </div>
 
-        <div th:if="${message}" class="alert alert-info col-sm-6 mr-2" role="alert">
+        <div th:if="${message}" class="alert alert-info col-sm-6" role="alert">
             <p th:text="${message}">메시지</p>
             <strong><small th:text="${account.email}">your@email.com</small></strong>
         </div>

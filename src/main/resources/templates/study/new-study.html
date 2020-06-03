@@ -14,14 +14,14 @@
         <form class="needs-validation col-sm-10" th:action="@{/study/new-study}" th:object="${studyForm}"
               method="post" novalidate>
             <div class="form-group">
-                <label for="path">스터디 URL</label>
+                <label for="path">스터디 경로</label>
                 <input id="path" type="text" th:field="*{path}" class="form-control"
                        placeholder="공백없이 문자, 숫자, 대시(-)와 언더바(_)만 사용하여 2자 이상 20자 이내로 입력하세요."
                        aria-describedby="pathHelp" minlength="2" maxlength="20" required>
                 <small id="pathHelp" class="form-text text-muted">
-                    입력한 URL은 현재 개설할 스터디 홈 주소에 사용됩니다. 예) /study/studies/<b>my-study-path</b>
+                    입력한 경로는 현재 개설할 스터디 홈 주소에 사용됩니다. 예) /study/studies/<b>my-study-path</b>
                 </small>
-                <small class="invalid-feedback">스터디 경로를 입력하세요.</small>
+                <small class="invalid-feedback">값이 비어있거나 형식에 맞지 않습니다.</small>
                 <small class="form-text text-danger" th:if="${#fields.hasErrors('path')}" th:errors="*{path}">
                     Path Error
                 </small>
@@ -34,7 +34,7 @@
                 <small id="titleHelp" class="form-text text-muted">
                     자유롭게 50자 이내로 입력하세요.
                 </small>
-                <small class="invalid-feedback">스터디 이름을 입력하세요.</small>
+                <small class="invalid-feedback">값이 비어있거나 형식에 맞지 않습니다.</small>
                 <small class="form-text text-danger" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">
                     Title Error
                 </small>
@@ -49,7 +49,7 @@
                 <small id="shortDescriptionHelp" class="form-text text-muted">
                     자유롭게 100자 이내로 입력하세요.
                 </small>
-                <small class="invalid-feedback">짧은 소개를 입력하세요.</small>
+                <small class="invalid-feedback">값이 비어있거나 형식에 맞지 않습니다.</small>
                 <small class="form-text text-danger" th:if="${#fields.hasErrors('shortDescription')}" th:errors="*{shortDescription}">
                     ShortDescription Error
                 </small>
@@ -63,7 +63,7 @@
                 <small id="fullDescriptionHelp" class="form-text text-muted">
                     스터디의 목표, 일정, 진행 방식, 사용할 교재 또는 강좌, 모집 중인 스터디 멤버 등 본 스터디에 대해 자세히 적어주세요.
                 </small>
-                <small class="invalid-feedback">상세 소개를 입력하세요.</small>
+                <small class="invalid-feedback">값이 비어있거나 형식에 맞지 않습니다.</small>
                 <small class="form-text text-danger" th:if="${#fields.hasErrors('fullDescription')}" th:errors="*{fullDescription}">
                     FullDescription Error
                 </small>

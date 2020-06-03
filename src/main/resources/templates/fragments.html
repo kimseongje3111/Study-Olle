@@ -27,6 +27,10 @@
             padding: 0;
             margin: 0;
         }
+
+        button:focus {
+            outline: none;
+        }
     </style>
 </head>
 
@@ -293,9 +297,9 @@
 </script>
 
 <!-- study banner -->
-<div th:fragment="study-banner" th:if="${study.useBanner}" class="row" id="study-logo" style="height: 150px;">
-    <img th:src="${study.bannerImg}" class="w-50 mh-100"/>
-    <img th:src="${study.bannerImg}" class="w-50 mh-100"/>
+<div th:fragment="study-banner" th:if="${study.useBanner && study.bannerImg != null}"
+     class="row" id="study-logo" style="height: 150px;">
+    <img th:src="${study.bannerImg}" class="w-100 h-100"/>
 </div>
 
 <!-- study info -->
@@ -309,51 +313,53 @@
 
         <div class="col-4 text-right justify-content-end">
             <!-- study state -->
-            <span th:if="${study.published}" class="d-inline-block" tabindex="0" data-toggle="tooltip"
+            <span th:if="${study.published && !study.closed}" class="d-inline-block" tabindex="0" data-toggle="tooltip"
                   data-placement="bottom" title="스터디 공개 중">
-                    <button class="btn btn-success btn-sm" style="pointer-events: none;" type="button" disabled>
+                    <button class="btn btn-success btn-sm font-weight-bold" style="pointer-events: none;" type="button" disabled>
                         STUDY-OPEN
                     </button>
             </span>
-            <span th:if="${!study.published}" class="d-inline-block" tabindex="0" data-toggle="tooltip"
+            <span th:if="${!study.published && !study.closed}" class="d-inline-block" tabindex="0" data-toggle="tooltip"
                   data-placement="bottom" title="스터디 공개 준비 중">
-                    <button class="btn btn-warning btn-sm" style="pointer-events: none;" type="button" disabled>
+                    <button class="btn btn-warning btn-sm font-weight-bold" style="pointer-events: none;" type="button" disabled>
                         STUDY-DRAFT
                     </button>
             </span>
             <span th:if="${study.closed}" class="d-inline-block" tabindex="0" data-toggle="tooltip"
                   data-placement="bottom" title="스터디 종료함">
-                    <button class="btn btn-danger btn-sm" style="pointer-events: none;" type="button" disabled>
+                    <button class="btn btn-danger btn-sm font-weight-bold" style="pointer-events: none;" type="button" disabled>
                         STUDY-CLOSED
                     </button>
             </span>
 
             <!-- recruiting state -->
-            <span th:if="${study.recruiting}" class="d-inline-block ml-1" tabindex="0" data-toggle="tooltip"
-                  data-placement="bottom" title="팀원 모집 중">
-                    <button class="btn btn-success btn-sm" style="pointer-events: none;" type="button" disabled>
+            <span th:if="${study.published && study.recruiting && !study.closed}" class="d-inline-block ml-1"
+                  tabindex="0" data-toggle="tooltip" data-placement="bottom" title="팀원 모집 중">
+                    <button class="btn btn-success btn-sm font-weight-bold" style="pointer-events: none;" type="button" disabled>
                         APPLY-ON
                     </button>
             </span>
-            <span th:if="${!study.recruiting}" class="d-inline-block ml-1" tabindex="0" data-toggle="tooltip"
-                  data-placement="bottom" title="팀원 모집 중 아님">
-                    <button class="btn btn-warning btn-sm" style="pointer-events: none;" type="button" disabled>
+            <span th:if="${study.published && !study.recruiting && !study.closed}" class="d-inline-block ml-1"
+                  tabindex="0" data-toggle="tooltip" data-placement="bottom" title="팀원 모집 중 아님">
+                    <button class="btn btn-warning btn-sm font-weight-bold" style="pointer-events: none;" type="button" disabled>
                         APPLY-OFF
                     </button>
             </span>
 
             <!-- member menu -->
             <span sec:authorize="isAuthenticated()"
-                  th:if="${study.isJoinable(#authentication.principal)}" class="btn-group ml-1" role="group">
-                    <a class="btn btn-info mr-1" th:href="@{'/study/studies/' + ${study.path} + '/join'}">스터디 가입</a>
+                  th:if="${study.canJoin(#authentication.principal)}" class="btn-group ml-1" role="group">
+                    <a class="btn btn-primary" th:href="@{'/study/studies/' + ${study.path} + '/join'}">
+                        스터디 가입
+                    </a>
                     <a class="btn btn-outline-primary" th:href="@{'/study/studies/' + ${study.path} + '/members'}"
                        th:text="${study.memberCount}" data-toggle="tooltip" title="참여 중인 인원">0</a>
             </span>
             <span sec:authorize="isAuthenticated()"
-                  th:if="${!study.closed && study.isMember(#authentication.principal)}" class="btn-group ml-" role="group">
-                    <a class="btn btn-outline-danger mr-1" th:href="@{'/study/studies/' + ${study.path} + '/leave'}">스터디 탈퇴</a>
-                    <a class="btn btn-outline-primary" th:href="@{'/study/studies/' + ${study.path} + '/members'}"
-                       th:text="${study.memberCount}" data-toggle="tooltip" title="참여 중인 인원">0</a>
+                  th:if="${!study.closed && study.isMember(#authentication.principal)}">
+                    <a class="btn btn-outline-danger" th:href="@{'/study/studies/' + ${study.path} + '/leave'}">
+                        스터디 탈퇴
+                    </a>
             </span>
 
             <!-- manager menu -->
@@ -375,16 +381,16 @@
     <div class="row justify-content-center bg-light mt-1">
         <div class="col-10">
             <p>
-                <span th:each="tag: ${study.tags}"
+                <span th:each="tagItem: ${study.tags}"
                       class="font-weight-light text-monospace badge badge-pill badge-info mr-3">
-                    <a th:href="@{'/search/tag/' + ${tag.title}}" class="text-decoration-none text-white">
-                        <i class="fa fa-tag"></i> <span th:text="${tag.title}">Tag</span>
+                    <a th:href="@{'/search/tag/' + ${tagItem.tag.title}}" class="text-decoration-none text-white">
+                        <i class="fa fa-tag"></i> <span th:text="${tagItem.tag.title}">Tag</span>
                     </a>
                 </span>
 
-                <span th:each="zone: ${study.zones}" class="font-weight-light text-monospace badge badge-primary mr-3">
-                    <a th:href="@{'/search/zone/' + ${zone.id}}" class="text-decoration-none text-white">
-                        <i class="fa fa-globe"></i> <span th:text="${zone.localNameOfCity}">City</span>
+                <span th:each="zoneItem: ${study.zones}" class="font-weight-light text-monospace badge badge-primary mr-3">
+                    <a th:href="@{'/search/zone/' + ${zoneItem.zone.id}}" class="text-decoration-none text-white">
+                        <i class="fa fa-globe"></i> <span th:text="${zoneItem.zone.localNameOfCity}">City</span>
                     </a>
                 </span>
             </p>

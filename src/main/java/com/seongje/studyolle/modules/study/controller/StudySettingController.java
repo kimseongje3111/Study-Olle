@@ -47,10 +47,7 @@ public class StudySettingController {
     private final ObjectMapper objectMapper;
 
     @GetMapping(DESCRIPTIONS)
-    public String studyDescriptionsForm(@CurrentUser Account account,
-                                        @PathVariable String path,
-                                        Model model) {
-
+    public String studyDescriptionsForm(@CurrentUser Account account, @PathVariable String path, Model model) {
         Study findStudy = studyService.findStudyForUpdate(path, account);
 
         model.addAttribute(account);
@@ -62,12 +59,9 @@ public class StudySettingController {
 
     @SneakyThrows
     @PostMapping(DESCRIPTIONS)
-    public String studyDescriptionsFormUpdate(@CurrentUser Account account,
-                                              @PathVariable String path,
+    public String studyDescriptionsFormUpdate(@CurrentUser Account account, @PathVariable String path,
                                               @Valid StudyDescriptionsForm studyDescriptionsForm,
-                                              Errors errors,
-                                              Model model,
-                                              RedirectAttributes attributes) {
+                                              Errors errors, Model model, RedirectAttributes attributes) {
 
         Study findStudy = studyService.findStudyForUpdate(path, account);
 
@@ -99,10 +93,8 @@ public class StudySettingController {
 
     @SneakyThrows
     @PostMapping(BANNER)
-    public String studyBannerFormUpdate(@CurrentUser Account account,
-                                        @PathVariable String path,
-                                        String studyBannerImage,
-                                        String basicBanner,
+    public String studyBannerFormUpdate(@CurrentUser Account account, @PathVariable String path,
+                                        String studyBannerImage, String basicBanner,
                                         RedirectAttributes attributes) {
 
         Study findStudy = studyService.findStudyForUpdate(path, account);
@@ -141,7 +133,9 @@ public class StudySettingController {
     }
 
     @GetMapping(STUDY_TAGS)
-    public String studyTagsForm(@CurrentUser Account account, @PathVariable String path, Model model) throws JsonProcessingException {
+    public String studyTagsForm(@CurrentUser Account account, @PathVariable String path,
+                                Model model) throws JsonProcessingException {
+
         Study findStudy = studyService.findStudyForUpdate(path, account);
         Set<String> studyTags = studyService.getStudyTags(findStudy);
         List<String> allTags = tagService.getAllTags();
@@ -156,8 +150,7 @@ public class StudySettingController {
 
     @PostMapping(STUDY_TAGS + "/add")
     @ResponseBody
-    public ResponseEntity addStudyTags(@CurrentUser Account account,
-                                       @PathVariable String path,
+    public ResponseEntity addStudyTags(@CurrentUser Account account, @PathVariable String path,
                                        @RequestBody TagForm tagForm) {
 
         Tag findOrNewTag = tagService.findOrCreateTag(tagForm.getTagTitle());
@@ -169,8 +162,7 @@ public class StudySettingController {
     }
 
     @PostMapping(STUDY_TAGS + "/remove")
-    public ResponseEntity removeStudyTags(@CurrentUser Account account,
-                                          @PathVariable String path,
+    public ResponseEntity removeStudyTags(@CurrentUser Account account, @PathVariable String path,
                                           @RequestBody TagForm tagForm) {
 
         Tag findTag = tagService.findByTagTitle(tagForm.getTagTitle());
@@ -186,7 +178,9 @@ public class StudySettingController {
     }
 
     @GetMapping(STUDY_ZONES)
-    public String studyZonesForm(@CurrentUser Account account, @PathVariable String path, Model model) throws JsonProcessingException {
+    public String studyZonesForm(@CurrentUser Account account, @PathVariable String path,
+                                 Model model) throws JsonProcessingException {
+
         Study findStudy = studyService.findStudyForUpdate(path, account);
         Set<String> studyZones = studyService.getStudyZones(findStudy);
         List<String> allZones = zoneService.getAllZones();
@@ -201,9 +195,8 @@ public class StudySettingController {
 
     @PostMapping(STUDY_ZONES + "/add")
     @ResponseBody
-    public ResponseEntity addStudyZones(@CurrentUser Account account,
-                                       @PathVariable String path,
-                                       @RequestBody ZoneForm zoneForm) {
+    public ResponseEntity addStudyZones(@CurrentUser Account account, @PathVariable String path,
+                                        @RequestBody ZoneForm zoneForm) {
 
         Zone findZone = zoneService.findZone(zoneForm);
         Study findStudy = studyService.findStudyForUpdate(path, account);
@@ -214,9 +207,8 @@ public class StudySettingController {
     }
 
     @PostMapping(STUDY_ZONES + "/remove")
-    public ResponseEntity removeStudyZones(@CurrentUser Account account,
-                                          @PathVariable String path,
-                                          @RequestBody ZoneForm zoneForm) {
+    public ResponseEntity removeStudyZones(@CurrentUser Account account, @PathVariable String path,
+                                           @RequestBody ZoneForm zoneForm) {
 
         Zone findZone = zoneService.findZone(zoneForm);
         Study findStudy = studyService.findStudyForUpdate(path, account);
@@ -228,5 +220,126 @@ public class StudySettingController {
         studyService.removeStudyZone(findStudy, findZone);
 
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping(DETAILS)
+    public String studyDetailsForm(@CurrentUser Account account, @PathVariable String path, Model model) {
+        Study findStudy = studyService.findStudyForUpdate(path, account);
+
+        model.addAttribute(account);
+        model.addAttribute(findStudy);
+
+        return STUDY_SETTINGS + DETAILS;
+    }
+
+    @SneakyThrows
+    @PostMapping(DETAILS + "/publish")
+    public String studyPublish(@CurrentUser Account account, @PathVariable String path,
+                               RedirectAttributes attributes) {
+
+        Study findStudy = studyService.findStudyForUpdate(path, account);
+
+        studyService.studyPublish(findStudy);
+        attributes.addFlashAttribute("message", "스터디를 공개했습니다.");
+
+        return REDIRECT + findStudy.getEncodedPath() + "/settings" + DETAILS;
+    }
+
+    @SneakyThrows
+    @PostMapping(DETAILS + "/close")
+    public String studyClose(@CurrentUser Account account, @PathVariable String path,
+                             RedirectAttributes attributes) {
+
+        Study findStudy = studyService.findStudyForUpdate(path, account);
+
+        studyService.studyClose(findStudy);
+        attributes.addFlashAttribute("message", "스터디를 종료했습니다.");
+
+        return REDIRECT + findStudy.getEncodedPath() + "/settings" + DETAILS;
+    }
+
+    @SneakyThrows
+    @PostMapping(DETAILS + "/recruit-start")
+    public String studyRecruitStart(@CurrentUser Account account, @PathVariable String path,
+                                    RedirectAttributes attributes) {
+
+        Study findStudy = studyService.findStudyForUpdate(path, account);
+
+        if (!findStudy.canUpdateRecruiting()) {
+            attributes.addFlashAttribute("message", "현재는 팀원 모집 상태를 변경할 수 없습니다.");
+            return REDIRECT + findStudy.getEncodedPath() + "/settings" + DETAILS;
+        }
+
+        studyService.studyRecruitStart(findStudy);
+        attributes.addFlashAttribute("message", "팀원 모집을 시작합니다.");
+
+        return REDIRECT + findStudy.getEncodedPath() + "/settings" + DETAILS;
+    }
+
+    @SneakyThrows
+    @PostMapping(DETAILS + "/recruit-stop")
+    public String studyRecruitStop(@CurrentUser Account account, @PathVariable String path,
+                                   RedirectAttributes attributes) {
+
+        Study findStudy = studyService.findStudyForUpdate(path, account);
+
+        if (!findStudy.canUpdateRecruiting()) {
+            attributes.addFlashAttribute("message", "현재는 팀원 모집 상태를 변경할 수 없습니다.");
+            return REDIRECT + findStudy.getEncodedPath() + "/settings" + DETAILS;
+        }
+
+        studyService.studyRecruitStop(findStudy);
+        attributes.addFlashAttribute("message", "팀원 모집을 중단합니다.");
+
+        return REDIRECT + findStudy.getEncodedPath() + "/settings" + DETAILS;
+    }
+
+    @SneakyThrows
+    @PostMapping(DETAILS + "/title")
+    public String studyTitleUpdate(@CurrentUser Account account, @PathVariable String path,
+                                   String newTitle, Model model, RedirectAttributes attributes) {
+
+        Study findStudy = studyService.findStudyForUpdate(path, account);
+
+        if (!studyService.studyTitleUpdate(findStudy, newTitle)) {
+            model.addAttribute(account);
+            model.addAttribute(findStudy);
+            model.addAttribute("studyTitleError", "스터디 이름이 너무 깁니다.");
+
+            return STUDY_SETTINGS + DETAILS;
+        }
+
+        attributes.addFlashAttribute("message", "스터디 이름이 변경되었습니다.");
+
+        return REDIRECT + findStudy.getEncodedPath() + "/settings" + DETAILS;
+    }
+
+    @SneakyThrows
+    @PostMapping(DETAILS + "/path")
+    public String studyPathUpdate(@CurrentUser Account account, @PathVariable String path,
+                                  String newPath, Model model, RedirectAttributes attributes) {
+
+        Study findStudy = studyService.findStudyForUpdate(path, account);
+
+        if (!studyService.studyPathUpdate(findStudy, newPath)) {
+            model.addAttribute(account);
+            model.addAttribute(findStudy);
+            model.addAttribute("studyTitleError", "입력 값이 형식에 맞지 않거나 이미 사용 중인 스터디 경로입니다.");
+
+            return STUDY_SETTINGS + DETAILS;
+        }
+
+        attributes.addFlashAttribute("message", "스터디 경로가 변경되었습니다.");
+
+        return REDIRECT + findStudy.getEncodedPath() + "/settings" + DETAILS;
+    }
+
+    @PostMapping(DETAILS + "/delete")
+    public String studyDelete(@CurrentUser Account account, @PathVariable String path) {
+        Study findStudy = studyService.findStudyForUpdate(path, account);
+
+        studyService.studyDelete(findStudy);
+
+        return "redirect:/";
     }
 }

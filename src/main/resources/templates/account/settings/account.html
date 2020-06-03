@@ -22,7 +22,7 @@
             </div>
 
             <div class="row">
-                <h2 class="col-sm-12">닉네임 변경</h2>
+                <h2 class="col-sm-12">닉네임</h2>
             </div>
 
             <div class="row mt-3">
@@ -36,8 +36,8 @@
                         <input id="nickname" type="text" th:field="*{nickname}" class="form-control"
                                aria-describedby="nicknameHelp" minlength="3" maxlength="20" required>
                         <small id="nicknameHelp" class="form-text text-muted">
-                            공백없이 문자와 숫자로만 이루어진 형식이며 3자 이상 20자 이내로 입력하세요.
-                            <br>닉네임 변경은 하루에 한번만 가능합니다.
+                            공백없이 문자와 숫자로만 이루어진 형식이며 3자 이상 20자 이내로 입력하세요.<br>
+                            닉네임 변경은 하루에 한번만 가능합니다.
                         </small>
                         <small class="invalid-feedback">값이 비어있거나 형식에 맞지 않습니다.</small>
                         <small class="form-text text-danger" th:if="${#fields.hasErrors('nickname')}"
@@ -47,14 +47,14 @@
                     </div>
 
                     <div class="form-group mt-4">
-                        <button class="btn btn-outline-primary" type="submit" aria-describedby="submitHelp">
-                            변경하기
+                        <button class="btn btn-outline-warning" type="submit" aria-describedby="submitHelp">
+                            닉네임 변경
                         </button>
                     </div>
                 </form>
             </div>
 
-            <div class="dropdown-divider col-8 mt-5"></div>
+            <div class="dropdown-divider col-8 mt-4"></div>
 
             <div class="row mt-3">
                 <h2 class="col-sm-12 text-danger">계정 삭제</h2>

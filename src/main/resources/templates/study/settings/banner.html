@@ -27,12 +27,12 @@
                           method="post" novalidate>
                         <div class="alert alert-primary" role="alert">
                             <p>스터디 배너 이미지를 <strong>사용합니다.</strong></p>
-                            <p>스터디 배너 이미지를 설정하지 않으면 기본 배너 이미지를 사용합니다.</p>
+                            스터디 배너 이미지를 설정하지 않으면 기본 배너 이미지를 사용합니다.
                         </div>
 
                         <div class="form-group mt-4">
                             <button class="btn btn-outline-primary btn-block" type="submit" aria-describedby="submitHelp">
-                                배너 이미지 사용하기
+                                배너 이미지 사용
                             </button>
                         </div>
                     </form>
@@ -41,12 +41,12 @@
                           method="post" novalidate>
                         <div class="alert alert-info" role="alert">
                             <p>스터디 배너 이미지를 <strong>사용하지 않습니다.</strong> (※ 현재 배너 이미지는 삭제됩니다)</p>
-                            <p>스터디 배너 이미지를 설정하지 않으면 스터디 목록에서는 기본 배너 이미지로 표시됩니다.</p>
+                            스터디 배너 이미지를 설정하지 않으면 스터디 목록에서는 기본 배너 이미지로 표시됩니다.
                         </div>
 
                         <div class="form-group mt-4">
                             <button class="btn btn-primary btn-block" type="submit" aria-describedby="submitHelp">
-                                배너 이미지 사용하기 않기
+                                배너 이미지 사용 안함
                             </button>
                         </div>
                     </form>
@@ -54,7 +54,7 @@
             </div>
 
             <div class="row mt-3" th:if="${study.useBanner}">
-                <div class="dropdown-divider col-sm-12 mt-5"></div>
+                <div class="dropdown-divider col-sm-12 mt-4"></div>
 
                 <div class="col-10">
                     <form id="bannerImageForm" th:action="@{'/study/studies/' + ${study.path} + '/settings/banner'}"
@@ -113,19 +113,19 @@
 
     <!-- basic banners modal -->
     <div class="modal fade" id="basicBannersModal" tabindex="-1" role="dialog" aria-labelledby="basicBannersModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
             <div class="modal-content justify-content-center">
                 <div class="modal-header">
                     <h5 class="modal-title text-muted" id="basicBannersModalLabel">기본 배너 이미지 목록</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close border-0" data-dismiss="modal" aria-label="Close">
                         <i class="fa fa-times-circle" aria-hidden="true"></i>
                     </button>
                 </div>
 
-                <div class="modal-body bg-light" style="max-height: 600px">
+                <div class="modal-body bg-light">
                     <form id="basicBannerForm" th:action="@{'/study/studies/' + ${study.path} + '/settings/banner'}"
                           method="post" novalidate>
-                        <div th:each="file_name : ${basic_banners}" class="row my-2">
+                        <div th:each="file_name : ${basic_banners}" class="row my-3">
                             <div class="custom-control custom-radio mx-3 d-flex align-items-center">
                                 <input type="radio" th:id="${file_name}" name="basicBanner"
                                        class="custom-control-input" th:value="${file_name}">
@@ -191,7 +191,7 @@
                         let img = document.createElement("img");
                         img.id = 'new-banner';
                         img.src = e.target.result;
-                        img.setAttribute('width', '99%');
+                        img.setAttribute('width', '100%');
 
                         $newBannerImage.html(img);
                         $newBannerImage.show();

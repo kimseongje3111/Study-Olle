@@ -13,7 +13,6 @@ import com.seongje.studyolle.modules.study.repository.StudyMemberRepository;
 import com.seongje.studyolle.modules.study.repository.StudyRepository;
 import com.seongje.studyolle.modules.study.repository.StudyTagItemRepository;
 import com.seongje.studyolle.modules.study.repository.StudyZoneItemRepository;
-import com.seongje.studyolle.modules.tag.TagForm;
 import com.seongje.studyolle.modules.tag.TagRepository;
 import com.seongje.studyolle.modules.zone.ZoneRepository;
 import eu.maxschuster.dataurl.DataUrl;
@@ -33,7 +32,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -76,7 +74,7 @@ public class StudyService {
         Study findStudy = studyRepository.findByPath(path);
 
         if (findStudy == null) {
-            throw new IllegalStateException("요청한 '" + path + "'에 해당하는 스터디가 없습니다.");
+            throw new IllegalArgumentException("요청한 '" + path + "'에 해당하는 스터디가 없습니다.");
         }
 
         return findStudy;
@@ -87,12 +85,12 @@ public class StudyService {
         Study findStudy = studyRepository.findByPath(path);
 
         if (findStudy == null) {
-            throw new IllegalStateException("요청한 '" + path + "'에 해당하는 스터디가 없습니다.");
+            throw new IllegalArgumentException("요청한 '" + path + "'에 해당하는 스터디가 없습니다.");
         }
 
         if (findAccount != null) {
             if (!findStudy.isManagerBy(account)) {
-                throw new AccessDeniedException("해당 기능을 사용할 수 없습니다.");
+                throw new AccessDeniedException("해당 기능을 사용할 수 있는 권한이 없습니다.");
             }
 
             return findStudy;
@@ -194,6 +192,67 @@ public class StudyService {
         Zone findZone = zoneRepository.findByCityAndLocalNameOfCity(zone.getCity(), zone.getLocalNameOfCity());
 
         findStudy.removeZoneItem(findZone);
+    }
+
+    @Transactional
+    public void studyPublish(Study study) {
+        Study findStudy = studyRepository.findByPath(study.getPath());
+        findStudy.publish();
+    }
+
+    @Transactional
+    public void studyClose(Study study) {
+        Study findStudy = studyRepository.findByPath(study.getPath());
+        findStudy.close();
+    }
+
+    @Transactional
+    public void studyRecruitStart(Study study) {
+        Study findStudy = studyRepository.findByPath(study.getPath());
+        findStudy.startRecruiting();
+    }
+
+    @Transactional
+    public void studyRecruitStop(Study study) {
+        Study findStudy = studyRepository.findByPath(study.getPath());
+        findStudy.stopRecruiting();
+    }
+
+    @Transactional
+    public boolean studyTitleUpdate(Study study, String newTitle) {
+        if (newTitle.length() > 50) {
+            return false;
+        }
+
+        Study findStudy = studyRepository.findByPath(study.getPath());
+        findStudy.setTitle(newTitle);
+
+        return true;
+    }
+
+    @Transactional
+    public boolean studyPathUpdate(Study study, String newPath) {
+        String regex = "^[ㄱ-ㅎ가-힣a-zA-Z0-9_-]{2,20}$";
+
+        if (!newPath.matches(regex) || studyRepository.existsByPath(newPath)) {
+            return false;
+        }
+
+        Study findStudy = studyRepository.findByPath(study.getPath());
+        findStudy.setPath(newPath);
+
+        return true;
+    }
+
+    @Transactional
+    public void studyDelete(Study study) {
+        Study findStudy = studyRepository.findByPath(study.getPath());
+
+        if (!findStudy.canDeleteStudy()) {
+            throw new IllegalArgumentException("해당 스터디를 삭제할 수 없습니다.");
+        }
+
+        studyRepository.delete(findStudy);
     }
 
     private String getImageDataUrl(String basicBanner) throws IOException {

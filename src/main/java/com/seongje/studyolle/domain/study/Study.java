@@ -96,7 +96,7 @@ public class Study {
 
     // 비지니스 메서드 //
 
-    public boolean isJoinable(UserAccount userAccount) {
+    public boolean canJoin(UserAccount userAccount) {
         Account currentUser = userAccount.getAccount();
 
         if (!this.isPublished() || !this.isRecruiting()) {
@@ -104,7 +104,7 @@ public class Study {
         }
 
         for (StudyMember studyMember : this.members) {
-            if (!currentUser.equals(studyMember.getAccount())) {
+            if (currentUser.equals(studyMember.getAccount())) {
                 return false;
             }
         }
@@ -148,5 +148,52 @@ public class Study {
 
     public String getEncodedPath() throws UnsupportedEncodingException {
         return URLEncoder.encode(this.path, "UTF-8");
+    }
+
+    public void publish() {
+        if (!this.closed && !this.published) {
+            this.published = true;
+            this.publishedDateTime = LocalDateTime.now();
+
+        } else {
+            throw new RuntimeException("스터디를 공개할 수 없습니다. 이미 공개됬거나 종료된 스터디입니다.");
+        }
+    }
+
+    public void close() {
+        if (!this.closed && this.published) {
+            this.closed = true;
+            this.closedDateTime = LocalDateTime.now();
+
+        } else {
+            throw new RuntimeException("스터디를 종료할 수 없습니다. 아직 공개되지 않았거나 이미 종료된 스터디입니다.");
+        }
+    }
+
+    public boolean canUpdateRecruiting() {
+        return this.published && (this.recruitingUpdatedDateTime == null ||
+                this.recruitingUpdatedDateTime.isBefore(LocalDateTime.now().minusHours(1)));
+    }
+
+    public void startRecruiting() {
+        if (!canUpdateRecruiting()) {
+            throw new RuntimeException("팀원 모집을 시작할 수 없습니다. 스터디를 공개하거나 1시간 뒤에 시도하세요.");
+        }
+
+        this.recruiting = true;
+        this.recruitingUpdatedDateTime = LocalDateTime.now();
+    }
+
+    public void stopRecruiting() {
+        if (!canUpdateRecruiting()) {
+            throw new RuntimeException("팀원 모집을 시작할 수 없습니다. 스터디를 공개하거나 1시간 뒤에 시도하세요.");
+        }
+
+        this.recruiting = false;
+        this.recruitingUpdatedDateTime = LocalDateTime.now();
+    }
+
+    public boolean canDeleteStudy() {
+        return !this.published;     // TODO : 이미 모임을 한번 했던 스터디 불가
     }
 }
