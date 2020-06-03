@@ -61,8 +61,8 @@ public class StudyService {
         Study newStudy = studyRepository.save(newStudyInfo);
 
         if (findAccount != null) {
-            StudyMember newStudyMember = studyMemberRepository.save(createStudyMember(newStudy, findAccount, MANAGER));
-            newStudy.addStudyMember(newStudyMember);
+            StudyMember newStudyManager = studyMemberRepository.save(createStudyMember(newStudy, findAccount, MANAGER));
+            newStudy.addStudyMember(newStudyManager);
 
             return newStudy;
         }
@@ -97,6 +97,29 @@ public class StudyService {
         }
 
         return null;
+    }
+
+    @Transactional
+    public void joinToStudy(Account account, Study study) {
+        Account findAccount = accountRepository.findByEmail(account.getEmail());
+        Study findStudy = studyRepository.findByPath(study.getPath());
+
+        StudyMember newStudyMember = studyMemberRepository.save(createStudyMember(findStudy, findAccount, MEMBER));
+        findStudy.addStudyMember(newStudyMember);
+    }
+
+    @Transactional
+    public void leaveFromStudy(Account account, Study study) {
+        Account findAccount = accountRepository.findByEmail(account.getEmail());
+        Study findStudy = studyRepository.findByPath(study.getPath());
+
+        if (!studyMemberRepository.existsByAccountAndStudy(findAccount, findStudy)) {
+            throw new IllegalArgumentException("스터디에서 해당 사용자를 찾을 수 없습니다.");
+        }
+
+        studyMemberRepository.deleteByAccountAndStudy(findAccount, findStudy);
+
+        findStudy.removeStudyMember(findAccount);
     }
 
     public List<String> getBasicBannerImages() {

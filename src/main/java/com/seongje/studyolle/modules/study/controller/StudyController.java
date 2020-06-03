@@ -82,5 +82,25 @@ public class StudyController {
         return "study/study-members";
     }
 
+    @SneakyThrows
+    @GetMapping(STUDY_HOME + "/join")
+    public String studyJoin(@CurrentUser Account account, @PathVariable String path) {
+        Study findStudy = studyService.findStudy(path);
+
+        studyService.joinToStudy(account, findStudy);
+
+        return REDIRECT + findStudy.getEncodedPath() + "/members";
+    }
+
+    @SneakyThrows
+    @GetMapping(STUDY_HOME + "/leave")
+    public String studyLeave(@CurrentUser Account account, @PathVariable String path) {
+        Study findStudy = studyService.findStudy(path);
+
+        studyService.leaveFromStudy(account, findStudy);
+
+        return REDIRECT + findStudy.getEncodedPath() + "/members";
+    }
+
     // TODO : 모임 설정
 }

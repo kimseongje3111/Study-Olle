@@ -352,8 +352,8 @@
                     <a class="btn btn-primary" th:href="@{'/study/studies/' + ${study.path} + '/join'}">
                         스터디 가입
                     </a>
-                    <a class="btn btn-outline-primary" th:href="@{'/study/studies/' + ${study.path} + '/members'}"
-                       th:text="${study.memberCount}" data-toggle="tooltip" title="참여 중인 인원">0</a>
+                    <a class="btn btn-outline-info" th:href="@{'/study/studies/' + ${study.path} + '/members'}"
+                       th:text="${study.memberCount}" aria-pressed="true" data-toggle="tooltip" title="참여 중인 인원">0</a>
             </span>
             <span sec:authorize="isAuthenticated()"
                   th:if="${!study.closed && study.isMember(#authentication.principal)}">
@@ -427,7 +427,7 @@
         <li class="media my-3" th:each="member: ${members}">
             <svg th:if="${#strings.isEmpty(member.account?.profileImg)}"
                  th:data-jdenticon-value="${member.account.nickname}"
-                 width="64" height="64" class="rounded border bg-light mr-3"></svg>
+                 width="64" height="64" class="rounded border mr-3"></svg>
             <img th:if="${!#strings.isEmpty(member.account?.profileImg)}" th:src="${member.account?.profileImg}"
                  width="64" height="64" class="rounded border mr-3"/>
 

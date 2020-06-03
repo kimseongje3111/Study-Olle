@@ -76,6 +76,11 @@ public class Study {
         studyMember.setStudy(this);
     }
 
+    public void removeStudyMember(Account account) {
+        memberCount--;
+        this.members.removeIf(studyMember -> studyMember.getAccount().equals(account));
+    }
+
     public void addTagItem(StudyTagItem studyTagItem) {
         this.tags.add(studyTagItem);
         studyTagItem.setStudy(this);
@@ -99,7 +104,7 @@ public class Study {
     public boolean canJoin(UserAccount userAccount) {
         Account currentUser = userAccount.getAccount();
 
-        if (!this.isPublished() || !this.isRecruiting()) {
+        if (!this.isPublished() || !this.isRecruiting() || this.closed) {
             return false;
         }
 
