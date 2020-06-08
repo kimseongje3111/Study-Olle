@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="fragments.html :: header"></head>
+
+<body class="bg-light">
+<div th:replace="fragments.html :: main-nav"></div>
+
+<div class="container">
+    <div class="row my-1 mx-1 py-5 text-left justify-content-center rounded" style="background-color: #e9ecef;">
+        <div class="col-6">
+            <span class="h2">
+                <a class="text-decoration-none" th:text="${study.title}" th:href="@{'/study/studies/' + ${study.path}}">
+                    스터디 이름
+                </a> / <span class="text-decoration-none" th:text="${event.title}">모임 이름</span>
+            </span>
+        </div>
+
+        <div class="col-4 text-right justify-content-end">
+            <span sec:authorize="isAuthenticated()" th:if="${study.isManager(#authentication.principal)}">
+                <a class="btn btn-outline-primary"
+                   th:href="@{'/study/studies/' + ${study.path} + '/event/events/' + ${event.id} + '/edit'}">
+                        <i class="fa fa-edit"></i> 모임 수정
+                </a>
+                <button class="btn btn-outline-danger ml-1" data-toggle="modal" data-target="#cancel">
+                    <i class="fa fa-minus-circle"></i> 모임 취소
+                </button>
+                <!-- TODO > 모임 결과 작성 -->
+            </span>
+
+            <span sec:authorize="isAuthenticated()" th:if="${study.isMember(#authentication.principal)}">
+                <button th:if="${event.isEnrollableFor(#authentication.principal)}"
+                        class="btn btn-outline-primary" data-toggle="modal" data-target="#enroll">
+                    <i class="fa fa-plus-circle"></i> 참가 신청
+                </button>
+                <button th:if="${event.isDisenrollableFor(#authentication.principal)}"
+                        class="btn btn-outline-danger" data-toggle="modal" data-target="#disenroll">
+                    <i class="fa fa-minus-circle"></i> 참가 신청 취소
+                </button>
+                <span class="text-success" th:if="${event.isAttended(#authentication.principal)}">
+                    <i class="fa fa-check-circle"></i> 참석 완료
+                </span>
+            </span>
+        </div>
+
+        <!-- event cancel modal -->
+        <div class="modal fade" id="cancel" tabindex="-1" role="dialog" aria-labelledby="cancelTitle"
+             aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="cancelTitle" th:text="${event.title}"></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <i class="fa fa-times-circle" aria-hidden="true"></i>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <p>해당 모임을 <strong>취소</strong> 하시겠습니까?</p>
+                        모임을 취소할 경우, 해당 모임과 관련된 데이터를 모두 <strong>삭제</strong>합니다.
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">닫기</button>
+                        <form th:action="@{'/study/studies/' + ${study.path} + '/event/events/' + ${event.id} + '/delete'}" method="post">
+                            <button class="btn btn-primary" type="submit" aria-describedby="submitHelp">확인</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- enrollment modal -->
+        <div class="modal fade" id="enroll" tabindex="-1" role="dialog" aria-labelledby="enrollmentTitle"
+             aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="enrollmentTitle" th:text="${event.title}">모임 이름</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <i class="fa fa-times-circle" aria-hidden="true"></i>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <p>해당 모임에 <strong>참가</strong>하시겠습니까? 일정을 캘린더에 등록해 두시면 좋습니다.</p>
+                        <p><strong>확인</strong>을 눌러 모임 참가 신청을 완료해주세요.</p>
+                        <small>
+                            <strong>※ 모집 방법에 따른 참가 신청 처리 안내</strong><br/><br/>
+                            <strong>선착순</strong> : 모집 인원 내의 모임 신청은 자동으로 확정됩니다.
+                            제한 인원을 초과한 경우 모집 대기 상태가 되며, 이후에 확정자 중 취소자가 발생하면 선착순으로 다음 대기자가 확정됩니다.<br/>
+                            <strong>관리자 확인</strong> : 모임 및 스터디 관리자가 모임 신청 목록을 조회하고, 직접 확정 여부를 결정합니다.
+                        </small>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">닫기</button>
+                        <form th:action="@{'/study/studies/' + ${study.path} + '/event/events/' + ${event.id} + '/enroll'}" method="post">
+                            <button class="btn btn-primary" type="submit" aria-describedby="submitHelp">확인</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- enrollment cancel modal -->
+        <div class="modal fade" id="disenroll" tabindex="-1" role="dialog" aria-labelledby="leaveTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="leaveTitle" th:text="${event.title}"></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <i class="fa fa-times-circle" aria-hidden="true"></i>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <p>모임 참가 신청을 <strong>취소</strong>하시겠습니까?</p>
+                        <p>선착순으로 모집하는 모임의 참가 신청을 취소할 경우, 그 다음 대기자가 확정됩니다.</p>
+                        <strong>확인</strong>을 누르면 모임 참가 신청이 취소됩니다.
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">닫기</button>
+                        <form th:action="@{'/study/studies/' + ${study.path} + '/event/events/' + ${event.id} + '/disenroll'}" method="post">
+                            <button class="btn btn-primary" type="submit" aria-describedby="submitHelp">확인</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row px-3 justify-content-center">
+        <div class="col-7 pt-3 mr-3">
+            <div class="row mb-5 bg-white rounded" style="border: 1px solid rgba(0,0,0,.125)">
+                <div class="px-3 py-3" th:utext="${event.description}">상세 설명</div>
+            </div>
+
+            <div class="row">
+                <h5>모임 참가 신청 현황 (<span th:text="${event.enrollments.size()}">0</span>)</h5>
+
+                <table th:if="${event.enrollments.size() > 0}" class="table">
+                    <thead class="thead-light">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">사용자</th>
+                            <th scope="col">참가 신청 일시</th>
+                            <th scope="col">참가 상태</th>
+                            <th scope="col" th:if="${study.isManager(#authentication.principal) &&
+                                event.eventType == T(com.seongje.studyolle.domain.event.EventType).MANAGER_APPROVAL}">
+                                참가 신청 관리
+                            </th>
+                            <th th:if="${study.isManager(#authentication.principal)}" scope="col">
+                                출석 체크
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr th:each="enroll: ${event.enrollments}">
+                            <th scope="row" th:text="${enrollStat.count}"></th>
+                            <td>
+                                <a th:href="@{'/account/profile/' + ${enroll.account.nickname}}" class="text-decoration-none">
+                                    <svg th:if="${#strings.isEmpty(enroll.account?.profileImg)}"
+                                         th:data-jdenticon-value="${enroll.account.nickname}"
+                                         width="24" height="24" class="rounded border bg-light"></svg>
+                                    <img th:if="${!#strings.isEmpty(enroll.account?.profileImg)}"
+                                         th:src="${enroll.account?.profileImg}"
+                                         width="24" height="24" class="rounded border">
+                                    <span th:text="${enroll.account.nickname}"></span>
+                                </a>
+                            </td>
+                            <td>
+                                <span class="date-time" th:text="${enroll.appliedDateTime}"></span>
+                            </td>
+                            <td>
+                                <span class="font-weight-bold" th:if="${enroll.approved}">확정</span>
+                                <span class="font-weight-light" th:if="${!enroll.approved}">대기중</span>
+                            </td>
+                            <td th:if="${study.isManager(#authentication.principal) &&
+                                event.eventType == T(com.seongje.studyolle.domain.event.EventType).MANAGER_APPROVAL} ">
+                                <a th:if="${event.canAccept(enroll)}" class="btn btn-success"
+                                   th:href="@{'/study/studies/' + ${study.path} + '/event/events/' + ${event.id} + '/enrollments/' + ${enroll.id} + '/accept'}">
+                                    신청 수락
+                                </a>
+                                <a th:if="${event.canReject(enroll)}" class="btn btn-warning"
+                                   th:href="@{'/study/studies/' + ${study.path} + '/event/events/' + ${event.id} + '/enrollments/' + ${enroll.id} + '/reject'}">
+                                    취소
+                                </a>
+                            </td>
+                            <td th:if="${study.isManager(#authentication.principal)}">
+                                <a th:if="${enroll.approved && !enroll.attended}" class="btn btn-info"
+                                   th:href="@{'/study/studies/' + ${study.path} + '/event/events/' + ${event.id} + '/enrollments/' + ${enroll.id} + '/checkin'}">
+                                    체크인
+                                </a>
+                                <a th:if="${enroll.approved && enroll.attended}" class="btn btn-warning"
+                                   th:href="@{'/study/studies/' + ${study.path} + '/event/events/' + ${event.id} + '/enrollments/' + ${enroll.id} + '/checkin-cancel'}">
+                                    취소
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="col-3 pt-3 px-3">
+            <div class="card">
+                <div class="card-header text-center text-white bg-info">
+                    <i class="fa fa-info-circle"></i> 모임 정보
+                </div>
+
+                <div class="card-body">
+                    <div class="row px-2 d-flex align-items-end flex-column">
+                        <div class="badge badge-secondary text-wrap mb-1">모집 방법</div>
+                        <div class="text-right">
+                            <span th:if="${event.eventType == T(com.seongje.studyolle.domain.event.EventType).FCFS}">
+                                선착순
+                            </span>
+                            <span th:if="${event.eventType == T(com.seongje.studyolle.domain.event.EventType).MANAGER_APPROVAL}">
+                                관리자 확인
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="dropdown-divider"></div>
+
+                    <div class="row px-2 d-flex align-items-end flex-column">
+                        <div class="badge badge-secondary text-wrap mb-1">모집 인원</div>
+                        <div>
+                            <span th:text="${event.limitOfEnrollments}">0</span> 명
+                        </div>
+                    </div>
+
+                    <div class="dropdown-divider"></div>
+
+                    <div class="row px-2 d-flex align-items-end flex-column">
+                        <div class="badge badge-secondary text-wrap mb-1">참가 신청 마감</div>
+                        <div>
+                            ~ <span class="date-weekday-time" th:text="${event.enrollmentDeadline}"></span>
+                        </div>
+                    </div>
+
+                    <div class="dropdown-divider"></div>
+
+                    <div class="row px-2 d-flex align-items-end flex-column">
+                        <div class="badge badge-secondary text-wrap mb-1">모임 시작</div>
+                        <div>
+                            <span class="date-weekday-time" th:text="${event.startDateTime}"></span> ~
+                        </div>
+                    </div>
+
+                    <div class="dropdown-divider"></div>
+
+                    <div class="row px-2 d-flex align-items-end flex-column">
+                        <div class="badge badge-secondary text-wrap mb-1">모임 종료</div>
+                        <div>
+                            ~ <span class="date-weekday-time" th:text="${event.endDateTime}"></span>
+                        </div>
+                    </div>
+
+                    <div class="dropdown-divider"></div>
+
+                    <div class="row px-2 d-flex align-items-end flex-column">
+                        <div class="badge badge-secondary text-wrap mb-1">모임 관리자</div>
+                        <div>
+                            <a th:href="@{'/account/profile/' + ${event.createdBy?.nickname}}" class="text-decoration-none">
+                                <svg th:if="${#strings.isEmpty(event.createdBy?.profileImg)}"
+                                     th:data-jdenticon-value="${event.createdBy?.nickname}"
+                                     width="24" height="24" class="rounded border bg-light"></svg>
+                                <img th:if="${!#strings.isEmpty(event.createdBy?.profileImg)}"
+                                     th:src="${event.createdBy?.profileImg}"
+                                     width="24" height="24" class="rounded border">
+                                <span th:text="${event.createdBy?.nickname}">모임 관리자</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="fragments.html :: footer"></div>
+</div>
+
+<script th:replace="fragments.html :: date-time"></script>
+</body>
+</html>

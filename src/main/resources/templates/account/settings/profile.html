@@ -29,21 +29,19 @@
                         <small id="aboutMeHelp" class="form-text text-muted">
                             길지 않게 35자 이내로 입력해 주세요.
                         </small>
-                        <small class="form-text text-danger" th:if="${#fields.hasErrors('aboutMe')}"
-                               th:errors="*{aboutMe}">
-                            조금 더 짧게 작성해 주세요.
+                        <small class="form-text text-danger" th:if="${#fields.hasErrors('aboutMe')}" th:errors="*{aboutMe}">
+                            AboutMe Error
                         </small>
                     </div>
 
                     <div class="form-group">
                         <label for="url">링크</label>
-                        <input id="url" type="url" th:field="*{url}" class="form-control"
-                               aria-describedby="urlHelp" required>
+                        <input id="url" type="url" th:field="*{url}" class="form-control" aria-describedby="urlHelp" required>
                         <small id="urlHelp" class="form-text text-muted">
                             블로그, 유튜브 또는 포트폴리오 등 본인을 표현할 수 있는 링크를 추가해 보세요.
                         </small>
                         <small class="form-text text-danger" th:if="${#fields.hasErrors('url')}" th:errors="*{url}">
-                            옳바른 URL이 아닙니다. 다시 확인해 주세요.
+                            Url Error
                         </small>
                     </div>
 
@@ -54,6 +52,9 @@
                         <small id="occupationHelp" class="form-text text-muted">
                             개발자? 매니저? 취준생? 대표님?
                         </small>
+                        <small class="form-text text-danger" th:if="${#fields.hasErrors('occupation')}" th:errors="*{occupation}">
+                            Occupation Error
+                        </small>
                     </div>
 
                     <div class="form-group">
@@ -63,10 +64,13 @@
                         <small id="locationHelp" class="form-text text-muted">
                             주요 활동(사는 곳이나 직장을 다니는 곳 또는 놀러 다니는 곳) 지역의 도시 이름을 알려주세요.
                         </small>
+                        <small class="form-text text-danger" th:if="${#fields.hasErrors('location')}" th:errors="*{location}">
+                            Location Error
+                        </small>
                     </div>
 
                     <div class="form-group">
-                        <input id="profileImage" type="hidden" th:field="*{profileImg}" class="form-control" />
+                        <input id="profileImage" type="hidden" th:field="*{profileImg}" class="form-control">
                     </div>
 
                     <div class="form-group mt-4">

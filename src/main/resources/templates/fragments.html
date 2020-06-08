@@ -12,10 +12,12 @@
     <link rel="stylesheet" href="/node_modules/font-awesome/css/font-awesome.min.css"/>
     <link rel="stylesheet" href="/node_modules/@yaireo/tagify/dist/tagify.css">
     <link rel="stylesheet" href="/node_modules/summernote/dist/summernote-bs4.min.css">
+    <link rel="stylesheet" href="/node_modules/bootstrap-select/dist/css/bootstrap-select.min.css">
 
     <script src="/node_modules/jquery/dist/jquery.min.js"></script>
     <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/node_modules/jdenticon/dist/jdenticon.min.js"></script>
+    <script src="/node_modules/bootstrap-select/dist/js/bootstrap-select.min.js"></script>
 
     <style>
         .container {
@@ -28,7 +30,7 @@
             margin: 0;
         }
 
-        button:focus {
+        button:focus, input[type=button]:focus {
             outline: none;
         }
     </style>
@@ -365,7 +367,7 @@
             <!-- manager menu -->
             <span sec:authorize="isAuthenticated()"
                   th:if="${study.published && !study.closed && study.isManager(#authentication.principal)}">
-                    <a class="btn btn-outline-primary ml-1" th:href="@{'/study/studies/' + ${study.path} + '/new-event'}">
+                    <a class="btn btn-outline-primary ml-1" th:href="@{'/study/studies/' + ${study.path} + '/event/new-event'}">
                         <i class="fa fa-plus"></i> 모임 만들기
                     </a>
             </span>
@@ -410,7 +412,7 @@
             <i class="fa fa-user"></i> 구성원
         </a>
         <a class="nav-item nav-link" th:classappend="${studyMenu == 'events'}? active"
-           th:href="@{'/study/studies/' + ${study.path} + '/events'}">
+           th:href="@{'/study/studies/' + ${study.path} + '/event/events'}">
             <i class="fa fa-calendar"></i> 모임
         </a>
         <a sec:authorize="isAuthenticated()" th:if="${study.isManager(#authentication.principal)}"
@@ -456,6 +458,37 @@
        th:href="@{'/study/studies/' + ${study.path} + '/settings/study-zones'}">활동 지역</a>
     <a class="list-group-item list-group-item-action list-group-item-danger" th:classappend="${currentMenu == 'details'}? active"
        th:href="@{'/study/studies/' + ${study.path} + '/settings/details'}">스터디</a>
+</div>
+
+<!-- date-time format -->
+<div th:fragment="date-time">
+    <script src="/node_modules/moment/min/moment-with-locales.min.js"></script>
+    <script type="application/javascript">
+        $(function () {
+            moment.locale('ko');
+            $(".date-time").text(function(index, dateTime) {
+                return moment(dateTime, "YYYY-MM-DD`T`hh:mm").format('LLL');
+            });
+            $(".date").text(function(index, dateTime) {
+                return moment(dateTime, "YYYY-MM-DD`T`hh:mm").format('LL');
+            });
+            $(".weekday").text(function(index, dateTime) {
+                return moment(dateTime, "YYYY-MM-DD`T`hh:mm").format('dddd');
+            });
+            $(".time").text(function(index, dateTime) {
+                return moment(dateTime, "YYYY-MM-DD`T`hh:mm").format('LT');
+            });
+            $(".calendar").text(function(index, dateTime) {
+                return moment(dateTime, "YYYY-MM-DD`T`hh:mm").calendar();
+            });
+            $(".fromNow").text(function(index, dateTime) {
+                return moment(dateTime, "YYYY-MM-DD`T`hh:mm").fromNow();
+            });
+            $(".date-weekday-time").text(function(index, dateTime) {
+                return moment(dateTime, "YYYY-MM-DD`T`hh:mm").format('LLLL');
+            });
+        })
+    </script>
 </div>
 
 </html>

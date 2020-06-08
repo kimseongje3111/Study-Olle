@@ -1,6 +1,5 @@
 package com.seongje.studyolle.domain.study;
 
-import com.seongje.studyolle.domain.Tag;
 import com.seongje.studyolle.domain.Zone;
 import lombok.*;
 
@@ -13,6 +12,7 @@ import javax.persistence.*;
 public class StudyZoneItem {
 
     @Id @GeneratedValue
+    @Column(name = "study_zone_item_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

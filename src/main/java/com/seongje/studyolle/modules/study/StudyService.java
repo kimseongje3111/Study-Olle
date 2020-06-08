@@ -118,7 +118,6 @@ public class StudyService {
         }
 
         studyMemberRepository.deleteByAccountAndStudy(findAccount, findStudy);
-
         findStudy.removeStudyMember(findAccount);
     }
 

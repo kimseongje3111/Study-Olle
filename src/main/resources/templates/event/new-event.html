@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments.html :: header"></head>
+
+<body class="bg-light">
+<div th:replace="fragments.html :: main-nav"></div>
+<div th:replace="fragments.html :: study-banner"></div>
+
+<div class="container">
+    <nav class="pt-2" aria-label="breadcrumb">
+        <ol class="breadcrumb" style="font-size: large;">
+            <li class="breadcrumb-item">
+                <a th:href="'/study/studies/' + ${study.path}" th:text="${study.title}">Home</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">새 모임 만들기</li>
+        </ol>
+    </nav>
+
+    <div class="py-5 text-center">
+        <h2>새 모임 만들기</h2>
+    </div>
+
+    <div class="row justify-content-center">
+        <form class="needs-validation col-sm-10" th:action="@{'/study/studies/' + ${study.path} + '/event/new-event'}"
+              th:object="${eventForm}" method="post" novalidate>
+            <div class="form-group">
+                <label for="title">모임 이름</label>
+                <input id="title" type="text" th:field="*{title}" class="form-control"
+                       aria-describedby="titleHelp" autofocus required>
+                <small id="titleHelp" class="form-text text-muted">
+                    자유롭게 50자 이내로 입력하세요.
+                </small>
+                <small class="invalid-feedback">모임 이름을 입력하세요.</small>
+                <small class="form-text text-danger" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">
+                    Title Error
+                </small>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="eventType">모집 방법</label>
+                    <select th:field="*{eventType}" class="selectpicker form-control" id="eventType"
+                            data-style="btn-white border" aria-describedby="eventTypeHelp">
+                        <option th:value="FCFS">선착순</option>
+                        <option th:value="MANAGER_APPROVAL">관리자 확인</option>
+                    </select>
+                    <small id="eventTypeHelp" class="form-text text-muted">
+                        <strong>※</strong> 모집 방법은 두 가지입니다.<br/><br/>
+                        <strong>선착순</strong> : 모집 인원 내의 모임 신청은 자동으로 확정됩니다.
+                        제한 인원을 초과한 경우 모집 대기 상태가 되며, 이후에 확정자 중 취소자가 발생하면 선착순으로 다음 대기자가 확정됩니다.
+                        단, 등록 마감일 이후에는 신청을 취소해도 확정 여부가 바뀌지 않습니다.<br/>
+                        <strong>관리자 확인</strong> : 모임 및 스터디 관리자가 모임 신청 목록을 조회하고, 직접 확정 여부를 결정할 수 있습니다.
+                        단, 등록 마감일 이후에는 변경할 수 없습니다.
+                    </small>
+                </div>
+
+                <div class="form-group col-md-6">
+                    <label for="limitOfEnrollments">모집 인원</label>
+                    <input id="limitOfEnrollments" type="number" th:field="*{limitOfEnrollments}" class="form-control" placeholder="0"
+                           aria-describedby="limitOfEnrollmentsHelp" required>
+                    <small id="limitOfEnrollmentsHelp" class="form-text text-muted">
+                        최대 수용 가능한 모임 참석 인원을 설정하세요. 최소 2인 이상이어야 합니다.
+                    </small>
+                    <small class="invalid-feedback">모집 인원을 입력하세요.</small>
+                    <small class="form-text text-danger" th:if="${#fields.hasErrors('limitOfEnrollments')}" th:errors="*{limitOfEnrollments}">
+                        LimitOfEnrollments Error
+                    </small>
+                </div>
+            </div>
+
+            <div class="form-row mt-3">
+                <div class="form-group">
+                    <input id="startDateTimeValue" type="hidden" th:field="*{startDateTime}" class="form-control">
+                </div>
+
+                <div class="form-group col-md-4">
+                    <label for="startDateTime">모임 시작 일시</label>
+                    <div class="input-group date" id="datetimepicker1" data-target-input="nearest">
+                        <input id="startDateTime" type="text" class="form-control datetimepicker-input"
+                               data-target="#datetimepicker1" aria-describedby="startDateTimeHelp" required>
+                        <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
+                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                        </div>
+                    </div>
+                    <small id="startDateTimeHelp" class="form-text text-muted">
+                        모임 시작 일시를 입력하세요. 상세한 모임 일정은 본문에 적어주세요.
+                    </small>
+                    <small class="invalid-feedback">모임 시작 일시를 입력하세요.</small>
+                    <small class="form-text text-danger" th:if="${#fields.hasErrors('startDateTime')}" th:errors="*{startDateTime}">
+                        StartDateTime Error
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <input id="endDateTimeValue" type="hidden" th:field="*{endDateTime}" class="form-control">
+                </div>
+
+                <div class="form-group col-md-4">
+                    <label for="endDateTime">모임 종료 일시</label>
+                    <div class="input-group date" id="datetimepicker2" data-target-input="nearest">
+                        <input id="endDateTime" type="text" class="form-control datetimepicker-input"
+                               data-target="#datetimepicker2" aria-describedby="endDateTimeHelp" required>
+                        <div class="input-group-append" data-target="#datetimepicker2" data-toggle="datetimepicker">
+                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                        </div>
+                    </div>
+                    <small id="endDateTimeHelp" class="form-text text-muted">
+                        모임 종료 일시가 지나면 모임은 자동으로 종료됩니다.
+                    </small>
+                    <small class="invalid-feedback">모임 종료 일시를 입력하세요.</small>
+                    <small class="form-text text-danger" th:if="${#fields.hasErrors('endDateTime')}" th:errors="*{endDateTime}">
+                        EndDateTime Error
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <input id="enrollmentDeadlineValue" type="hidden" th:field="*{enrollmentDeadline}" class="form-control">
+                </div>
+
+                <div class="form-group col-md-4">
+                    <label for="enrollmentDeadline">등록 마감 일시</label>
+                    <div class="input-group date" id="datetimepicker3" data-target-input="nearest">
+                        <input id="enrollmentDeadline" type="text" class="form-control datetimepicker-input"
+                               data-target="#datetimepicker3" aria-describedby="enrollmentDeadlineHelp" required>
+                        <div class="input-group-append" data-target="#datetimepicker3" data-toggle="datetimepicker">
+                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                        </div>
+                    </div>
+                    <small id="enrollmentDeadlineHelp" class="form-text text-muted">
+                        등록 마감 일시 이전에만 모임 참가 신청을 할 수 있습니다.
+                    </small>
+                    <small class="invalid-feedback">등록 마감 일시를 입력하세요.</small>
+                    <small class="form-text text-danger" th:if="${#fields.hasErrors('enrollmentDeadline')}" th:errors="*{enrollmentDeadline}">
+                        EnrollmentDeadline Error
+                    </small>
+                </div>
+            </div>
+
+            <div class="form-group mt-3">
+                <label for="description">모임 설명</label>
+                <textarea id="description" type="textarea" th:field="*{description}" class="editor form-control"
+                          aria-describedby="descriptionHelp" required></textarea>
+                <small id="descriptionHelp" class="form-text text-muted">
+                    모임에서 다루는 주제, 장소, 진행 방식 등을 자세히 적어 주세요.
+                </small>
+                <small class="invalid-feedback">모임 설명을 입력하세요.</small>
+                <small class="form-text text-danger" th:if="${#fields.hasErrors('description')}" th:errors="*{description}">
+                    Description Error
+                </small>
+            </div>
+
+            <div class="form-group mt-4">
+                <button class="btn btn-primary btn-block" type="submit" aria-describedby="submitHelp">
+                    모임 만들기
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div th:replace="fragments.html :: footer"></div>
+</div>
+
+<script th:replace="fragments.html :: form-validation"></script>
+<script th:replace="fragments.html :: editor-script"></script>
+
+<link rel="stylesheet" href="/node_modules/tempusdominus-bootstrap-4/build/css/tempusdominus-bootstrap-4.min.css">
+<script src="/node_modules/moment/min/moment.min.js"></script>
+<script src="/node_modules/moment/min/moment-with-locales.min.js"></script>
+<script src="/node_modules/tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4.min.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $('#datetimepicker1').datetimepicker({
+            format: 'LLL',
+            locale: 'ko',
+            sideBySide: true,
+            useCurrent: false,
+            minDate: moment()
+        });
+
+        $('#datetimepicker2').datetimepicker({
+            format: 'LLL',
+            locale: 'ko',
+            sideBySide: true,
+            useCurrent: false,
+            minDate: moment()
+        });
+
+        $('#datetimepicker3').datetimepicker({
+            format: 'LLL',
+            locale: 'ko',
+            sideBySide: true,
+            useCurrent: false,
+            minDate: moment()
+        });
+
+        $("#datetimepicker1").on("change.datetimepicker", function (e) {
+            var date = new Date(e.date.toString());
+
+            $('#datetimepicker3').datetimepicker('maxDate', e.date);
+            $('#datetimepicker2').datetimepicker('minDate', e.date);
+            $('#startDateTimeValue').val(date.toISOString().slice(0, -1));
+        });
+
+        $("#datetimepicker2").on("change.datetimepicker", function (e) {
+            var date = new Date(e.date.toString());
+
+            $('#datetimepicker1').datetimepicker('maxDate', e.date);
+            $('#endDateTimeValue').val(date.toISOString().slice(0, -1));
+        });
+
+        $("#datetimepicker3").on("change.datetimepicker", function (e) {
+            var date = new Date(e.date.toString());
+
+            $('#datetimepicker1').datetimepicker('minDate', e.date);
+            $('#enrollmentDeadlineValue').val(date.toISOString().slice(0, -1));
+        });
+    });
+</script>
+</body>
+</html>

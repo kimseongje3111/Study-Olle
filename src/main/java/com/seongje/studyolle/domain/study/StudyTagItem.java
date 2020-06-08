@@ -12,6 +12,7 @@ import javax.persistence.*;
 public class StudyTagItem {
 
     @Id @GeneratedValue
+    @Column(name = "study_tag_item_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

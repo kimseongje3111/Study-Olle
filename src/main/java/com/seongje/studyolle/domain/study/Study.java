@@ -17,17 +17,12 @@ import static com.seongje.studyolle.domain.study.ManagementLevel.*;
 
 @Entity
 @Getter @Setter @EqualsAndHashCode(of = "id")
-@Builder @AllArgsConstructor @NoArgsConstructor
+@AllArgsConstructor @NoArgsConstructor
 public class Study {
 
     @Id @GeneratedValue
     @Column(name = "study_id")
     private Long id;
-
-    // 관리자 및 참여 멤버 //
-
-    @OneToMany(mappedBy = "study", cascade = CascadeType.ALL)
-    private Set<StudyMember> members = new HashSet<>();
 
     // 스터디 기본 정보 //
 
@@ -38,10 +33,10 @@ public class Study {
 
     private String shortDescription;
 
-    @Lob @Basic(fetch = FetchType.EAGER)
+    @Lob
     private String fullDescription;
 
-    @Lob @Basic(fetch = FetchType.EAGER)
+    @Lob
     private String bannerImg;
 
     private int memberCount = 0;
@@ -67,6 +62,11 @@ public class Study {
 
     @OneToMany(mappedBy = "study", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<StudyZoneItem> zones = new HashSet<>();
+
+    // 관리자 및 참여 멤버 //
+
+    @OneToMany(mappedBy = "study", cascade = CascadeType.ALL)
+    private Set<StudyMember> members = new HashSet<>();
 
     // 연관 관계 편의 메서드 //
 

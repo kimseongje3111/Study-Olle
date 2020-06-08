@@ -101,6 +101,4 @@ public class StudyController {
 
         return REDIRECT + findStudy.getEncodedPath() + "/members";
     }
-
-    // TODO : 모임 설정
 }
