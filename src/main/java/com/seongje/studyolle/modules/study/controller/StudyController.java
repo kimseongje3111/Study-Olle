@@ -1,9 +1,9 @@
 package com.seongje.studyolle.modules.study.controller;
 
-import com.seongje.studyolle.domain.account.Account;
-import com.seongje.studyolle.domain.study.Study;
-import com.seongje.studyolle.modules.authentication.CurrentUser;
-import com.seongje.studyolle.modules.study.StudyService;
+import com.seongje.studyolle.modules.account.domain.Account;
+import com.seongje.studyolle.modules.study.domain.Study;
+import com.seongje.studyolle.modules.account.authentication.CurrentUser;
+import com.seongje.studyolle.modules.study.service.StudyService;
 import com.seongje.studyolle.modules.study.form.StudyForm;
 import com.seongje.studyolle.modules.study.validator.StudyFormValidator;
 import lombok.RequiredArgsConstructor;
@@ -16,8 +16,6 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 
 @Controller
 @RequiredArgsConstructor
@@ -29,6 +27,8 @@ public class StudyController {
     static final String STUDIES = "study/studies";
     static final String STUDY_HOME = STUDIES + "/{path}";
     static final String STUDY_MEMBERS = STUDY_HOME + "/members";
+    static final String STUDY_JOIN = STUDY_HOME + "/join";
+    static final String STUDY_LEAVE = STUDY_HOME + "/leave";
 
     private final StudyService studyService;
     private final StudyFormValidator studyFormValidator;
@@ -83,7 +83,7 @@ public class StudyController {
     }
 
     @SneakyThrows
-    @GetMapping(STUDY_HOME + "/join")
+    @GetMapping(STUDY_JOIN)
     public String studyJoin(@CurrentUser Account account, @PathVariable String path) {
         Study findStudy = studyService.findStudy(path);
 
@@ -93,7 +93,7 @@ public class StudyController {
     }
 
     @SneakyThrows
-    @GetMapping(STUDY_HOME + "/leave")
+    @GetMapping(STUDY_LEAVE)
     public String studyLeave(@CurrentUser Account account, @PathVariable String path) {
         Study findStudy = studyService.findStudy(path);
 

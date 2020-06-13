@@ -1,11 +1,10 @@
 package com.seongje.studyolle.modules.account.controller;
 
-import com.seongje.studyolle.modules.account.AccountService;
-import com.seongje.studyolle.modules.authentication.CurrentUser;
+import com.seongje.studyolle.modules.account.service.AccountService;
+import com.seongje.studyolle.modules.account.authentication.CurrentUser;
 import com.seongje.studyolle.modules.account.form.SignUpForm;
-import com.seongje.studyolle.modules.account.repository.AccountRepository;
 import com.seongje.studyolle.modules.account.validator.SignUpFormValidator;
-import com.seongje.studyolle.domain.account.Account;
+import com.seongje.studyolle.modules.account.domain.Account;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -155,6 +154,18 @@ public class AccountController {
 
         model.addAttribute(findAccount);
         model.addAttribute("isOwner", findAccount.equals(account));
+        model.addAttribute("isStudyTab", false);
+
+        return "account/profile";
+    }
+
+    @GetMapping(USER_PROFILE + "/study")
+    public String viewStudyOfProfile(@CurrentUser Account account, @PathVariable String nickname, Model model) {
+        Account findAccount = accountService.findByNickname(nickname);
+
+        model.addAttribute(findAccount);
+        model.addAttribute("isOwner", findAccount.equals(account));
+        model.addAttribute("isStudyTab", true);
 
         return "account/profile";
     }

@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: jdbc:tc:postgresql:///studyolletest
+
+  jpa:
+    hibernate:
+      ddl-auto: update

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments.html :: header"></head>
+
+<body class="bg-light">
+<div th:replace="fragments.html :: main-nav"></div>
+<div th:replace="fragments.html :: study-banner"></div>
+
+<div class="container">
+    <div th:replace="fragments.html :: study-info"></div>
+
+    <div th:replace="fragments.html :: study-menu (studyMenu='events')"></div>
+
+    <div class="row px-3 justify-content-center" style="height: 450px; max-height: 100%;">
+        <div class="col-10 py-3 bg-white rounded-bottom">
+            <div class="row">
+                <div class="col-2 pt-3">
+                    <div class="nav flex-column nav-pills bg-light" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                        <a class="nav-link active" id="v-pills-newEvents-tab" data-toggle="pill" href="#v-pills-newEvents"
+                           role="tab" aria-controls="v-pills-newEvents" aria-selected="true">
+                            새 모임 (<span th:text="${newEvents.size()}">0</span>)
+                        </a>
+                        <a class="nav-link" id="v-pills-nowEvents-tab" data-toggle="pill" href="#v-pills-nowEvents"
+                           role="tab" aria-controls="v-pills-nowEvents" aria-selected="false">
+                            진행 중인 모임 (<span th:text="${nowEvents.size()}">0</span>)
+                        </a>
+                        <a class="nav-link" id="v-pills-oldEvents-tab" data-toggle="pill" href="#v-pills-oldEvents"
+                           role="tab" aria-controls="v-pills-oldEvents" aria-selected="false">
+                            종료된 모임 (<span th:text="${oldEvents.size()}">0</span>)
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-10 pt-3">
+                    <div class="tab-content" id="v-pills-tabContent">
+                        <div class="tab-pane fade show active" id="v-pills-newEvents" role="tabpanel"
+                             aria-labelledby="v-pills-home-tab">
+                            <div class="row">
+                                <div th:if="${newEvents.size() == 0}" class="col-12 text-center">
+                                    새 모임이 없습니다.
+                                </div>
+                            </div>
+
+                            <div class="row row-cols-3">
+                                <div class="col mb-4" th:each="event : ${newEvents}">
+                                    <div class="card">
+                                        <div class="card-header text-center text-white font-weight-bold bg-info">
+                                            <span th:text="${event.title}">title</span>
+                                        </div>
+
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item list-group-item-light list-group-item-action">
+                                                <i class="fa fa-calendar"></i>
+                                                <span class="calendar" th:text="${event.startDateTime}"></span> 모임 시작
+                                            </li>
+                                            <li class="list-group-item list-group-item-light list-group-item-action">
+                                                <i class="fa fa-hourglass-end"></i>
+                                                <span class="fromNow" th:text="${event.enrollmentDeadline}"></span> 모집 마감
+                                            </li>
+                                            <li class="list-group-item list-group-item-light list-group-item-action">
+                                                    <span th:if="${event.limitOfEnrollments != 0}">
+                                                        <i class="fa fa-info-circle"></i>
+                                                        현재 <span th:text="${event.limitOfEnrollments}"></span>명 모집 중
+                                                        (남은 자리 : <span th:text="${event.getNumberOfRemainingSeats()}"></span>)
+                                                    </span>
+                                            </li>
+                                            <li class="list-group-item list-group-item-light text-center">
+                                                <a th:href="@{'/study/studies/' + ${study.path} + '/event/events/' + ${event.id}}" class="card-link">
+                                                    자세히 보기
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade col-sm-10" id="v-pills-nowEvents" role="tabpanel"
+                             aria-labelledby="v-pills-nowEvents-tab">
+                            <table class="table table-hover">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">모임 이름</th>
+                                        <th scope="col">모임 시작 일시</th>
+                                        <th scope="col">참가 인원</th>
+                                        <th scope="col"></th>
+                                    </tr>
+                                </thead>
+
+                                <tbody th:each="event : ${nowEvents}">
+                                    <tr>
+                                        <th scope="row" th:text="${eventStat.count}">1</th>
+                                        <td th:text="${event.title}">모임 이름</td>
+                                        <td>
+                                            <i class="fa fa-calendar"></i>
+                                            <span class="date-weekday-time" th:text="${event.startDateTime}">시작 일시</span>
+                                        </td>
+                                        <td th:text="${event.getNumberOfAcceptedEnrollments()}">0</td>
+                                        <td>
+                                            <a th:href="@{'/study/studies/' + ${study.path} + '/event/events/' + ${event.id}}" class="card-link">
+                                                자세히 보기
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="tab-pane fade col-sm-10" id="v-pills-oldEvents" role="tabpanel"
+                             aria-labelledby="v-pills-newEvents-tab">
+                            <table class="table table-hover">
+                                <thead class="thead-light">
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">모임 이름</th>
+                                    <th scope="col">모임 종료 일시</th>
+                                    <th scope="col"></th>
+                                </tr>
+                                </thead>
+
+                                <tbody th:each="event : ${oldEvents}">
+                                <tr>
+                                    <th scope="row" th:text="${eventStat.count}">1</th>
+                                    <td th:text="${event.title}">모임 이름</td>
+                                    <td>
+                                        <i class="fa fa-calendar"></i>
+                                        <span class="date-weekday-time" th:text="${event.endDateTime}">종료 일시</span>
+                                    </td>
+                                    <td>
+                                        <a th:href="@{'/study/studies/' + ${study.path} + '/event/events/' + ${event.id}}" class="card-link">
+                                            자세히 보기
+                                        </a>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="fragments.html :: footer"></div>
+</div>
+
+<script th:replace="fragments.html :: tooltip"></script>
+<script th:replace="fragments.html :: date-time"></script>
+</body>
+</html>

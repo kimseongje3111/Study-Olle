@@ -1,6 +1,6 @@
 package com.seongje.studyolle.modules.study.repository;
 
-import com.seongje.studyolle.domain.study.Study;
+import com.seongje.studyolle.modules.study.domain.Study;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 

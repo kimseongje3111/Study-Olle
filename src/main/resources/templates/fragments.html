@@ -98,10 +98,11 @@
                 <div class="dropdown-menu dropdown-menu-sm-right" aria-labelledby="userDropdown">
                     <h6 class="dropdown-header"><span sec:authentication="name">username</span></h6>
                     <a class="dropdown-item" th:href="@{'/account/profile/' + ${#authentication.name}}">프로필</a>
-                    <a class="dropdown-item">스터디</a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" th:href="@{'/account/settings/profile'}">설정</a>
+                    <a class="dropdown-item" th:href="@{'/account/profile/' + ${#authentication.name} + '/study'}">스터디</a>
 
+                    <div class="dropdown-divider"></div>
+
+                    <a class="dropdown-item" th:href="@{'/account/settings/profile'}">설정</a>
                     <form class="form-inline my-2 my-lg-0" th:action="@{/logout}" method="post">
                         <button class="dropdown-item" type="submit">로그아웃</button>
                     </form>
@@ -350,24 +351,24 @@
 
             <!-- member menu -->
             <span sec:authorize="isAuthenticated()"
-                  th:if="${study.canJoin(#authentication.principal)}" class="btn-group ml-1" role="group">
+                  th:if="${study.canJoin(#authentication.principal)}" class="btn-group ml-2" role="group">
                     <a class="btn btn-primary" th:href="@{'/study/studies/' + ${study.path} + '/join'}">
-                        스터디 가입
+                        <i class="fa fa-sign-in"></i> 스터디 가입
                     </a>
                     <a class="btn btn-outline-info" th:href="@{'/study/studies/' + ${study.path} + '/members'}"
                        th:text="${study.memberCount}" aria-pressed="true" data-toggle="tooltip" title="참여 중인 인원">0</a>
             </span>
             <span sec:authorize="isAuthenticated()"
-                  th:if="${!study.closed && study.isMember(#authentication.principal)}">
+                  th:if="${!study.closed && study.isMember(#authentication.principal)}" class="ml-2">
                     <a class="btn btn-outline-danger" th:href="@{'/study/studies/' + ${study.path} + '/leave'}">
-                        스터디 탈퇴
+                        <i class="fa fa-sign-out"></i> 스터디 탈퇴
                     </a>
             </span>
 
             <!-- manager menu -->
             <span sec:authorize="isAuthenticated()"
                   th:if="${study.published && !study.closed && study.isManager(#authentication.principal)}">
-                    <a class="btn btn-outline-primary ml-1" th:href="@{'/study/studies/' + ${study.path} + '/event/new-event'}">
+                    <a class="btn btn-outline-primary ml-2" th:href="@{'/study/studies/' + ${study.path} + '/event/new-event'}">
                         <i class="fa fa-plus"></i> 모임 만들기
                     </a>
             </span>

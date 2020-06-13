@@ -7,9 +7,6 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    properties:
-      hibernate:
-        default_batch_fetch_size: 1000
 
   mail:
     host: smtp.gmail.com
@@ -21,7 +18,3 @@ spring:
         auth: true
         timeout: 5000
         starttls.enable: true
-
-server:
-  tomcat:
-    max-http-form-post-size: 5MB

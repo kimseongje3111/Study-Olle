@@ -156,7 +156,8 @@
             locale: 'ko',
             sideBySide: true,
             useCurrent: false,
-            minDate: moment()
+            minDate: moment(),
+            defaultDate: $('#startDateTimeValue').val()
         });
 
         $('#datetimepicker2').datetimepicker({
@@ -164,7 +165,8 @@
             locale: 'ko',
             sideBySide: true,
             useCurrent: false,
-            minDate: moment()
+            minDate: moment(),
+            defaultDate: $('#endDateTimeValue').val()
         });
 
         $('#datetimepicker3').datetimepicker({
@@ -172,7 +174,8 @@
             locale: 'ko',
             sideBySide: true,
             useCurrent: false,
-            minDate: moment()
+            minDate: moment(),
+            defaultDate: $('#enrollmentDeadlineValue').val()
         });
 
         $("#datetimepicker1").on("change.datetimepicker", function (e) {

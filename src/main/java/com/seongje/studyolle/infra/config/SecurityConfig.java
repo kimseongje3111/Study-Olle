@@ -1,6 +1,5 @@
 package com.seongje.studyolle.infra.config;
 
-import com.seongje.studyolle.modules.account.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -10,20 +9,18 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
-import org.springframework.security.web.header.writers.frameoptions.WhiteListedAllowFromStrategy;
-import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 
 import javax.sql.DataSource;
-import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final AccountService accountService;
+    private final UserDetailsService userDetailsService;
     private final DataSource dataSource;
 
     // Custom Spring Security Configuration //
@@ -48,7 +45,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // Keep login //
 
         http.rememberMe()
-                .userDetailsService(accountService)      // User details service
+                .userDetailsService(userDetailsService)      // User details service
                 .tokenRepository(tokenRepository());     // Token in DB
     }
 

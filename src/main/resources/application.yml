@@ -9,10 +9,6 @@ spring:
       hibernate:
         default_batch_fetch_size : 1000
 
-  h2:
-    console:
-      enabled: true
-
 logging:
   level:
     org.hibernate.SQL: debug

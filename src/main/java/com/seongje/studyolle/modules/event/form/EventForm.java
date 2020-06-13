@@ -1,6 +1,6 @@
 package com.seongje.studyolle.modules.event.form;
 
-import com.seongje.studyolle.domain.event.EventType;
+import com.seongje.studyolle.modules.event.domain.EventType;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -9,7 +9,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
-import static com.seongje.studyolle.domain.event.EventType.*;
+import static com.seongje.studyolle.modules.event.domain.EventType.*;
 import static org.springframework.format.annotation.DateTimeFormat.ISO.*;
 
 @Data
