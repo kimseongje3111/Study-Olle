@@ -25,8 +25,8 @@ public class EventEnrollmentsController {
     static final String ENROLLMENT_CHECKIN = "/checkin";
     static final String ENROLLMENT_CHECKIN_CANCEL = "/checkin-cancel";
 
-    private final EventService eventService;
     private final StudyService studyService;
+    private final EventService eventService;
 
     @SneakyThrows
     @GetMapping(ENROLLMENT_ACCEPT)

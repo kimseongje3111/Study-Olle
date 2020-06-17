@@ -32,6 +32,9 @@ public class TagService {
     }
 
     public List<String> getAllTags() {
-        return tagRepository.findAll().stream().map(Tag::getTitle).sorted().collect(Collectors.toList());
+        return tagRepository.findAll().stream()
+                .map(Tag::getTitle)
+                .sorted()
+                .collect(Collectors.toList());
     }
 }

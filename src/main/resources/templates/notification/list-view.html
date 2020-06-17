@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments.html :: header"></head>
+
+<body class="bg-light">
+<nav th:replace="fragments.html :: main-nav"></nav>
+
+<div class="container">
+    <div class="row pt-5 px-3 text-center">
+        <div class="col-3 mr-3">
+            <ul class="list-group">
+                <a th:href="@{/notifications}" th:classappend="${!isRead} ? active"
+                   class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                    읽지 않은 알림
+                    <span th:text="${numberOfNotChecked}">0</span>
+                </a>
+                <a th:href="@{/notifications/read}" th:classappend="${isRead} ? active"
+                   class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                    읽은 알림
+                    <span th:text="${numberOfChecked}">0</span>
+                </a>
+            </ul>
+
+            <ul class="list-group mt-5">
+                <a th:if="${newStudyNotifications.size() > 0}"
+                   class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                    새 스터디 알림
+                    <span class="badge badge-primary badge-pill" th:text="${newStudyNotifications.size()}">0</span>
+                </a>
+                <a th:if="${eventEnrollmentNotifications.size() > 0}"
+                   class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                    모임 신청 및 결과 알림
+                    <span class="badge badge-primary badge-pill" th:text="${eventEnrollmentNotifications.size()}">0</span>
+                </a>
+                <a th:if="${participatingStudyNotifications.size() > 0}"
+                   class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                    참여 중인 스터디 알림
+                    <span class="badge badge-primary badge-pill" th:text="${participatingStudyNotifications.size()}">0</span>
+                </a>
+            </ul>
+
+            <ul class="list-group mt-3">
+                <form th:if="${!isRead && numberOfNotChecked > 0}" th:action="@{/notifications/change-to-read}" method="post">
+                    <button type="submit" class="btn btn-block btn-outline-success">
+                        모두 읽음으로 표시
+                    </button>
+                </form>
+
+                <form th:if="${isRead && numberOfChecked > 0}" th:action="@{/notifications/delete}" method="post" class="mt-1">
+                    <button type="submit" class="btn btn-block btn-outline-warning" aria-describedby="deleteHelp">
+                        읽은 알림 삭제
+                    </button>
+                    <small id="deleteHelp" class="text-left text-muted">
+                        <i class="fa fa-exclamation-circle"></i>
+                        한달이 지난 알림은 자동으로 삭제됩니다.
+                    </small>
+                </form>
+            </ul>
+        </div>
+
+        <div class="col-8">
+            <div class="card mt-4" th:if="${notifications.size() == 0}">
+                <div class="card-header font-weight-border">
+                    알림 메시지가 없습니다.
+                </div>
+            </div>
+
+            <div class="card mt-4" th:if="${newStudyNotifications.size() > 0}">
+                <div class="card-header font-weight-bolder">
+                    주요 활동 지역에 관심있는 주제의 스터디가 새로 오픈하였습니다.
+                </div>
+
+                <div th:replace="fragments.html :: notification-list (notifications=${newStudyNotifications})"></div>
+            </div>
+
+            <div class="card mt-4" th:if="${eventEnrollmentNotifications.size() > 0}">
+                <div class="card-header font-weight-bolder">
+                    모임 신청 및 결과 관련 소식이 있습니다.
+                </div>
+
+                <div th:replace="fragments.html :: notification-list (notifications=${eventEnrollmentNotifications})"></div>
+            </div>
+
+            <div class="card mt-4" th:if="${participatingStudyNotifications.size() > 0}">
+                <div class="card-header font-weight-bolder">
+                    참여 중인 스터디 관련 소식이 있습니다.
+                </div>
+
+                <div th:replace="fragments.html :: notification-list (notifications=${participatingStudyNotifications})"></div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="fragments.html :: footer"></div>
+</div>
+
+<script th:replace="fragments.html :: date-time"></script>
+</body>
+</html>

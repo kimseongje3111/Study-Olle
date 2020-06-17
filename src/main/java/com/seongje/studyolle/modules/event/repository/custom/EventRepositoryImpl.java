@@ -7,9 +7,9 @@ import javax.persistence.EntityManager;
 
 import java.util.List;
 
-import static com.seongje.studyolle.domain.account.QAccount.account;
-import static com.seongje.studyolle.domain.event.QEvent.*;
-import static com.seongje.studyolle.domain.study.QStudy.study;
+import static com.seongje.studyolle.modules.account.domain.QAccount.*;
+import static com.seongje.studyolle.modules.event.domain.QEvent.*;
+import static com.seongje.studyolle.modules.study.domain.QStudy.*;
 
 public class EventRepositoryImpl implements EventRepositoryCustom {
 

@@ -75,7 +75,8 @@
             <!-- login after -->
             <li class="nav-item" sec:authorize="isAuthenticated()">
                 <a class="nav-link" th:href="@{/notifications}" th:if="${account?.isEmailVerified()}">
-                    <i class="fa fa-bell-o" aria-hidden="true"></i>
+                    <i th:if="${!hasNotification}" class="fa fa-bell-o" aria-hidden="true"></i >
+                    <span th:if="${hasNotification}" class="text-info"><i class="fa fa-bell" aria-hidden="true"></i></span>
                 </a>
             </li>
             <li class="nav-item" sec:authorize="isAuthenticated()">
@@ -491,5 +492,38 @@
         })
     </script>
 </div>
+
+<!-- notification list -->
+<ul th:fragment="notification-list (notifications)" class="list-group list-group-flush">
+    <li th:each="notification : ${notifications}" class="list-group-item list-group-item-action">
+        <div class="d-flex w-100 justify-content-between">
+            <div>
+                <div th:if="${notification.isMyStudy()}" class="badge badge-info text-wrap mr-1">
+                    내 스터디
+                </div>
+
+                <span th:if="${#strings.isEmpty(notification.link)}">
+                    <small class="text-muted"><i class="fa fa-unlink"></i></small>
+                    <small th:text="${notification.title}" class="text-muted">notification title</small>
+                </span>
+
+                <span th:if="${!#strings.isEmpty(notification.link)}">
+                    <small><i class="fa fa-link"></i></small>
+                    <a th:href="@{${notification.link}}">
+                        <small th:text="${notification.title}">notification title</small>
+                    </a>
+                </span>
+            </div>
+
+            <small class="fromNow text-muted" th:text="${notification.createdDateTime}">notification created datetime</small>
+        </div>
+
+        <p th:text="${notification.message}" class="text-left mb-0 mt-1">message</p>
+        <p th:if="${!#strings.isEmpty(notification.additionalExplanation)}" class="text-left mb-0 text-muted">
+            <small class="text-muted"><i class="fa fa-arrow-circle-right"></i></small>
+            <small th:text="${notification.additionalExplanation}">additional explanation</small>
+        </p>
+    </li>
+</ul>
 
 </html>

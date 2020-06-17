@@ -34,8 +34,8 @@ public class EventController {
     static final String EVENT_ENROLL = EVENT_HOME + "/enroll";
     static final String EVENT_ENROLL_CANCEL = EVENT_HOME + "/disenroll";
 
-    private final EventService eventService;
     private final StudyService studyService;
+    private final EventService eventService;
     private final EventFormValidator eventFormValidator;
     private final ModelMapper modelMapper;
 

@@ -43,23 +43,6 @@
                     </div>
 
                     <div class="alert alert-light" role="alert">
-                        <strong>스터디 모임 참가 신청</strong> 결과에 대한 알림을 받을 방법을 설정하세요.
-                    </div>
-
-                    <div class="form-group mb-5">
-                        <div class="custom-control custom-switch custom-control-inline">
-                            <input type="checkbox" th:field="*{studyEnrollmentResultByEmail}"
-                                   class="custom-control-input" id="studyEnrollmentResultByEmil">
-                            <label class="custom-control-label" for="studyEnrollmentResultByEmil">이메일로 받기</label>
-                        </div>
-                        <div class="custom-control custom-switch custom-control-inline">
-                            <input type="checkbox" th:field="*{studyEnrollmentResultByWeb}" class="custom-control-input"
-                                   id="studyEnrollmentResultByWeb">
-                            <label class="custom-control-label" for="studyEnrollmentResultByWeb">웹으로 받기</label>
-                        </div>
-                    </div>
-
-                    <div class="alert alert-light" role="alert">
                         <strong>참여 중인 스터디</strong>에 대한 알림을 받을 방법을 설정하세요.
                     </div>
 
@@ -73,6 +56,23 @@
                             <input type="checkbox" th:field="*{studyUpdatedByWeb}" class="custom-control-input"
                                    id="studyWatchByWeb">
                             <label class="custom-control-label" for="studyWatchByWeb">웹으로 받기</label>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-light" role="alert">
+                        <strong>스터디 모임 신청 및 결과</strong>에 대한 알림을 받을 방법을 설정하세요.
+                    </div>
+
+                    <div class="form-group mb-5">
+                        <div class="custom-control custom-switch custom-control-inline">
+                            <input type="checkbox" th:field="*{studyEnrollmentResultByEmail}"
+                                   class="custom-control-input" id="studyEnrollmentResultByEmil">
+                            <label class="custom-control-label" for="studyEnrollmentResultByEmil">이메일로 받기</label>
+                        </div>
+                        <div class="custom-control custom-switch custom-control-inline">
+                            <input type="checkbox" th:field="*{studyEnrollmentResultByWeb}" class="custom-control-input"
+                                   id="studyEnrollmentResultByWeb">
+                            <label class="custom-control-label" for="studyEnrollmentResultByWeb">웹으로 받기</label>
                         </div>
                     </div>
 

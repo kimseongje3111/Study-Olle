@@ -161,7 +161,7 @@
                                        placeholder="공백없이 문자, 숫자, 대시(-)와 언더바(_)만 사용하여 2자 이상 20자 이내로 입력하세요."
                                        name="newPath" aria-describedby="pathHelp" minlength="2" maxlength="20" required>
                                 <small id="pathHelp" class="form-text text-muted">
-                                    입력한 경로는 현재 개설할 스터디 홈 주소에 사용됩니다. 예) /study/studies/<b>my-study-path</b>
+                                    위 경로는 현재 스터디의 홈 주소에 사용됩니다. 예) /study/studies/<b>my-study-path</b>
                                 </small>
                                 <small class="invalid-feedback">길이에 맞게 스터디 경로를 입력하세요.</small>
                                 <small class="form-text text-danger" th:if="${studyPathError}" th:errors="${studyPathError}">

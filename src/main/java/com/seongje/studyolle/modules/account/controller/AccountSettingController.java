@@ -74,13 +74,14 @@ public class AccountSettingController {
     @PostMapping(PROFILE)
     public String updateProfileFormSubmit(@CurrentUser Account account, @Valid ProfileForm profileForm,
                                           Errors errors, Model model, RedirectAttributes attributes) {
-
         if (errors.hasErrors()) {
             model.addAttribute(account);
             return PROFILE;
         }
 
-        accountService.updateProfile(account, profileForm);
+        Account findAccount = accountService.findByEmail(account.getEmail());
+
+        accountService.updateProfile(findAccount, profileForm);
         attributes.addFlashAttribute("message", "프로필이 수정되었습니다.");
 
         return REDIRECT + PROFILE;
@@ -97,13 +98,14 @@ public class AccountSettingController {
     @PostMapping(PASSWORD)
     public String updatePasswordFormSubmit(@CurrentUser Account account, @Valid PasswordForm passwordForm,
                                            Errors errors, Model model, RedirectAttributes attributes) {
-
         if (errors.hasErrors()) {
             model.addAttribute(account);
             return PASSWORD;
         }
 
-        accountService.updatePassword(account, passwordForm.getNewPassword());
+        Account findAccount = accountService.findByEmail(account.getEmail());
+
+        accountService.updatePassword(findAccount, passwordForm.getNewPassword());
         attributes.addFlashAttribute("message", "패스워드가 변경되었습니다.");
 
         return REDIRECT + PASSWORD;
@@ -120,13 +122,14 @@ public class AccountSettingController {
     @PostMapping(NOTIFICATIONS)
     public String updatedNotificationsFormSubmit(@CurrentUser Account account, @Valid NotificationsForm notificationsForm,
                                                  Errors errors, Model model, RedirectAttributes attributes) {
-
         if (errors.hasErrors()) {
             model.addAttribute(account);
             return NOTIFICATIONS;
         }
 
-        accountService.updateNotifications(account, notificationsForm);
+        Account findAccount = accountService.findByEmail(account.getEmail());
+
+        accountService.updateNotifications(findAccount, notificationsForm);
         attributes.addFlashAttribute("message", "변경 사항이 저장되었습니다.");
 
         return REDIRECT + NOTIFICATIONS;
@@ -147,9 +150,10 @@ public class AccountSettingController {
     @PostMapping(TAGS + "/add")
     @ResponseBody
     public ResponseEntity addTag(@CurrentUser Account account, @RequestBody TagForm tagForm) {
+        Account findAccount = accountService.findByEmail(account.getEmail());
         Tag findOrNewTag = tagService.findOrCreateTag(tagForm.getTagTitle());
 
-        accountService.addTag(account, findOrNewTag);
+        accountService.addTag(findAccount, findOrNewTag);
 
         return ResponseEntity.ok().build();
     }
@@ -157,13 +161,14 @@ public class AccountSettingController {
     @PostMapping(TAGS + "/remove")
     @ResponseBody
     public ResponseEntity removeTag(@CurrentUser Account account, @RequestBody TagForm tagForm) {
+        Account findAccount = accountService.findByEmail(account.getEmail());
         Tag findTag = tagService.findByTagTitle(tagForm.getTagTitle());
 
         if (findTag == null) {
             return ResponseEntity.badRequest().build();
         }
 
-        accountService.removeTag(account, findTag);
+        accountService.removeTag(findAccount, findTag);
 
         return ResponseEntity.ok().build();
     }
@@ -182,28 +187,30 @@ public class AccountSettingController {
 
     @PostMapping(ZONES + "/add")
     @ResponseBody
-    public ResponseEntity addTag(@CurrentUser Account account, @RequestBody ZoneForm zoneForm) {
+    public ResponseEntity addZone(@CurrentUser Account account, @RequestBody ZoneForm zoneForm) {
+        Account findAccount = accountService.findByEmail(account.getEmail());
         Zone findZone = zoneService.findZone(zoneForm);
 
         if (findZone == null) {
             return ResponseEntity.badRequest().build();
         }
 
-        accountService.addZone(account, findZone);
+        accountService.addZone(findAccount, findZone);
 
         return ResponseEntity.ok().build();
     }
 
     @PostMapping(ZONES + "/remove")
     @ResponseBody
-    public ResponseEntity removeTag(@CurrentUser Account account, @RequestBody ZoneForm zoneForm) {
+    public ResponseEntity removeZone(@CurrentUser Account account, @RequestBody ZoneForm zoneForm) {
+        Account findAccount = accountService.findByEmail(account.getEmail());
         Zone findZone = zoneService.findZone(zoneForm);
 
         if (findZone == null) {
             return ResponseEntity.badRequest().build();
         }
 
-        accountService.removeZone(account, findZone);
+        accountService.removeZone(findAccount, findZone);
 
         return ResponseEntity.ok().build();
     }
@@ -219,13 +226,14 @@ public class AccountSettingController {
     @PostMapping(ACCOUNT)
     public String updateAccountFormSubmit(@CurrentUser Account account, @Valid AccountForm accountForm,
                                           Errors errors, Model model, RedirectAttributes attributes) {
-
         if (errors.hasErrors()) {
             model.addAttribute(account);
             return ACCOUNT;
         }
 
-        if (!accountService.updateNickname(account, accountForm.getNickname())) {
+        Account findAccount = accountService.findByNickname(account.getNickname());
+
+        if (!accountService.updateNickname(findAccount, accountForm.getNickname())) {
             model.addAttribute(account);
             model.addAttribute(modelMapper.map(account, AccountForm.class));
             model.addAttribute("error", "닉네임 변경은 하루에 한번만 가능합니다.");

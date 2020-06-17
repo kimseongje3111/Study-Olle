@@ -53,6 +53,9 @@ public class ZoneService {
     }
 
     public List<String> getAllZones() {
-        return zoneRepository.findAll().stream().map(Zone::toString).sorted().collect(Collectors.toList());
+        return zoneRepository.findAll().stream()
+                .map(Zone::toString)
+                .sorted()
+                .collect(Collectors.toList());
     }
 }

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>스터디올래</title>
+</head>
+
+<body>
+<div>
+    <p>안녕하세요. <span th:text="${nickname}"></span> 님</p>
+
+    <h2 th:text="${message}">메시지</h2>
+
+    <div th:if="${!isDeleted}">
+        <div style="margin-bottom: 5px">
+            해당 스터디 바로 가기 : <a th:href="${host + link}" th:text="${linkName}">링크</a>
+        </div>
+
+        <div>
+            <p style="margin-bottom: 2px">링크가 동작하지 않는 경우, 아래 URL을 웹 브라우저에 복사해서 붙여 넣으세요.</p>
+            <p th:text="${host + link}"></p>
+        </div>
+    </div>
+
+    <div th:if="${isDeleted}">
+        <div style="margin-bottom: 5px">
+            삭제된 스터디 이름 : <span th:text="${linkName}">스터디 이름</span>
+        </div>
+    </div>
+</div>
+</body>
+
+<footer style="margin-top: 10px">
+    <small>&copy;스터디올래 2020</small>
+</footer>
+</html>

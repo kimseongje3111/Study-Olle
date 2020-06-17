@@ -39,20 +39,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // Custom login & logout page //
 
         http.formLogin().loginPage("/account/login").permitAll();
-
         http.logout().logoutSuccessUrl("/");
 
         // Keep login //
 
         http.rememberMe()
                 .userDetailsService(userDetailsService)      // User details service
-                .tokenRepository(tokenRepository());     // Token in DB
+                .tokenRepository(tokenRepository());         // Token in DB
     }
 
     @Override
     public void configure(WebSecurity web) throws Exception {
 
-        // Resources //
+        // Static resources //
 
         web.ignoring()
                 .mvcMatchers("/node_modules/**")

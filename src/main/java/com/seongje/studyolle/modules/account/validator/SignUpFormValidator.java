@@ -24,8 +24,6 @@ public class SignUpFormValidator implements Validator {
     public void validate(Object target, Errors errors) {
         SignUpForm signUpForm = (SignUpForm) target;
 
-        // 닉네임,이메일 중복 검사 //
-
         if (accountRepository.existsByNickname(signUpForm.getNickname())) {
             errors.rejectValue("nickname","invalid.nickname",
                     new Object[]{signUpForm.getNickname()}, "이미 사용 중인 닉네임입니다.");

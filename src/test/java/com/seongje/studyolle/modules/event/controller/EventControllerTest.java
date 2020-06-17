@@ -11,11 +11,9 @@ import com.seongje.studyolle.modules.event.domain.Enrollment;
 import com.seongje.studyolle.modules.event.domain.Event;
 import com.seongje.studyolle.modules.event.form.EventForm;
 import com.seongje.studyolle.modules.event.repository.EnrollmentRepository;
-import com.seongje.studyolle.modules.event.repository.EventRepository;
 import com.seongje.studyolle.modules.event.service.EventService;
 import com.seongje.studyolle.modules.study.StudyFactory;
 import com.seongje.studyolle.modules.study.domain.Study;
-import com.seongje.studyolle.modules.study.repository.StudyRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,12 +23,10 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
 
-import static com.seongje.studyolle.modules.event.controller.EventController.*;
 import static com.seongje.studyolle.modules.event.domain.EventType.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -40,8 +36,6 @@ class EventControllerTest extends AbstractContainerBaseTest {
     @Autowired MockMvc mockMvc;
     @Autowired EventService eventService;
     @Autowired AccountRepository accountRepository;
-    @Autowired StudyRepository studyRepository;
-    @Autowired EventRepository eventRepository;
     @Autowired EnrollmentRepository enrollmentRepository;
     @Autowired AccountFactory accountFactory;
     @Autowired StudyFactory studyFactory;
@@ -54,9 +48,9 @@ class EventControllerTest extends AbstractContainerBaseTest {
     public void event_update_limit_of_enrollments_form_FCFS_with_waiting() throws Exception {
         // Given
         Account manager = accountRepository.findByNickname("seongje");
-        Account guest1 = accountRepository.save(accountFactory.createAccount("guest1"));
-        Account guest2 = accountRepository.save(accountFactory.createAccount("guest2"));
-        Study testStudy = studyRepository.save(studyFactory.createStudy("test-study", manager));
+        Account guest1 = accountFactory.createAccount("guest1");
+        Account guest2 = accountFactory.createAccount("guest2");
+        Study testStudy = studyFactory.createStudy("test-study", manager);
         Event testEvent = eventFactory.createEvent("test-event", FCFS, 2, testStudy, manager);
 
         // When 1
@@ -86,9 +80,9 @@ class EventControllerTest extends AbstractContainerBaseTest {
     public void event_update_limit_of_enrollments_less_than_number_of_accepted() throws Exception {
         // Given
         Account manager = accountRepository.findByNickname("seongje");
-        Account guest1 = accountRepository.save(accountFactory.createAccount("guest1"));
-        Account guest2 = accountRepository.save(accountFactory.createAccount("guest2"));
-        Study testStudy = studyRepository.save(studyFactory.createStudy("test-study", manager));
+        Account guest1 = accountFactory.createAccount("guest1");
+        Account guest2 = accountFactory.createAccount("guest2");
+        Study testStudy = studyFactory.createStudy("test-study", manager);
         Event testEvent = eventFactory.createEvent("test-event", FCFS, 3, testStudy, manager);
 
         // When
@@ -112,8 +106,8 @@ class EventControllerTest extends AbstractContainerBaseTest {
     @WithAccount("seongje")
     public void enrollment_before_deadline() throws Exception {
         // Given
-        Account manager = accountRepository.save(accountFactory.createAccount("manager"));
-        Study testStudy = studyRepository.save(studyFactory.createStudy("test-study", manager));
+        Account manager = accountFactory.createAccount("manager");
+        Study testStudy = studyFactory.createStudy("test-study", manager);
         Event testEvent = eventFactory.createEvent("test-event", FCFS, 2, testStudy, manager);
 
         // When
@@ -136,9 +130,9 @@ class EventControllerTest extends AbstractContainerBaseTest {
     @WithAccount("seongje")
     public void enrollment_cancel_before_deadline() throws Exception {
         // Given
-        Account manager = accountRepository.save(accountFactory.createAccount("manager"));
+        Account manager = accountFactory.createAccount("manager");
         Account guest = accountRepository.findByNickname("seongje");
-        Study testStudy = studyRepository.save(studyFactory.createStudy("test-study", manager));
+        Study testStudy = studyFactory.createStudy("test-study", manager);
         Event testEvent = eventFactory.createEvent("test-event", FCFS, 2, testStudy, manager);
 
         // When
@@ -164,8 +158,8 @@ class EventControllerTest extends AbstractContainerBaseTest {
     @WithAccount("seongje")
     public void enrollment_after_deadline() throws Exception {
         // Given
-        Account manager = accountRepository.save(accountFactory.createAccount("manager"));
-        Study testStudy = studyRepository.save(studyFactory.createStudy("test-study", manager));
+        Account manager = accountFactory.createAccount("manager");
+        Study testStudy = studyFactory.createStudy("test-study", manager);
         Event testEvent = eventFactory.createEvent("test-event", FCFS, 2, testStudy, manager);
 
         // When
@@ -189,9 +183,9 @@ class EventControllerTest extends AbstractContainerBaseTest {
     @WithAccount("seongje")
     public void enrollment_cancel_after_deadline() throws Exception {
         // Given
-        Account manager = accountRepository.save(accountFactory.createAccount("manager"));
+        Account manager = accountFactory.createAccount("manager");
         Account guest = accountRepository.findByNickname("seongje");
-        Study testStudy = studyRepository.save(studyFactory.createStudy("test-study", manager));
+        Study testStudy = studyFactory.createStudy("test-study", manager);
         Event testEvent = eventFactory.createEvent("test-event", FCFS, 2, testStudy, manager);
 
         // When
@@ -221,8 +215,8 @@ class EventControllerTest extends AbstractContainerBaseTest {
     @WithAccount("seongje")
     public void enrollment_to_FCFS_event_when_there_are_remains() throws Exception {
         // Given
-        Account manager = accountRepository.save(accountFactory.createAccount("manager"));
-        Study testStudy = studyRepository.save(studyFactory.createStudy("test-study", manager));
+        Account manager = accountFactory.createAccount("manager");
+        Study testStudy = studyFactory.createStudy("test-study", manager);
         Event testEvent = eventFactory.createEvent("test-event", FCFS, 2, testStudy, manager);
 
         // When
@@ -247,9 +241,9 @@ class EventControllerTest extends AbstractContainerBaseTest {
     @WithAccount("seongje")
     public void enrollment_to_FCFS_event_when_there_are_no_remains() throws Exception {
         // Given
-        Account manager = accountRepository.save(accountFactory.createAccount("manager"));
-        Account guest1 = accountRepository.save(accountFactory.createAccount("guest1"));
-        Study testStudy = studyRepository.save(studyFactory.createStudy("test-study", manager));
+        Account manager = accountFactory.createAccount("manager");
+        Account guest1 = accountFactory.createAccount("guest1");
+        Study testStudy = studyFactory.createStudy("test-study", manager);
         Event testEvent = eventFactory.createEvent("test-event", FCFS, 2, testStudy, manager);
 
         // When
@@ -275,9 +269,9 @@ class EventControllerTest extends AbstractContainerBaseTest {
     @WithAccount("seongje")
     public void enrollment_cancel_from_FCFS_event_when_there_is_no_waiting() throws Exception {
         // Given
-        Account manager = accountRepository.save(accountFactory.createAccount("manager"));
+        Account manager = accountFactory.createAccount("manager");
         Account guest = accountRepository.findByNickname("seongje");
-        Study testStudy = studyRepository.save(studyFactory.createStudy("test-study", manager));
+        Study testStudy = studyFactory.createStudy("test-study", manager);
         Event testEvent = eventFactory.createEvent("test-event", FCFS, 2, testStudy, manager);
 
         // When 1
@@ -307,10 +301,10 @@ class EventControllerTest extends AbstractContainerBaseTest {
     @WithAccount("seongje")
     public void enrollment_cancel_from_FCFS_event_when_there_is_waiting() throws Exception {
         // Given
-        Account manager = accountRepository.save(accountFactory.createAccount("manager"));
+        Account manager = accountFactory.createAccount("manager");
         Account guest1 = accountRepository.findByNickname("seongje");
-        Account guest2 = accountRepository.save(accountFactory.createAccount("guest2"));
-        Study testStudy = studyRepository.save(studyFactory.createStudy("test-study", manager));
+        Account guest2 = accountFactory.createAccount("guest2");
+        Study testStudy = studyFactory.createStudy("test-study", manager);
         Event testEvent = eventFactory.createEvent("test-event", FCFS, 2, testStudy, manager);
 
         // When
@@ -335,8 +329,8 @@ class EventControllerTest extends AbstractContainerBaseTest {
     @WithAccount("seongje")
     public void enrollment_to_MANAGER_APPROVAL_event_when_there_are_remains() throws Exception {
         // Given
-        Account manager = accountRepository.save(accountFactory.createAccount("manager"));
-        Study testStudy = studyRepository.save(studyFactory.createStudy("test-study", manager));
+        Account manager = accountFactory.createAccount("manager");
+        Study testStudy = studyFactory.createStudy("test-study", manager);
         Event testEvent = eventFactory.createEvent("test-event", MANAGER_APPROVAL, 5, testStudy, manager);
 
         // When

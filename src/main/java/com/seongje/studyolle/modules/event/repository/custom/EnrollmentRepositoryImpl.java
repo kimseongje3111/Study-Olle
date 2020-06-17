@@ -5,9 +5,9 @@ import com.seongje.studyolle.modules.event.domain.Enrollment;
 
 import javax.persistence.EntityManager;
 
-import static com.seongje.studyolle.domain.account.QAccount.*;
-import static com.seongje.studyolle.domain.event.QEnrollment.*;
-import static com.seongje.studyolle.domain.event.QEvent.*;
+import static com.seongje.studyolle.modules.account.domain.QAccount.*;
+import static com.seongje.studyolle.modules.event.domain.QEnrollment.enrollment;
+import static com.seongje.studyolle.modules.event.domain.QEvent.*;
 
 public class EnrollmentRepositoryImpl implements EnrollmentRepositoryCustom {
 

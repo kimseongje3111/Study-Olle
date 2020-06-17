@@ -36,15 +36,13 @@ public class AccountController {
 
     @InitBinder("signUpForm")
     public void initBinder(WebDataBinder webDataBinder) {
-
-        // 회원 중복 검증 (닉네임, 이메일) //
-
         webDataBinder.addValidators(signUpFormValidator);
     }
 
     @GetMapping(SIGN_UP)
     public String signUpForm(Model model) {
         model.addAttribute(new SignUpForm());
+
         return SIGN_UP;
     }
 
@@ -54,7 +52,7 @@ public class AccountController {
             return SIGN_UP;
         }
 
-        accountService.processNewAccount(signUpForm);
+        accountService.processForNewAccount(signUpForm);
 
         return REDIRECT;
     }
@@ -62,12 +60,13 @@ public class AccountController {
     @GetMapping(CHECK_EMAIL)
     public String checkEmail(@CurrentUser Account account, Model model) {
         model.addAttribute(account);
+
         return CHECK_EMAIL;
     }
 
     @GetMapping(CHECK_EMAIL_TOKEN)
     public String checkEmailToken(String token, String email, Model model) {
-        Account findAccount = accountService.findByEmail(email);
+        Account findAccount = accountService.findByEmailAsNullable(email);
 
         if (findAccount == null || !findAccount.isValidToken(token)) {
             model.addAttribute("error", "wrong.emailOrToken");
@@ -75,7 +74,6 @@ public class AccountController {
         }
 
         accountService.completeSignUpAndCheckEmail(findAccount);
-
         model.addAttribute(findAccount);
         model.addAttribute("numberOfUser", accountService.usersTotalCount());
 
@@ -91,7 +89,7 @@ public class AccountController {
             return CHECK_EMAIL;
         }
 
-        accountService.resendSignUpConfirmEmail(account);
+        accountService.sendSignUpConfirmEmail(account);
 
         return REDIRECT;
     }
@@ -108,7 +106,7 @@ public class AccountController {
 
     @PostMapping(EMAIL_LOGIN)
     public String sendEmailLoginLink(String email, Model model, RedirectAttributes attributes) {
-        Account findAccount = accountService.findByEmail(email);
+        Account findAccount = accountService.findByEmailAsNullable(email);
 
         if (findAccount == null) {
             model.addAttribute("error", "유효하지 않은 이메일입니다.");
@@ -126,7 +124,6 @@ public class AccountController {
         }
 
         accountService.sendEmailLoginLink(findAccount);
-
         model.addAttribute(findAccount);
         attributes.addFlashAttribute("message", "로그인 링크를 이메일로 전송했습니다.");
 
@@ -135,14 +132,14 @@ public class AccountController {
 
     @GetMapping(EMAIL_LOGIN_CONFIRM)
     public String loginByEmail(String token, String email, Model model) {
-        Account findAccount = accountService.findByEmail(email);
+        Account findAccount = accountService.findByEmailAsNullable(email);
 
         if (findAccount == null || !findAccount.isValidToken(token)) {
             model.addAttribute("error", "wrong.emailOrToken");
             return EMAIL_LOGIN_CONFIRM;
         }
 
-        accountService.completeEmailLogin(findAccount);
+        accountService.login(findAccount);
         model.addAttribute(findAccount);
 
         return EMAIL_LOGIN_CONFIRM;

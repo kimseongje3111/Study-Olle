@@ -133,6 +133,7 @@ public class Event {
                 && (getNumberOfRemainingSeats() > 0)
                 && !enrollment.isAttended()
                 && !enrollment.isApproved();
+
     }
 
     public boolean canReject(Enrollment enrollment) {

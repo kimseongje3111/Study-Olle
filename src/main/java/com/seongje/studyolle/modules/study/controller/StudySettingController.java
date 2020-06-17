@@ -153,8 +153,8 @@ public class StudySettingController {
     public ResponseEntity addStudyTags(@CurrentUser Account account, @PathVariable String path,
                                        @RequestBody TagForm tagForm) {
 
-        Tag findOrNewTag = tagService.findOrCreateTag(tagForm.getTagTitle());
         Study findStudy = studyService.findStudyForUpdate(path, account);
+        Tag findOrNewTag = tagService.findOrCreateTag(tagForm.getTagTitle());
 
         studyService.addStudyTag(findStudy, findOrNewTag);
 
@@ -165,8 +165,8 @@ public class StudySettingController {
     public ResponseEntity removeStudyTags(@CurrentUser Account account, @PathVariable String path,
                                           @RequestBody TagForm tagForm) {
 
-        Tag findTag = tagService.findByTagTitle(tagForm.getTagTitle());
         Study findStudy = studyService.findStudyForUpdate(path, account);
+        Tag findTag = tagService.findByTagTitle(tagForm.getTagTitle());
 
         if (findTag == null) {
             return ResponseEntity.badRequest().build();
@@ -198,8 +198,8 @@ public class StudySettingController {
     public ResponseEntity addStudyZones(@CurrentUser Account account, @PathVariable String path,
                                         @RequestBody ZoneForm zoneForm) {
 
-        Zone findZone = zoneService.findZone(zoneForm);
         Study findStudy = studyService.findStudyForUpdate(path, account);
+        Zone findZone = zoneService.findZone(zoneForm);
 
         studyService.addStudyZone(findStudy, findZone);
 
@@ -210,8 +210,8 @@ public class StudySettingController {
     public ResponseEntity removeStudyZones(@CurrentUser Account account, @PathVariable String path,
                                            @RequestBody ZoneForm zoneForm) {
 
-        Zone findZone = zoneService.findZone(zoneForm);
         Study findStudy = studyService.findStudyForUpdate(path, account);
+        Zone findZone = zoneService.findZone(zoneForm);
 
         if (findZone == null) {
             return ResponseEntity.badRequest().build();

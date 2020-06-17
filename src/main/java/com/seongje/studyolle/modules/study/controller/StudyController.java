@@ -51,7 +51,6 @@ public class StudyController {
     @PostMapping(NEW_STUDY)
     public String newStudySubmit(@CurrentUser Account account, @Valid StudyForm studyForm,
                                  Errors errors, Model model) {
-
         if (errors.hasErrors()) {
             model.addAttribute(account);
             return NEW_STUDY;
@@ -87,7 +86,7 @@ public class StudyController {
     public String studyJoin(@CurrentUser Account account, @PathVariable String path) {
         Study findStudy = studyService.findStudy(path);
 
-        studyService.joinToStudy(account, findStudy);
+        studyService.joinToStudy(findStudy, account);
 
         return REDIRECT + findStudy.getEncodedPath() + "/members";
     }
@@ -97,7 +96,7 @@ public class StudyController {
     public String studyLeave(@CurrentUser Account account, @PathVariable String path) {
         Study findStudy = studyService.findStudy(path);
 
-        studyService.leaveFromStudy(account, findStudy);
+        studyService.leaveFromStudy(findStudy, account);
 
         return REDIRECT + findStudy.getEncodedPath() + "/members";
     }

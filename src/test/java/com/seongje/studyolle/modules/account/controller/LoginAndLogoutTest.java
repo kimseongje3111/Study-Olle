@@ -35,7 +35,7 @@ public class LoginAndLogoutTest extends AbstractContainerBaseTest {
         signUpForm.setEmail("seongje@email.com");
         signUpForm.setPassword("password");
 
-        accountService.processNewAccount(signUpForm);
+        accountService.processForNewAccount(signUpForm);
     }
 
     @AfterEach

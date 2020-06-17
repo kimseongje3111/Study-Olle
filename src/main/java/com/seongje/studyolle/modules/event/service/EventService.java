@@ -4,13 +4,12 @@ import com.seongje.studyolle.modules.account.domain.Account;
 import com.seongje.studyolle.modules.event.domain.Enrollment;
 import com.seongje.studyolle.modules.event.domain.Event;
 import com.seongje.studyolle.modules.study.domain.Study;
-import com.seongje.studyolle.modules.account.repository.AccountRepository;
 import com.seongje.studyolle.modules.event.form.EventForm;
 import com.seongje.studyolle.modules.event.repository.EnrollmentRepository;
 import com.seongje.studyolle.modules.event.repository.EventRepository;
-import com.seongje.studyolle.modules.study.repository.StudyRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +17,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.seongje.studyolle.modules.event.domain.Enrollment.*;
 import static com.seongje.studyolle.modules.event.domain.EventType.*;
 
 @Service
@@ -27,9 +27,8 @@ public class EventService {
 
     private final EventRepository eventRepository;
     private final EnrollmentRepository enrollmentRepository;
-    private final AccountRepository accountRepository;
-    private final StudyRepository studyRepository;
     private final ModelMapper modelMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
     public Event findEvent(Long eventId) {
         Event findEvent = eventRepository.searchEventById(eventId);
@@ -53,107 +52,106 @@ public class EventService {
 
     @Transactional
     public Event createNewEvent(Event event, Account account, Study study) {
-        Account findAccount = accountRepository.findByEmail(account.getEmail());
-        Study findStudy = studyRepository.findByPath(study.getPath());
+        Event newEvent = eventRepository.save(event.newEvent(account, study));
 
-        return eventRepository.save(event.newEvent(findAccount, findStudy));
-    }
+        // TODO : 모임 생성 이벤트
 
-    @Transactional
-    public void enrollToEvent(Event event, Account account) {
-        Event findEvent = eventRepository.searchEventById(event.getId());
-        Account findAccount = accountRepository.findByEmail(account.getEmail());
-
-        if (enrollmentRepository.existsByEventAndAccount(findEvent, findAccount)) {
-            throw new IllegalArgumentException("이미 해당 모임 참가 신청을 완료했습니다.");
-        }
-
-        if (!findEvent.isAfterEnrollmentDeadline()) {
-            Enrollment newEnrollment = Enrollment.createNewEnrollment(findEvent, findAccount);
-
-            if (findEvent.getCreatedBy().equals(findAccount) || findEvent.isRemainingSeatsFor(FCFS)) {
-                newEnrollment.setApproved(true);
-            }
-
-            findEvent.addEnrollment(enrollmentRepository.save(newEnrollment));
-        }
-    }
-
-    @Transactional
-    public void cancelEnrollFromEvent(Event event, Account account) {
-        Event findEvent = eventRepository.searchEventById(event.getId());
-        Account findAccount = accountRepository.findByEmail(account.getEmail());
-
-        if (!enrollmentRepository.existsByEventAndAccount(findEvent, findAccount)) {
-            throw new IllegalArgumentException("해당 모임에 참가 신청한 기록이 없습니다.");
-        }
-
-        Enrollment findEnrollment =
-                enrollmentRepository.searchEnrollmentByEventAndAccount(findEvent.getId(), findAccount.getId());
-
-        if (!findEvent.isAfterEnrollmentDeadline() && !findEnrollment.isAttended()) {
-            enrollmentRepository.delete(findEnrollment);
-            findEvent.removeEnrollment(findEnrollment);
-
-            if (findEvent.isRemainingSeatsFor(FCFS)) {
-                findEvent.updateEnrollmentsWaitingToApproved();
-            }
-        }
+        return newEvent;
     }
 
     @Transactional
     public void updateEvent(Event event, EventForm eventForm) {
-        Event findEvent = eventRepository.searchEventById(event.getId());
+        if (eventForm.getLimitOfEnrollments() >= event.getNumberOfAcceptedEnrollments()) {
+            modelMapper.map(eventForm, event);
 
-        if (eventForm.getLimitOfEnrollments() >= findEvent.getNumberOfAcceptedEnrollments()) {
-            modelMapper.map(eventForm, findEvent);
-
-            if (findEvent.isRemainingSeatsFor(FCFS)) {
-                findEvent.updateEnrollmentsWaitingToApproved();
+            if (event.isRemainingSeatsFor(FCFS)) {
+                event.updateEnrollmentsWaitingToApproved();
             }
+
+            // TODO : 모임 수정 이벤트
         }
     }
 
     @Transactional
     public void deleteEvent(Event event) {
         eventRepository.delete(event);
+
+        // TODO : 모임 삭제 이벤트
+    }
+
+    @Transactional
+    public void enrollToEvent(Event event, Account account) {
+        if (enrollmentRepository.existsByEventAndAccount(event, account)) {
+            throw new IllegalArgumentException("이미 해당 모임 참가 신청을 완료했습니다.");
+        }
+
+        if (!event.isAfterEnrollmentDeadline()) {
+            Enrollment newEnrollment = createNewEnrollment(event, account);
+
+            if (event.getCreatedBy().equals(account) || event.isRemainingSeatsFor(FCFS)) {
+                newEnrollment.setApproved(true);
+            }
+
+            event.addEnrollment(enrollmentRepository.save(newEnrollment));
+
+            // TODO : 모임 신청 이벤트
+        }
+    }
+
+    @Transactional
+    public void cancelEnrollFromEvent(Event event, Account account) {
+        if (!enrollmentRepository.existsByEventAndAccount(event, account)) {
+            throw new IllegalArgumentException("해당 모임에 참가 신청한 기록이 없습니다.");
+        }
+
+        Enrollment findEnrollment =
+                enrollmentRepository.searchEnrollmentByEventAndAccount(event.getId(), account.getId());
+
+        if (!event.isAfterEnrollmentDeadline() && !findEnrollment.isAttended()) {
+            enrollmentRepository.delete(findEnrollment);
+            event.removeEnrollment(findEnrollment);
+
+            if (event.isRemainingSeatsFor(FCFS)) {
+                event.updateEnrollmentsWaitingToApproved();
+            }
+
+            // TODO : 모임 신청 취소 이벤트
+        }
     }
 
     @Transactional
     public void enrollmentAccept(Event event, Enrollment enrollment) {
-        Event findEvent = eventRepository.searchEventById(event.getId());
-        Enrollment findEnrollment = enrollmentRepository.searchEnrollmentById(enrollment.getId());
+        if (event.canAccept(enrollment)) {
+            enrollment.setApproved(true);
 
-        if (findEvent.canAccept(findEnrollment)) {
-            findEnrollment.setApproved(true);
+            // TODO : 모임 신청 결과 이벤트 (관리자 확인)
         }
     }
 
     @Transactional
     public void enrollmentReject(Event event, Enrollment enrollment) {
-        Event findEvent = eventRepository.searchEventById(event.getId());
-        Enrollment findEnrollment = enrollmentRepository.searchEnrollmentById(enrollment.getId());
+        if (event.canReject(enrollment)) {
+            enrollment.setApproved(false);
 
-        if (findEvent.canReject(findEnrollment)) {
-            findEnrollment.setApproved(false);
+            // TODO : 모임 신청 결과 이벤트 (관리자 확인)
         }
     }
 
     @Transactional
     public void enrollmentCheckIn(Event event, Enrollment enrollment) {
-        Enrollment findEnrollment = enrollmentRepository.searchEnrollmentById(enrollment.getId());
-
         if (event.isStarted() && enrollment.isApproved()) {
-            findEnrollment.setAttended(true);
+            enrollment.setAttended(true);
+
+            // TODO : 모임 출석 결과 이벤트
         }
     }
 
     @Transactional
     public void enrollmentCheckInCancel(Event event, Enrollment enrollment) {
-        Enrollment findEnrollment = enrollmentRepository.searchEnrollmentById(enrollment.getId());
-
         if (event.isStarted() && enrollment.isApproved()) {
-            findEnrollment.setAttended(false);
+            enrollment.setAttended(false);
+
+            // TODO : 모임 출석 결과 이벤트
         }
     }
 
