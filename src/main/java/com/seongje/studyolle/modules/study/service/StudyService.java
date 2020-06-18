@@ -1,6 +1,7 @@
 package com.seongje.studyolle.modules.study.service;
 
 import com.seongje.studyolle.modules.study.app_event.custom.*;
+import com.seongje.studyolle.modules.study.domain.StudyMember;
 import com.seongje.studyolle.modules.tag.domain.Tag;
 import com.seongje.studyolle.modules.zone.domain.Zone;
 import com.seongje.studyolle.modules.account.domain.Account;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -269,5 +271,25 @@ public class StudyService {
                 .build();
 
         return dataUrlSerializer.serialize(dataUrl);
+    }
+
+    public List<Study> getUserStudiesForParticipating(Account account) {
+        List<StudyMember> userStudies = studyMemberRepository.searchAllByAccount(account.getId());
+
+        return userStudies.stream()
+                .map(StudyMember::getStudy)
+                .filter(study -> study.isPublished() && !study.isClosed())
+                .sorted(Comparator.comparing(Study::getPublishedDateTime).reversed())
+                .collect(Collectors.toList());
+    }
+
+    public List<Study> getUserStudiesForClosed(Account account) {
+        List<StudyMember> userStudies = studyMemberRepository.searchAllByAccount(account.getId());
+
+        return userStudies.stream()
+                .map(StudyMember::getStudy)
+                .filter(study -> study.isPublished() && study.isClosed())
+                .sorted(Comparator.comparing(Study::getPublishedDateTime).reversed())
+                .collect(Collectors.toList());
     }
 }

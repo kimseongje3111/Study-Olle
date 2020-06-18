@@ -1,6 +1,12 @@
 package com.seongje.studyolle.modules.event.service;
 
 import com.seongje.studyolle.modules.account.domain.Account;
+import com.seongje.studyolle.modules.event.app_event.custom.enrollment.EnrollmentAppliedEvent;
+import com.seongje.studyolle.modules.event.app_event.custom.enrollment.EnrollmentCancelledEvent;
+import com.seongje.studyolle.modules.event.app_event.custom.enrollment.EnrollmentResultType;
+import com.seongje.studyolle.modules.event.app_event.custom.event.EventCancelledEvent;
+import com.seongje.studyolle.modules.event.app_event.custom.event.EventCreatedEvent;
+import com.seongje.studyolle.modules.event.app_event.custom.event.EventUpdatedEvent;
 import com.seongje.studyolle.modules.event.domain.Enrollment;
 import com.seongje.studyolle.modules.event.domain.Event;
 import com.seongje.studyolle.modules.study.domain.Study;
@@ -17,6 +23,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.seongje.studyolle.modules.event.app_event.custom.enrollment.EnrollmentResultType.*;
 import static com.seongje.studyolle.modules.event.domain.Enrollment.*;
 import static com.seongje.studyolle.modules.event.domain.EventType.*;
 
@@ -54,21 +61,25 @@ public class EventService {
     public Event createNewEvent(Event event, Account account, Study study) {
         Event newEvent = eventRepository.save(event.newEvent(account, study));
 
-        // TODO : 모임 생성 이벤트
+        eventPublisher.publishEvent(new EventCreatedEvent(newEvent));
 
         return newEvent;
     }
 
     @Transactional
     public void updateEvent(Event event, EventForm eventForm) {
-        if (eventForm.getLimitOfEnrollments() >= event.getNumberOfAcceptedEnrollments()) {
+        if (eventForm.getLimitOfEnrollments() >= event.getNumberOfApprovedEnrollments()) {
             modelMapper.map(eventForm, event);
 
             if (event.isRemainingSeatsFor(FCFS)) {
-                event.updateEnrollmentsWaitingToApproved();
+                event.getWaitingEnrollmentsOfRemainingSeats().forEach(enrollment -> {
+                    enrollment.setApproved(true);
+
+                    eventPublisher.publishEvent(new EnrollmentAppliedEvent(enrollment, APPROVED));
+                });
             }
 
-            // TODO : 모임 수정 이벤트
+            eventPublisher.publishEvent(new EventUpdatedEvent(event));
         }
     }
 
@@ -76,7 +87,7 @@ public class EventService {
     public void deleteEvent(Event event) {
         eventRepository.delete(event);
 
-        // TODO : 모임 삭제 이벤트
+        eventPublisher.publishEvent(new EventCancelledEvent(event));
     }
 
     @Transactional
@@ -94,7 +105,12 @@ public class EventService {
 
             event.addEnrollment(enrollmentRepository.save(newEnrollment));
 
-            // TODO : 모임 신청 이벤트
+            if (newEnrollment.isApproved()) {
+                eventPublisher.publishEvent(new EnrollmentAppliedEvent(newEnrollment, APPROVED));
+
+            } else {
+                eventPublisher.publishEvent(new EnrollmentAppliedEvent(newEnrollment, WAITING));
+            }
         }
     }
 
@@ -112,10 +128,14 @@ public class EventService {
             event.removeEnrollment(findEnrollment);
 
             if (event.isRemainingSeatsFor(FCFS)) {
-                event.updateEnrollmentsWaitingToApproved();
+                event.getWaitingEnrollmentsOfRemainingSeats().forEach(enrollment -> {
+                    enrollment.setApproved(true);
+
+                    eventPublisher.publishEvent(new EnrollmentAppliedEvent(enrollment, APPROVED));
+                });
             }
 
-            // TODO : 모임 신청 취소 이벤트
+            eventPublisher.publishEvent(new EnrollmentCancelledEvent(findEnrollment));
         }
     }
 
@@ -124,7 +144,7 @@ public class EventService {
         if (event.canAccept(enrollment)) {
             enrollment.setApproved(true);
 
-            // TODO : 모임 신청 결과 이벤트 (관리자 확인)
+            eventPublisher.publishEvent(new EnrollmentAppliedEvent(enrollment, APPROVED));
         }
     }
 
@@ -133,7 +153,7 @@ public class EventService {
         if (event.canReject(enrollment)) {
             enrollment.setApproved(false);
 
-            // TODO : 모임 신청 결과 이벤트 (관리자 확인)
+            eventPublisher.publishEvent(new EnrollmentAppliedEvent(enrollment, REJECTED));
         }
     }
 
@@ -141,8 +161,6 @@ public class EventService {
     public void enrollmentCheckIn(Event event, Enrollment enrollment) {
         if (event.isStarted() && enrollment.isApproved()) {
             enrollment.setAttended(true);
-
-            // TODO : 모임 출석 결과 이벤트
         }
     }
 
@@ -150,8 +168,6 @@ public class EventService {
     public void enrollmentCheckInCancel(Event event, Enrollment enrollment) {
         if (event.isStarted() && enrollment.isApproved()) {
             enrollment.setAttended(false);
-
-            // TODO : 모임 출석 결과 이벤트
         }
     }
 

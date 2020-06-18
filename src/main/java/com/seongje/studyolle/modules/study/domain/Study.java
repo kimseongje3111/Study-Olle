@@ -5,6 +5,7 @@ import com.seongje.studyolle.modules.zone.domain.Zone;
 import com.seongje.studyolle.modules.account.domain.Account;
 import com.seongje.studyolle.modules.account.authentication.UserAccount;
 import lombok.*;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.io.UnsupportedEncodingException;
@@ -12,6 +13,7 @@ import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.seongje.studyolle.modules.study.domain.ManagementLevel.*;
 
@@ -33,10 +35,12 @@ public class Study {
 
     private String shortDescription;
 
-    @Lob
+    @Lob @Basic(fetch = FetchType.EAGER)
+    @Type(type="org.hibernate.type.StringType")
     private String fullDescription;
 
-    @Lob
+    @Lob @Basic(fetch = FetchType.EAGER)
+    @Type(type="org.hibernate.type.StringType")
     private String bannerImg;
 
     private int memberCount = 0;
@@ -102,53 +106,38 @@ public class Study {
     // 비지니스 메서드 //
 
     public boolean canJoin(UserAccount userAccount) {
-        Account currentUser = userAccount.getAccount();
-
         if (!this.isPublished() || !this.isRecruiting() || this.closed) {
             return false;
         }
 
-        for (StudyMember studyMember : this.members) {
-            if (studyMember.getAccount().equals(currentUser)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    public boolean isMember(UserAccount userAccount) {
-        Account currentUser = userAccount.getAccount();
-
-        for (StudyMember studyMember : this.members) {
-            if (studyMember.getAccount().equals(currentUser)) {
-                return (studyMember.getManagementLevel() == MEMBER);
-            }
-        }
-
-        return false;
+        return !this.members.stream()
+                .map(StudyMember::getAccount)
+                .collect(Collectors.toSet())
+                .contains(userAccount.getAccount());
     }
 
     public boolean isManager(UserAccount userAccount) {
-        Account currentUser = userAccount.getAccount();
+        return this.members.stream()
+                .filter(studyMember -> studyMember.getManagementLevel() == MANAGER)
+                .map(StudyMember::getAccount)
+                .collect(Collectors.toSet())
+                .contains(userAccount.getAccount());
+    }
 
-        for (StudyMember studyMember : this.members) {
-            if (studyMember.getAccount().equals(currentUser)) {
-                return (studyMember.getManagementLevel() == MANAGER);
-            }
-        }
-
-        return false;
+    public boolean isMember(UserAccount userAccount) {
+        return this.members.stream()
+                .filter(studyMember -> studyMember.getManagementLevel() == MEMBER)
+                .map(StudyMember::getAccount)
+                .collect(Collectors.toSet())
+                .contains(userAccount.getAccount());
     }
 
     public boolean isManagerBy(Account account) {
-        for (StudyMember studyMember : this.members) {
-            if (studyMember.getAccount().equals(account)) {
-                return (studyMember.getManagementLevel() == MANAGER);
-            }
-        }
-
-        return false;
+        return this.members.stream()
+                .filter(studyMember -> studyMember.getManagementLevel() == MANAGER)
+                .map(StudyMember::getAccount)
+                .collect(Collectors.toSet())
+                .contains(account);
     }
 
     public String getEncodedPath() throws UnsupportedEncodingException {

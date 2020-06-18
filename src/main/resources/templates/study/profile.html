@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments.html :: header"></head>
+
+<body class="bg-light">
+<div th:replace="fragments.html :: main-nav"></div>
+
+<div class="container">
+    <div class="row mt-5 justify-content-center">
+        <div class="col-2 mr-5">
+            <!-- Avatar -->
+            <svg th:if="${#strings.isEmpty(account.profileImg)}" class="img-fluid float-left rounded img-thumbnail"
+                 th:data-jdenticon-value="${account.nickname}" width="125" height="125"></svg>
+            <img th:if="${!#strings.isEmpty(account.profileImg)}" class="img-fluid float-left rounded img-thumbnail"
+                 th:src="${account.profileImg}"
+                 width="125" height="125"/>
+        </div>
+
+        <div class="col-8">
+            <h1 class="display-4 font-italic" th:text="${account.nickname}">nickname</h1>
+            <p class="lead" th:if="${!#strings.isEmpty(account.aboutMe)}" th:text="${account.aboutMe}">aboutMe</p>
+            <p class="lead text-muted mt-2" th:if="${#strings.isEmpty(account.aboutMe) && isOwner}">
+                자신에 대한 한 줄 소개를 추가해 보세요.
+            </p>
+        </div>
+    </div>
+
+    <div class="row mt-3 justify-content-center">
+        <div class="col-2 mr-5">
+            <div th:replace="fragments.html :: profile-menu (currentMenu='study')"></div>
+        </div>
+
+        <div class="col-8 pt-2">
+            <div th:if="${participatingStudies.size() > 0}" class="row">
+                <h4><i class="fa fa-users"></i> 참여 중인 스터디</h4>
+
+                <table class="table mt-2 text-center">
+                    <thead class="thead-light">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">스터디 이름</th>
+                            <th scope="col">공개 날짜</th>
+                            <th scope="col">관리 여부</th>
+                            <th scope="col">가입 인원</th>
+                            <th scope="col" th:if="${isOwner}"></th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr th:each="study : ${participatingStudies}">
+                            <th scope="row" th:text="${studyStat.count}">1</th>
+                            <td th:text="${study.title}">스터디 이름</td>
+                            <td>
+                                <i class="fa fa-calendar"></i>
+                                <span class="date-weekday-time" th:text="${study.publishedDateTime}">공개 날짜</span>
+                            </td>
+                            <td>
+                                <span th:if="${study.isManager(#authentication.principal)}" class="text-success">
+                                    <i class="fa fa-check-square"></i>
+                                </span>
+                            </td>
+                            <td th:text="${study.memberCount}">0</td>
+                            <td>
+                                <a th:if="${isOwner}" class="btn btn-primary" th:href="@{'/study/studies/' + ${study.path}}">
+                                    바로가기
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div th:if="${closedStudies.size() > 0}" class="row mt-5">
+                <h4><i class="fa fa-history"></i> 종료된 스터디</h4>
+
+                <table class="table mt-2 text-center">
+                    <thead class="thead-light">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">스터디 이름</th>
+                            <th scope="col">종료 날짜</th>
+                            <th scope="col">관리 여부</th>
+                            <th scope="col" th:if="${isOwner}"></th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr th:each="study : ${closedStudies}">
+                            <th scope="row" th:text="${studyStat.count}">1</th>
+                            <td th:text="${study.title}">스터디 이름</td>
+                            <td>
+                                <i class="fa fa-calendar"></i>
+                                <span class="date-weekday-time" th:text="${study.closedDateTime}">종료 날짜</span>
+                            </td>
+                            <td>
+                                <span th:if="${study.isManager(#authentication.principal)}" class="text-success">
+                                    <i class="fa fa-check-square"></i>
+                                </span>
+                            </td>
+                            <td>
+                                <a th:if="${isOwner}" class="btn btn-primary" th:href="@{'/study/studies/' + ${study.path}}">
+                                    바로가기
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="fragments.html :: footer"></div>
+</div>
+
+<script th:replace="fragments.html :: date-time"></script>
+</body>
+</html>

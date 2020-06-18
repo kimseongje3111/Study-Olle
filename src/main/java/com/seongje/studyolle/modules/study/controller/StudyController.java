@@ -1,6 +1,7 @@
 package com.seongje.studyolle.modules.study.controller;
 
 import com.seongje.studyolle.modules.account.domain.Account;
+import com.seongje.studyolle.modules.account.service.AccountService;
 import com.seongje.studyolle.modules.study.domain.Study;
 import com.seongje.studyolle.modules.account.authentication.CurrentUser;
 import com.seongje.studyolle.modules.study.service.StudyService;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -29,7 +31,9 @@ public class StudyController {
     static final String STUDY_MEMBERS = STUDY_HOME + "/members";
     static final String STUDY_JOIN = STUDY_HOME + "/join";
     static final String STUDY_LEAVE = STUDY_HOME + "/leave";
+    static final String USER_PROFILE_STUDY = "account/profile/{nickname}/study";
 
+    private final AccountService accountService;
     private final StudyService studyService;
     private final StudyFormValidator studyFormValidator;
     private final ModelMapper modelMapper;
@@ -99,5 +103,19 @@ public class StudyController {
         studyService.leaveFromStudy(findStudy, account);
 
         return REDIRECT + findStudy.getEncodedPath() + "/members";
+    }
+
+    @GetMapping(USER_PROFILE_STUDY)
+    public String viewProfileStudy(@CurrentUser Account account, @PathVariable String nickname, Model model) {
+        Account findAccount = accountService.findByNickname(nickname);
+        List<Study> participatingStudies = studyService.getUserStudiesForParticipating(findAccount);
+        List<Study> closedStudies = studyService.getUserStudiesForClosed(findAccount);
+
+        model.addAttribute(findAccount);
+        model.addAttribute("participatingStudies", participatingStudies);
+        model.addAttribute("closedStudies", closedStudies);
+        model.addAttribute("isOwner", findAccount.equals(account));
+
+        return "study/profile";
     }
 }

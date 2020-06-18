@@ -23,6 +23,7 @@ public class AccountRepositoryImpl implements AccountRepositoryCustom {
     public List<Account> searchAllByTagsAndZones(Set<Tag> tags, Set<Zone> zones) {
         return queryFactory
                 .selectFrom(account)
+                .distinct()
                 .join(account.tags)
                 .join(account.zones)
                 .where(

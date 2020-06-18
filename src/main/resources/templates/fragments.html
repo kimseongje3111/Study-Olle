@@ -113,6 +113,14 @@
     </div>
 </nav>
 
+<!-- profile menu -->
+<div th:fragment="profile-menu (currentMenu)" class="list-group mt-1">
+    <a class="list-group-item list-group-item-action"
+       th:classappend="${currentMenu == 'introduction'}? active" th:href="@{'/account/profile/' + ${#authentication.name}}">소개</a>
+    <a class="list-group-item list-group-item-action"
+       th:classappend="${currentMenu == 'study'}? active" th:href="@{'/account/profile/' + ${#authentication.name} + '/study'}">스터디</a>
+</div>
+
 <!-- setting menu -->
 <div th:fragment="settings-menu (currentMenu)" class="list-group">
     <a class="list-group-item list-group-item-action"

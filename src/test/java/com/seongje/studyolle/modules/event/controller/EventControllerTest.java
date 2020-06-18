@@ -14,7 +14,6 @@ import com.seongje.studyolle.modules.event.repository.EnrollmentRepository;
 import com.seongje.studyolle.modules.event.service.EventService;
 import com.seongje.studyolle.modules.study.StudyFactory;
 import com.seongje.studyolle.modules.study.domain.Study;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
@@ -207,7 +206,7 @@ class EventControllerTest extends AbstractContainerBaseTest {
         // Then
         Enrollment findEnrollment = enrollmentRepository.searchEnrollmentByEventAndAccount(testEvent.getId(), guest.getId());
         assertThat(findEnrollment).isNotNull();
-        assertThat(testEvent.getNumberOfAcceptedEnrollments()).isEqualTo(2);
+        assertThat(testEvent.getNumberOfApprovedEnrollments()).isEqualTo(2);
     }
 
     @Test
@@ -233,7 +232,7 @@ class EventControllerTest extends AbstractContainerBaseTest {
         // Then
         Account guest = accountRepository.findByNickname("seongje");
         isAccepted(guest, testEvent);
-        assertThat(testEvent.getNumberOfAcceptedEnrollments()).isEqualTo(2);
+        assertThat(testEvent.getNumberOfApprovedEnrollments()).isEqualTo(2);
     }
 
     @Test
@@ -347,7 +346,7 @@ class EventControllerTest extends AbstractContainerBaseTest {
         // Then
         Account guest = accountRepository.findByNickname("seongje");
         isNotAccepted(guest, testEvent);
-        assertThat(testEvent.getNumberOfAcceptedEnrollments()).isEqualTo(1);
+        assertThat(testEvent.getNumberOfApprovedEnrollments()).isEqualTo(1);
     }
 
     private void isAccepted(Account account, Event event) {

@@ -75,9 +75,8 @@
                             </div>
                         </div>
 
-                        <div class="tab-pane fade col-sm-10" id="v-pills-nowEvents" role="tabpanel"
-                             aria-labelledby="v-pills-nowEvents-tab">
-                            <table class="table table-hover">
+                        <div class="tab-pane fade col-sm-10" id="v-pills-nowEvents" role="tabpanel" aria-labelledby="v-pills-nowEvents-tab">
+                            <table class="table table-hover text-center">
                                 <thead class="thead-light">
                                     <tr>
                                         <th scope="col">#</th>
@@ -88,15 +87,15 @@
                                     </tr>
                                 </thead>
 
-                                <tbody th:each="event : ${nowEvents}">
-                                    <tr>
+                                <tbody>
+                                    <tr th:each="event : ${nowEvents}">
                                         <th scope="row" th:text="${eventStat.count}">1</th>
                                         <td th:text="${event.title}">모임 이름</td>
                                         <td>
                                             <i class="fa fa-calendar"></i>
                                             <span class="date-weekday-time" th:text="${event.startDateTime}">시작 일시</span>
                                         </td>
-                                        <td th:text="${event.getNumberOfAcceptedEnrollments()}">0</td>
+                                        <td th:text="${event.getNumberOfApprovedEnrollments()}">0</td>
                                         <td>
                                             <a th:href="@{'/study/studies/' + ${study.path} + '/event/events/' + ${event.id}}" class="card-link">
                                                 자세히 보기
@@ -107,32 +106,31 @@
                             </table>
                         </div>
 
-                        <div class="tab-pane fade col-sm-10" id="v-pills-oldEvents" role="tabpanel"
-                             aria-labelledby="v-pills-newEvents-tab">
-                            <table class="table table-hover">
+                        <div class="tab-pane fade col-sm-10" id="v-pills-oldEvents" role="tabpanel" aria-labelledby="v-pills-newEvents-tab">
+                            <table class="table table-hover text-center">
                                 <thead class="thead-light">
-                                <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">모임 이름</th>
-                                    <th scope="col">모임 종료 일시</th>
-                                    <th scope="col"></th>
-                                </tr>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">모임 이름</th>
+                                        <th scope="col">모임 종료 일시</th>
+                                        <th scope="col"></th>
+                                    </tr>
                                 </thead>
 
-                                <tbody th:each="event : ${oldEvents}">
-                                <tr>
-                                    <th scope="row" th:text="${eventStat.count}">1</th>
-                                    <td th:text="${event.title}">모임 이름</td>
-                                    <td>
-                                        <i class="fa fa-calendar"></i>
-                                        <span class="date-weekday-time" th:text="${event.endDateTime}">종료 일시</span>
-                                    </td>
-                                    <td>
-                                        <a th:href="@{'/study/studies/' + ${study.path} + '/event/events/' + ${event.id}}" class="card-link">
-                                            자세히 보기
-                                        </a>
-                                    </td>
-                                </tr>
+                                <tbody>
+                                    <tr th:each="event : ${oldEvents}">
+                                        <th scope="row" th:text="${eventStat.count}">1</th>
+                                        <td th:text="${event.title}">모임 이름</td>
+                                        <td>
+                                            <i class="fa fa-calendar"></i>
+                                            <span class="date-weekday-time" th:text="${event.endDateTime}">종료 일시</span>
+                                        </td>
+                                        <td>
+                                            <a th:href="@{'/study/studies/' + ${study.path} + '/event/events/' + ${event.id}}" class="card-link">
+                                                자세히 보기
+                                            </a>
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>

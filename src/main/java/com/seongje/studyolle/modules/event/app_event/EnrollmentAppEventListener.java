@@ -1,12 +1,11 @@
 package com.seongje.studyolle.modules.event.app_event;
 
-import com.seongje.studyolle.infra.config.AppProperties;
-import com.seongje.studyolle.infra.mail.EmailMessage;
-import com.seongje.studyolle.infra.mail.MailService;
 import com.seongje.studyolle.modules.account.domain.Account;
-import com.seongje.studyolle.modules.event.app_event.custom.enrollment.EnrollmentAppliedEvent;
-import com.seongje.studyolle.modules.event.app_event.custom.enrollment.EnrollmentCancelledEvent;
-import com.seongje.studyolle.modules.event.app_event.custom.enrollment.EnrollmentScheduledEvent;
+import com.seongje.studyolle.modules.event.app_event.custom.enrollment.*;
+import com.seongje.studyolle.modules.event.domain.Event;
+import com.seongje.studyolle.modules.notification.NotificationMailSender;
+import com.seongje.studyolle.modules.notification.domain.Notification;
+import com.seongje.studyolle.modules.notification.domain.NotificationType;
 import com.seongje.studyolle.modules.notification.repository.NotificationRepository;
 import com.seongje.studyolle.modules.study.domain.Study;
 import lombok.RequiredArgsConstructor;
@@ -15,8 +14,14 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
+
+import static com.seongje.studyolle.modules.event.app_event.custom.enrollment.EnrollmentResultType.*;
+import static com.seongje.studyolle.modules.notification.NotificationMailSender.emailSubjectForEnrollmentResult;
+import static com.seongje.studyolle.modules.notification.NotificationMailSender.emailSubjectForUpdated;
+import static com.seongje.studyolle.modules.notification.domain.Notification.createNotification;
+import static com.seongje.studyolle.modules.notification.domain.NotificationType.*;
+import static com.seongje.studyolle.modules.notification.domain.NotificationType.STUDY_UPDATED;
+import static java.lang.String.*;
 
 @Async
 @Component
@@ -24,21 +29,87 @@ import org.thymeleaf.context.Context;
 @Transactional
 public class EnrollmentAppEventListener {
 
-    private static final String emailSubjectForEnrollmentResult = "[스터디 올래] 모임 신청 및 결과 관련 소식입니다.";
-
     private final NotificationRepository notificationRepository;
-    private final TemplateEngine templateEngine;
-    private final AppProperties appProperties;
-    private final MailService mailService;
+    private final NotificationMailSender mailSender;
 
+    @SneakyThrows
     @EventListener
     public void handleEnrollmentAppliedEvent(EnrollmentAppliedEvent appEvent) {
+        Event event = appEvent.getEnrollment().getEvent();
+        Study study = event.getStudy();
+        String title = study.getTitle();
+        String link = "/study/studies/" + study.getEncodedPath();
 
+        Account manager = event.getCreatedBy();
+        Account member = appEvent.getEnrollment().getAccount();
+
+        if (!manager.equals(member)) {
+            if (appEvent.getEventType() == APPROVED) {
+                appEvent.setMessageContent(format("'%s' 모임 확정자입니다. 자세한 내용은 모임 참가 신청 현황을 확인해주세요", event.getTitle()));
+
+                if (manager.isStudyUpdatedByWeb()) {
+                    Notification newNotification = createNotification(title, link, appEvent.getMessage(), EVENT_ENROLLMENT_RESULT, true, manager);
+                    newNotification.setAdditionalExplanation("사용자 : " + member.getNickname());
+
+                    notificationRepository.save(newNotification);
+                }
+
+                if (manager.isStudyUpdatedByEmail()) {
+                    mailSender.sendNotificationEmail(study, manager, appEvent.getMessage(), emailSubjectForEnrollmentResult, false);
+                }
+            }
+
+            setMessageContentForMemberByEnrollmentResultType(appEvent, event.getTitle());
+
+            if (member.isStudyUpdatedByWeb()) {
+                notificationRepository.save(
+                        createNotification(title, link, appEvent.getMessage(), EVENT_ENROLLMENT_RESULT, false, member)
+                );
+            }
+
+            if (member.isStudyUpdatedByEmail()) {
+                mailSender.sendNotificationEmail(study, member, appEvent.getMessage(), emailSubjectForEnrollmentResult, false);
+            }
+        }
     }
 
+    @SneakyThrows
     @EventListener
     public void handleEnrollmentCancelledEvent(EnrollmentCancelledEvent appEvent) {
+        Event event = appEvent.getEnrollment().getEvent();
+        Study study = event.getStudy();
+        String title = study.getTitle();
+        String link = "/study/studies/" + study.getEncodedPath();
 
+        Account manager = event.getCreatedBy();
+        Account member = appEvent.getEnrollment().getAccount();
+
+        if (!manager.equals(member)) {
+            appEvent.setMessageContent(format("'%s' 모임 신청 취소자가 발생하였습니다.", event.getTitle()));
+
+            if (manager.isStudyUpdatedByWeb()) {
+                Notification newNotification = createNotification(title, link, appEvent.getMessage(), EVENT_ENROLLMENT_RESULT, true, manager);
+                newNotification.setAdditionalExplanation("사용자 : " + member.getNickname());
+
+                notificationRepository.save(newNotification);
+            }
+
+            if (manager.isStudyUpdatedByEmail()) {
+                mailSender.sendNotificationEmail(study, manager, appEvent.getMessage(), emailSubjectForEnrollmentResult, false);
+            }
+
+            appEvent.setMessageContent(format("'%s' 모임 신청을 취소하였습니다.", event.getTitle()));
+
+            if (member.isStudyUpdatedByWeb()) {
+                notificationRepository.save(
+                        createNotification(title, link, appEvent.getMessage(), EVENT_ENROLLMENT_RESULT, false, member)
+                );
+            }
+
+            if (member.isStudyUpdatedByEmail()) {
+                mailSender.sendNotificationEmail(study, member, appEvent.getMessage(), emailSubjectForEnrollmentResult, false);
+            }
+        }
     }
 
     @EventListener
@@ -46,26 +117,19 @@ public class EnrollmentAppEventListener {
 
     }
 
-    private void sendNotificationEmail(Study study, Account account, String contextMessage, String emailSubject, boolean isDeleted) {
-        EmailMessage emailMessage = EmailMessage.builder()
-                .to(account.getEmail())
-                .subject(emailSubject)
-                .text(getNotificationEmailContent(study, account, contextMessage, isDeleted))
-                .build();
+    private void setMessageContentForMemberByEnrollmentResultType(EnrollmentAppliedEvent appEvent, String title) {
+        switch (appEvent.getEventType()) {
+            case APPROVED:
+                appEvent.setMessageContent(format("'%s' 모임 신청이 확정되었습니다. 모임 일정을 확인하세요.", title));
+                break;
 
-        mailService.send(emailMessage);
-    }
+            case WAITING:
+                appEvent.setMessageContent(format("'%s' 모임 신청을 완료하였습니다. 확정 시 알람이 발송됩니다.", title));
+                break;
 
-    @SneakyThrows
-    private String getNotificationEmailContent(Study study, Account account, String contextMessage, boolean isDeleted){
-        Context context = new Context();
-        context.setVariable("nickname", account.getNickname());
-        context.setVariable("message", contextMessage);
-        context.setVariable("linkName", study.getTitle());
-        context.setVariable("link", "/study/studies/" + study.getEncodedPath());
-        context.setVariable("host", appProperties.getHost());
-        context.setVariable("isDeleted", isDeleted);
-
-        return templateEngine.process("mail/notification-email-template", context);
+            case REJECTED:
+                appEvent.setMessageContent(format("'%s' 모임 신청이 거절되었습니다. 모임 관리자에게 문의해주세요.", title));
+                break;
+        }
     }
 }

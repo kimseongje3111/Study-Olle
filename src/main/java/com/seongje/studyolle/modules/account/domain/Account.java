@@ -3,6 +3,7 @@ package com.seongje.studyolle.modules.account.domain;
 import com.seongje.studyolle.modules.tag.domain.Tag;
 import com.seongje.studyolle.modules.zone.domain.Zone;
 import lombok.*;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -47,7 +48,8 @@ public class Account {
 
     private String location;
 
-    @Lob
+    @Lob @Basic(fetch = FetchType.EAGER)
+    @Type(type="org.hibernate.type.StringType")
     private String profileImg;
 
     private LocalDateTime nicknameLastChangedAt;
@@ -99,22 +101,13 @@ public class Account {
         this.emailCheckTokenGeneratedAt = LocalDateTime.now();
     }
 
+    public boolean isValidToken(String token) {
+        return this.emailCheckToken.equals(token);
+    }
+
     public void completeSignUpAndCheckEmail() {
         this.emailVerified = true;
         this.joinedAt = LocalDateTime.now();
-    }
-
-    public void changeNickname(String newNickname) {
-        this.nickname = newNickname;
-        this.nicknameLastChangedAt = LocalDateTime.now();
-    }
-
-    public void changePassword(String newPassword) {
-        this.password = newPassword;
-    }
-
-    public boolean isValidToken(String token) {
-        return this.emailCheckToken.equals(token);
     }
 
     public boolean canResendCheckEmail() {
@@ -124,5 +117,14 @@ public class Account {
     public boolean canChangeNickName() {
         return this.getNicknameLastChangedAt() == null
                 || this.getNicknameLastChangedAt().isBefore(LocalDateTime.now().minusHours(24));
+    }
+
+    public void changeNickname(String newNickname) {
+        this.nickname = newNickname;
+        this.nicknameLastChangedAt = LocalDateTime.now();
+    }
+
+    public void changePassword(String newPassword) {
+        this.password = newPassword;
     }
 }

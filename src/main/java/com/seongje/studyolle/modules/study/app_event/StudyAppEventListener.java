@@ -1,11 +1,11 @@
 package com.seongje.studyolle.modules.study.app_event;
 
-import com.seongje.studyolle.infra.config.AppProperties;
-import com.seongje.studyolle.infra.mail.EmailMessage;
-import com.seongje.studyolle.infra.mail.MailService;
 import com.seongje.studyolle.modules.account.domain.Account;
 import com.seongje.studyolle.modules.account.repository.AccountRepository;
+import com.seongje.studyolle.modules.event.app_event.custom.event.EventAppEvent;
+import com.seongje.studyolle.modules.notification.NotificationMailSender;
 import com.seongje.studyolle.modules.notification.domain.Notification;
+import com.seongje.studyolle.modules.notification.domain.NotificationType;
 import com.seongje.studyolle.modules.notification.repository.NotificationRepository;
 import com.seongje.studyolle.modules.study.app_event.custom.*;
 import com.seongje.studyolle.modules.study.domain.*;
@@ -18,13 +18,12 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
 
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.seongje.studyolle.modules.notification.NotificationMailSender.*;
 import static com.seongje.studyolle.modules.notification.domain.Notification.*;
 import static com.seongje.studyolle.modules.notification.domain.NotificationType.*;
 import static com.seongje.studyolle.modules.study.app_event.custom.StudyMemberEventType.*;
@@ -37,15 +36,10 @@ import static com.seongje.studyolle.modules.study.domain.ManagementLevel.*;
 @Transactional
 public class StudyAppEventListener {
 
-    private static final String emailSubjectForCreated = "[스터디 올래] 새로 오픈된 스터디 소식입니다.";
-    private static final String emailSubjectForUpdated = "[스터디 올래] 참여 중인 스터디 관련 소식입니다.";
-
     private final StudyRepository studyRepository;
     private final AccountRepository accountRepository;
     private final NotificationRepository notificationRepository;
-    private final TemplateEngine templateEngine;
-    private final AppProperties appProperties;
-    private final MailService mailService;
+    private final NotificationMailSender mailSender;
 
     @SneakyThrows
     @EventListener
@@ -71,7 +65,7 @@ public class StudyAppEventListener {
                 }
 
                 if (manager.isStudyUpdatedByEmail()) {
-                    sendNotificationEmail(findStudy, manager, appEvent.getMessage(), emailSubjectForUpdated, false);
+                    mailSender.sendNotificationEmail(findStudy, manager, appEvent.getMessage(), emailSubjectForUpdated, false);
                 }
             }
         });
@@ -86,7 +80,7 @@ public class StudyAppEventListener {
             }
 
             if (account.isStudyCreatedByEmail()) {
-                sendNotificationEmail(findStudy, account, appEvent.getMessage(), emailSubjectForCreated, false);
+                mailSender.sendNotificationEmail(findStudy, account, appEvent.getMessage(), emailSubjectForCreated, false);
             }
         });
     }
@@ -109,7 +103,7 @@ public class StudyAppEventListener {
                 }
 
                 if (manager.isStudyUpdatedByEmail()) {
-                    sendNotificationEmail(deletedStudy, manager, appEvent.getMessage(), emailSubjectForUpdated, true);
+                    mailSender.sendNotificationEmail(deletedStudy, manager, appEvent.getMessage(), emailSubjectForUpdated, true);
                 }
 
             } else {
@@ -124,7 +118,7 @@ public class StudyAppEventListener {
                 }
 
                 if (member.isStudyUpdatedByEmail()) {
-                    sendNotificationEmail(deletedStudy, member, appEvent.getMessage(), emailSubjectForUpdated, true);
+                    mailSender.sendNotificationEmail(deletedStudy, member, appEvent.getMessage(), emailSubjectForUpdated, true);
                 }
             }
         });
@@ -157,7 +151,7 @@ public class StudyAppEventListener {
                 }
 
                 if (manager.isStudyUpdatedByEmail()) {
-                    sendNotificationEmail(findStudy, manager, appEvent.getMessage(), emailSubjectForUpdated, false);
+                    mailSender.sendNotificationEmail(findStudy, manager, appEvent.getMessage(), emailSubjectForUpdated, false);
                 }
             }
         });
@@ -176,7 +170,7 @@ public class StudyAppEventListener {
         }
 
         if (findAccount.isStudyUpdatedByEmail()) {
-            sendNotificationEmail(findStudy, findAccount, appEvent.getMessage(), emailSubjectForUpdated, false);
+            mailSender.sendNotificationEmail(findStudy, findAccount, appEvent.getMessage(), emailSubjectForUpdated, false);
         }
     }
 
@@ -214,7 +208,7 @@ public class StudyAppEventListener {
                 }
 
                 if (manager.isStudyUpdatedByEmail()) {
-                    sendNotificationEmail(findStudy, manager, appEvent.getMessage(), emailSubjectForUpdated, false);
+                    mailSender.sendNotificationEmail(findStudy, manager, appEvent.getMessage(), emailSubjectForUpdated, false);
                 }
 
             } else {
@@ -243,33 +237,10 @@ public class StudyAppEventListener {
                 }
 
                 if (member.isStudyUpdatedByEmail()) {
-                    sendNotificationEmail(findStudy, member, appEvent.getMessage(), emailSubjectForUpdated, false);
+                    mailSender.sendNotificationEmail(findStudy, member, appEvent.getMessage(), emailSubjectForUpdated, false);
                 }
             }
         });
-    }
-
-    private void sendNotificationEmail(Study study, Account account, String contextMessage, String emailSubject, boolean isDeleted) {
-        EmailMessage emailMessage = EmailMessage.builder()
-                .to(account.getEmail())
-                .subject(emailSubject)
-                .text(getNotificationEmailContent(study, account, contextMessage, isDeleted))
-                .build();
-
-        mailService.send(emailMessage);
-    }
-
-    @SneakyThrows
-    private String getNotificationEmailContent(Study study, Account account, String contextMessage, boolean isDeleted){
-        Context context = new Context();
-        context.setVariable("nickname", account.getNickname());
-        context.setVariable("message", contextMessage);
-        context.setVariable("linkName", study.getTitle());
-        context.setVariable("link", "/study/studies/" + study.getEncodedPath());
-        context.setVariable("host", appProperties.getHost());
-        context.setVariable("isDeleted", isDeleted);
-
-        return templateEngine.process("mail/notification-email-template", context);
     }
 
     private void setMessageContentForManagerByUpdatedType(StudyUpdatedEvent studyUpdatedEvent) {

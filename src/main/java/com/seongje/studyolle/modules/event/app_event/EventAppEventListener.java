@@ -1,12 +1,10 @@
 package com.seongje.studyolle.modules.event.app_event;
 
-import com.seongje.studyolle.infra.config.AppProperties;
-import com.seongje.studyolle.infra.mail.EmailMessage;
-import com.seongje.studyolle.infra.mail.MailService;
 import com.seongje.studyolle.modules.account.domain.Account;
-import com.seongje.studyolle.modules.event.app_event.custom.event.EventCancelledEvent;
+import com.seongje.studyolle.modules.event.app_event.custom.event.EventAppEvent;
 import com.seongje.studyolle.modules.event.app_event.custom.event.EventCreatedEvent;
 import com.seongje.studyolle.modules.event.app_event.custom.event.EventUpdatedEvent;
+import com.seongje.studyolle.modules.notification.NotificationMailSender;
 import com.seongje.studyolle.modules.notification.repository.NotificationRepository;
 import com.seongje.studyolle.modules.study.domain.Study;
 import lombok.RequiredArgsConstructor;
@@ -15,8 +13,12 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
+
+import static com.seongje.studyolle.modules.notification.NotificationMailSender.*;
+import static com.seongje.studyolle.modules.notification.domain.Notification.createNotification;
+import static com.seongje.studyolle.modules.notification.domain.NotificationType.STUDY_UPDATED;
+import static com.seongje.studyolle.modules.study.domain.ManagementLevel.*;
+import static java.lang.String.*;
 
 @Async
 @Component
@@ -24,48 +26,71 @@ import org.thymeleaf.context.Context;
 @Transactional
 public class EventAppEventListener {
 
-    private static final String emailSubjectForUpdated = "[스터디 올래] 참여 중인 스터디 관련 소식입니다.";
-
     private final NotificationRepository notificationRepository;
-    private final TemplateEngine templateEngine;
-    private final AppProperties appProperties;
-    private final MailService mailService;
-
-    @EventListener
-    public void handleEventCreatedEvent(EventCreatedEvent appEvent) {
-
-    }
-
-    @EventListener
-    public void handleEventUpdatedEvent(EventUpdatedEvent appEvent) {
-
-    }
-
-    @EventListener
-    public void handleEventCancelledEvent(EventCancelledEvent appEvent) {
-
-    }
-
-    private void sendNotificationEmail(Study study, Account account, String contextMessage, String emailSubject, boolean isDeleted) {
-        EmailMessage emailMessage = EmailMessage.builder()
-                .to(account.getEmail())
-                .subject(emailSubject)
-                .text(getNotificationEmailContent(study, account, contextMessage, isDeleted))
-                .build();
-
-        mailService.send(emailMessage);
-    }
+    private final NotificationMailSender mailSender;
 
     @SneakyThrows
-    private String getNotificationEmailContent(Study study, Account account, String contextMessage, boolean isDeleted){
-        Context context = new Context();
-        context.setVariable("nickname", account.getNickname());
-        context.setVariable("message", contextMessage);
-        context.setVariable("linkName", study.getTitle());
-        context.setVariable("link", "/study/studies/" + study.getEncodedPath());
-        context.setVariable("host", appProperties.getHost());
-        context.setVariable("isDeleted", isDeleted);
+    @EventListener
+    public void handleEventAppEvent(EventAppEvent appEvent) {
+        Study study = appEvent.getEvent().getStudy();
+        String title = study.getTitle();
+        String link = "/study/studies/" + study.getEncodedPath();
 
-        return templateEngine.process("mail/notification-email-template", context);
+        study.getMembers().forEach(studyMember -> {
+            if (studyMember.getManagementLevel() == MANAGER) {
+                Account manager = studyMember.getAccount();
+
+                setMessageContentForManagerByInstanceOf(appEvent);
+
+                if (manager.isStudyUpdatedByWeb()) {
+                    notificationRepository.save(
+                            createNotification(title, link, appEvent.getMessage(), STUDY_UPDATED, true, manager)
+                    );
+                }
+
+                if (manager.isStudyUpdatedByEmail()) {
+                    mailSender.sendNotificationEmail(study, manager, appEvent.getMessage(), emailSubjectForUpdated, false);
+                }
+
+            } else {
+                Account member = studyMember.getAccount();
+
+                setMessageContentForMemberByInstanceOf(appEvent);
+
+                if (member.isStudyUpdatedByWeb()) {
+                    notificationRepository.save(
+                            createNotification(title, link, appEvent.getMessage(), STUDY_UPDATED, false, member)
+                    );
+                }
+
+                if (member.isStudyUpdatedByEmail()) {
+                    mailSender.sendNotificationEmail(study, member, appEvent.getMessage(), emailSubjectForUpdated, false);
+                }
+            }
+        });
+    }
+
+    private void setMessageContentForManagerByInstanceOf(EventAppEvent appEvent) {
+        if (appEvent instanceof EventCreatedEvent) {
+            appEvent.setMessageContent(format("'%s' 모임을 만들었습니다.", appEvent.getEvent().getTitle()));
+
+        } else if (appEvent instanceof EventUpdatedEvent) {
+            appEvent.setMessageContent(format("'%s' 모임을 수정하였습니다.", appEvent.getEvent().getTitle()));
+
+        } else {
+            appEvent.setMessageContent(format("'%s' 모임을 취소하였습니다.", appEvent.getEvent().getTitle()));
+        }
+    }
+
+    private void setMessageContentForMemberByInstanceOf(EventAppEvent appEvent) {
+        if (appEvent instanceof EventCreatedEvent) {
+            appEvent.setMessageContent(format("'%s' 모임이 새로 등록되었습니다. 모임에 참여해보세요.", appEvent.getEvent().getTitle()));
+
+        } else if (appEvent instanceof EventUpdatedEvent) {
+            appEvent.setMessageContent(format("'%s' 모임이 수정되었습니다. 변경 내용을 확인해주세요..", appEvent.getEvent().getTitle()));
+
+        } else {
+            appEvent.setMessageContent(format("'%s' 모임이 취소되었습니다.", appEvent.getEvent().getTitle()));
+        }
     }
 }

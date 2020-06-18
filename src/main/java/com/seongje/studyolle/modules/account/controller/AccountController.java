@@ -142,6 +142,7 @@ public class AccountController {
         accountService.login(findAccount);
         model.addAttribute(findAccount);
 
+
         return EMAIL_LOGIN_CONFIRM;
     }
 
@@ -151,18 +152,6 @@ public class AccountController {
 
         model.addAttribute(findAccount);
         model.addAttribute("isOwner", findAccount.equals(account));
-        model.addAttribute("isStudyTab", false);
-
-        return "account/profile";
-    }
-
-    @GetMapping(USER_PROFILE + "/study")
-    public String viewStudyOfProfile(@CurrentUser Account account, @PathVariable String nickname, Model model) {
-        Account findAccount = accountService.findByNickname(nickname);
-
-        model.addAttribute(findAccount);
-        model.addAttribute("isOwner", findAccount.equals(account));
-        model.addAttribute("isStudyTab", true);
 
         return "account/profile";
     }

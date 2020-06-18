@@ -4,12 +4,14 @@ import com.seongje.studyolle.modules.account.domain.Account;
 import com.seongje.studyolle.modules.study.domain.Study;
 import com.seongje.studyolle.modules.account.authentication.UserAccount;
 import lombok.*;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.seongje.studyolle.modules.event.domain.EventType.*;
 
@@ -27,7 +29,8 @@ public class Event {
     @Column(nullable = false)
     private String title;
 
-    @Lob
+    @Lob @Basic(fetch = FetchType.EAGER)
+    @Type(type="org.hibernate.type.StringType")
     private String description;
 
     @Enumerated(EnumType.STRING)
@@ -66,7 +69,6 @@ public class Event {
 
     public void removeEnrollment(Enrollment enrollment) {
         this.enrollments.remove(enrollment);
-        enrollment.setEvent(null);
     }
 
     // 비지니스 메서드 //
@@ -87,30 +89,25 @@ public class Event {
         return !isStarted() && !isAttended(userAccount) && isApplied(userAccount);
     }
 
+    public boolean isApplied(UserAccount userAccount) {
+        return this.enrollments.stream()
+                .map(Enrollment::getAccount)
+                .collect(Collectors.toSet())
+                .contains(userAccount.getAccount());
+    }
+
     public boolean isAttended(UserAccount userAccount) {
-        Account currentUser = userAccount.getAccount();
-
-        for (Enrollment enrollment : this.enrollments) {
-            if (enrollment.getAccount().equals(currentUser)
-                    && enrollment.isApproved() && enrollment.isAttended()) {
-                return true;
-            }
-        }
-
-        return false;
+        return this.enrollments.stream()
+                .filter(enrollment -> enrollment.getAccount().equals(userAccount.getAccount())
+                        && enrollment.isApproved() && enrollment.isAttended())
+                .count() == 1;
     }
 
     public boolean isNotAttended(UserAccount userAccount) {
-        Account currentUser = userAccount.getAccount();
-
-        for (Enrollment enrollment : this.enrollments) {
-            if (enrollment.getAccount().equals(currentUser)
-                    && enrollment.isApproved() && !enrollment.isAttended()) {
-                return true;
-            }
-        }
-
-        return false;
+        return this.enrollments.stream()
+                .filter(enrollment -> enrollment.getAccount().equals(userAccount.getAccount())
+                        && enrollment.isApproved() && !enrollment.isAttended())
+                .count() == 1;
     }
 
     public boolean isStarted() {
@@ -133,7 +130,6 @@ public class Event {
                 && (getNumberOfRemainingSeats() > 0)
                 && !enrollment.isAttended()
                 && !enrollment.isApproved();
-
     }
 
     public boolean canReject(Enrollment enrollment) {
@@ -150,30 +146,18 @@ public class Event {
     }
 
     public int getNumberOfRemainingSeats() {
-        return this.limitOfEnrollments - (int) getNumberOfAcceptedEnrollments();
+        return this.limitOfEnrollments - (int) getNumberOfApprovedEnrollments();
     }
 
-    public long getNumberOfAcceptedEnrollments() {
+    public long getNumberOfApprovedEnrollments() {
         return this.enrollments.stream().filter(Enrollment::isApproved).count();
     }
 
-    public void updateEnrollmentsWaitingToApproved() {
-        this.enrollments.stream()
+    public List<Enrollment> getWaitingEnrollmentsOfRemainingSeats() {
+        return this.enrollments.stream()
                 .filter(enrollment -> !enrollment.isApproved())
                 .sorted(Comparator.comparing(Enrollment::getAppliedDateTime))
                 .limit(getNumberOfRemainingSeats())
-                .forEach(enrollment -> enrollment.setApproved(true));
-    }
-
-    private boolean isApplied(UserAccount userAccount) {
-        Account currentUser = userAccount.getAccount();
-
-        for (Enrollment enrollment : this.enrollments) {
-            if (enrollment.getAccount().equals(currentUser)) {
-                return true;
-            }
-        }
-
-        return false;
+                .collect(Collectors.toList());
     }
 }

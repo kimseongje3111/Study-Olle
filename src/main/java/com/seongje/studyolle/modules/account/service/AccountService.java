@@ -143,6 +143,7 @@ public class AccountService implements UserDetailsService {
     @Transactional
     public void updateProfile(Account account, ProfileForm profileForm) {
         modelMapper.map(profileForm, account);
+        login(account);
     }
 
     @Transactional
@@ -153,6 +154,7 @@ public class AccountService implements UserDetailsService {
     @Transactional
     public void updateNotifications(Account account, NotificationsForm notificationsForm) {
         modelMapper.map(notificationsForm, account);
+        login(account);
     }
 
     public Set<String> getUserTags(Account account) throws IllegalStateException {
