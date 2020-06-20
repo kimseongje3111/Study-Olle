@@ -8,5 +8,5 @@ import java.util.List;
 @Transactional(readOnly = true)
 public interface StudyMemberRepositoryCustom {
 
-    List<StudyMember> searchAllByAccount(Long accountId);
+    List<StudyMember> searchAllByAccountAndPublishedDateTimeDesc(Long accountId);
 }

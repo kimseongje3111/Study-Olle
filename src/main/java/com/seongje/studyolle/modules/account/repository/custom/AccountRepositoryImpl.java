@@ -24,8 +24,8 @@ public class AccountRepositoryImpl implements AccountRepositoryCustom {
         return queryFactory
                 .selectFrom(account)
                 .distinct()
-                .join(account.tags)
-                .join(account.zones)
+                .leftJoin(account.tags)
+                .leftJoin(account.zones)
                 .where(
                         account.tags.any().tag.in(tags),
                         account.zones.any().zone.in(zones)

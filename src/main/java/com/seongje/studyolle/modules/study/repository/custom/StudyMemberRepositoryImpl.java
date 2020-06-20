@@ -23,12 +23,13 @@ public class StudyMemberRepositoryImpl implements StudyMemberRepositoryCustom {
     }
 
     @Override
-    public List<StudyMember> searchAllByAccount(Long accountId) {
+    public List<StudyMember> searchAllByAccountAndPublishedDateTimeDesc(Long accountId) {
         return queryFactory
                 .selectFrom(studyMember)
                 .join(studyMember.study, study).fetchJoin()
                 .join(studyMember.account, account).fetchJoin()
                 .where(account.id.eq(accountId))
+                .orderBy(study.publishedDateTime.desc())
                 .fetch();
     }
 }

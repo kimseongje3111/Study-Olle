@@ -20,8 +20,25 @@
     <script src="/node_modules/bootstrap-select/dist/js/bootstrap-select.min.js"></script>
 
     <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
         .container {
+            position: relative;
+            min-height: 90%;
             max-width: 100%;
+            padding-bottom: 50px;
+        }
+
+        footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding-top: 10px;
         }
 
         .tagify-outside {
@@ -38,9 +55,9 @@
 
 <!-- footer -->
 <footer th:fragment="footer">
-    <div class="row justify-content-center mt-5">
-        <img class="mb-2 mr-2" src="/images/logo.png" width="25" height="25">
-        <small class="d-block mb-3 text-muted">&copy; 스터디올래 2020</small>
+    <div class="row justify-content-center" style="width: 100%;">
+        <img class="mr-2" src="/images/logo.png" width="25" height="25">
+        <small class="d-block mt-1 text-muted">&copy; 스터디올래 2020</small>
     </div>
 </footer>
 
@@ -533,5 +550,51 @@
         </p>
     </li>
 </ul>
+
+<!-- study list -->
+<div th:fragment="study-list (studyList)" class="col-sm-10 py-3">
+    <div class="row">
+        <div class="col-md-4" th:each="study : ${studyList}">
+            <div class="card mb-4 shadow-sm">
+                <img th:if="${!study.useBanner}" src="/images/basic_banners/basic_banner_5.png" class="card-img-top" th:alt="${study.title}">
+                <img th:if="${study.useBanner}" th:src="${study.bannerImg}" class="card-img-top" th:alt="${study.title}">
+
+                <div class="card-body">
+                    <a th:href="@{'/study/studies/' + ${study.path}}" class="text-decoration-none">
+                        <h5 class="card-title context" th:text="${study.title}"></h5>
+                    </a>
+                    <p class="card-text" th:text="${study.shortDescription}">Short description</p>
+
+                    <div class="dropdown-divider"></div>
+
+                    <p class="card-text context">
+                        <span th:each="tagItem : ${study.tags}" class="font-weight-light text-monospace badge badge-pill badge-info mr-2">
+                            <a th:href="@{'/search/tag/' + ${tagItem.tag.title}}" class="text-decoration-none text-white">
+                                <i class="fa fa-tag"></i>
+                                <span th:text="${tagItem.tag.title}">Tag</span>
+                            </a>
+                        </span>
+                    </p>
+                    <p class="card-text context">
+                        <span th:each="zoneItem : ${study.zones}" class="font-weight-light text-monospace badge badge-primary mr-2">
+                            <a th:href="@{'/search/zone/' + ${zoneItem.zone.id}}" class="text-decoration-none text-white">
+                                <i class="fa fa-globe"></i>
+                                <span th:text="${zoneItem.zone.localNameOfCity}" class="text-white">City</span>
+                            </a>
+                        </span>
+                    </p>
+
+                    <div class="card-footer d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            <i class="fa fa-user-circle"></i>
+                            <span th:text="${study.memberCount}"></span>명
+                        </small>
+                        <small class="text-muted date" th:text="${study.publishedDateTime}">공개 날짜</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 </html>

@@ -4,12 +4,16 @@ import com.seongje.studyolle.modules.account.domain.Account;
 import com.seongje.studyolle.modules.account.service.AccountService;
 import com.seongje.studyolle.modules.study.domain.Study;
 import com.seongje.studyolle.modules.account.authentication.CurrentUser;
+import com.seongje.studyolle.modules.study.form.StudySearch;
 import com.seongje.studyolle.modules.study.service.StudyService;
 import com.seongje.studyolle.modules.study.form.StudyForm;
 import com.seongje.studyolle.modules.study.validator.StudyFormValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -18,6 +22,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+
+import static org.springframework.data.domain.Sort.Direction.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -32,6 +38,7 @@ public class StudyController {
     static final String STUDY_JOIN = STUDY_HOME + "/join";
     static final String STUDY_LEAVE = STUDY_HOME + "/leave";
     static final String USER_PROFILE_STUDY = "account/profile/{nickname}/study";
+    static final String SEARCH_STUDY = "/search/study";
 
     private final AccountService accountService;
     private final StudyService studyService;
@@ -117,5 +124,18 @@ public class StudyController {
         model.addAttribute("isOwner", findAccount.equals(account));
 
         return "study/profile";
+    }
+
+    @GetMapping(SEARCH_STUDY)
+    public String searchStudiesByKeyword(StudySearch studySearch, Model model,
+                                         @PageableDefault(size = 6, sort = "publishedDateTime", direction = DESC) Pageable pageable) {
+        Page<Study> findStudiesByPaging = studyService.getAllStudiesForKeyword(studySearch, pageable);
+
+        model.addAttribute(studySearch);
+        model.addAttribute("studiesByPaging", findStudiesByPaging);
+        model.addAttribute("sortProperty",
+                pageable.getSort().toString().contains("publishedDateTime") ? "publishedDateTime" : "memberCount");
+
+        return "study/search";
     }
 }

@@ -17,6 +17,7 @@
     "jdenticon": "^2.2.0",
     "jquery": "^3.5.1",
     "jquery-cropper": "^1.0.1",
+    "mark.js": "^8.11.1",
     "moment": "^2.26.0",
     "summernote": "^0.8.18",
     "tempusdominus-bootstrap-4": "^5.1.2"

@@ -37,10 +37,10 @@
         </div>
     </div>
 
-    <div th:replace="fragments.html :: footer"></div>
+    <footer th:replace="fragments.html :: footer"></footer>
 </div>
 
 <script th:replace="fragments.html :: ajax-csrf-header"></script>
-<div th:replace="fragments.html :: update-tags (baseUrl='/account/settings/tags')"></div>
+<script th:replace="fragments.html :: update-tags (baseUrl='/account/settings/tags')"></script>
 </body>
 </html>

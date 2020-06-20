@@ -32,7 +32,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.authorizeRequests()
                 .mvcMatchers("/", "/account/login", "/account/sign-up", "/account/check-email-token",
-                        "/account/email-login", "/account/email-login-confirm").permitAll()
+                        "/account/email-login", "/account/email-login-confirm", "/search/study").permitAll()
                 .mvcMatchers(HttpMethod.GET, "/account/profile/**").permitAll()
                 .anyRequest().authenticated();
 

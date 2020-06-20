@@ -41,11 +41,11 @@
         </div>
     </div>
 
-    <div th:replace="fragments.html :: footer"></div>
+    <footer th:replace="fragments.html :: footer"></footer>
 </div>
 
 <script th:replace="fragments.html :: tooltip"></script>
 <script th:replace="fragments.html :: ajax-csrf-header"></script>
-<div th:replace="fragments.html :: update-zones (baseUrl='/study/studies/' + ${study.path} + '/settings/study-zones')"></div>
+<script th:replace="fragments.html :: update-zones (baseUrl='/study/studies/' + ${study.path} + '/settings/study-zones')"></script>
 </body>
 </html>
