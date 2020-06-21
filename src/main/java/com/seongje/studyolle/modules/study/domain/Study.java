@@ -36,11 +36,9 @@ public class Study {
     private String shortDescription;
 
     @Lob @Basic(fetch = FetchType.EAGER)
-    @Type(type="org.hibernate.type.StringType")
     private String fullDescription;
 
     @Lob @Basic(fetch = FetchType.EAGER)
-    @Type(type="org.hibernate.type.StringType")
     private String bannerImg;
 
     private int memberCount = 0;

@@ -5,16 +5,27 @@
 <body class="bg-light">
 <div th:replace="fragments.html :: main-nav"></div>
 
-<div class="alert alert-warning" role="alert" th:if="${account != null && !account?.emailVerified}">
-    스터디올레 가입을 완료하려면 <a class="alert-link" th:href="@{/account/check-email}">계정 인증 이메일을 확인</a>하세요.
-</div>
+<section class="jumbotron text-center">
+    <div class="container">
+        <h1 class="display-4">스터디올래</h1>
+        <p class="lead text-muted">
+            스터디올래는 스터디 모임 관리 기능을 제공합니다.<br/>
+            주요 활동 지역과 관심 주제 태그를 통해 원하는 스터디 모임에 참여해보세요.
+        </p>
+        <p>
+            <a th:href="@{/account/sign-up}" class="btn btn-primary my-2">회원 가입</a>
+        </p>
+    </div>
+</section>
 
 <div class="container">
-    <div class="py-5 text-center">
-        <h1>스터디올래</h1>
+    <div class="row justify-content-center pt-3">
+        <div th:replace="fragments.html :: study-list (studyList=${mostRecent6Studies})"></div>
     </div>
 
     <footer th:replace="fragments.html :: footer"></footer>
 </div>
+
+<script th:replace="fragments.html :: date-time"></script>
 </body>
 </html>

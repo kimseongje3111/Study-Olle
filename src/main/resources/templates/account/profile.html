@@ -55,7 +55,7 @@
                 <span th:text="${#temporals.format(account.joinedAt, 'yyyy년 M월 가입')}" class="col-9"></span>
             </p>
 
-            <div class="mt-5" th:if="${isOwner}">
+            <div class="mt-5 pl-2" th:if="${isOwner}">
                 <a class="btn btn-outline-primary" th:href="@{/account/settings/profile}">프로필 수정</a>
             </div>
         </div>

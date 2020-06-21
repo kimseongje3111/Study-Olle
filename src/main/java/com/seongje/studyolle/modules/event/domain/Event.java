@@ -30,7 +30,6 @@ public class Event {
     private String title;
 
     @Lob @Basic(fetch = FetchType.EAGER)
-    @Type(type="org.hibernate.type.StringType")
     private String description;
 
     @Enumerated(EnumType.STRING)

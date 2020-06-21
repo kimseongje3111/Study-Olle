@@ -174,17 +174,17 @@
                         <tr>
                             <th scope="col">#</th>
                             <th scope="col">사용자</th>
-                            <th scope="col">참가 신청 일시</th>
+                            <th scope="col">참가 신청 날짜</th>
                             <th scope="col">접수 상태</th>
                             <th scope="col" th:if="${study.isManager(#authentication.principal) &&
                                 event.eventType == T(com.seongje.studyolle.modules.event.domain.EventType).MANAGER_APPROVAL}">
                                 참가 신청 관리
                             </th>
                             <th th:if="${study.isManager(#authentication.principal)}" scope="col">
-                                출석 체크
+                                출석 관리
                             </th>
                             <th th:if="${study.isMember(#authentication.principal)}" scope="col">
-                                출석 여부
+                                출석
                             </th>
                         </tr>
                     </thead>

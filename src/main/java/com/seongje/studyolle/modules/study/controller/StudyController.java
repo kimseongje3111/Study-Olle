@@ -115,11 +115,11 @@ public class StudyController {
     @GetMapping(USER_PROFILE_STUDY)
     public String viewProfileStudy(@CurrentUser Account account, @PathVariable String nickname, Model model) {
         Account findAccount = accountService.findByNickname(nickname);
-        List<Study> participatingStudies = studyService.getUserStudiesForParticipating(findAccount);
+        List<Study> notClosedStudies = studyService.getUserStudiesForNotClosed(findAccount);
         List<Study> closedStudies = studyService.getUserStudiesForClosed(findAccount);
 
         model.addAttribute(findAccount);
-        model.addAttribute("participatingStudies", participatingStudies);
+        model.addAttribute("notClosedStudies", notClosedStudies);
         model.addAttribute("closedStudies", closedStudies);
         model.addAttribute("isOwner", findAccount.equals(account));
 
@@ -128,7 +128,7 @@ public class StudyController {
 
     @GetMapping(SEARCH_STUDY)
     public String searchStudiesByKeyword(StudySearch studySearch, Model model,
-                                         @PageableDefault(size = 6, sort = "publishedDateTime", direction = DESC) Pageable pageable) {
+                                         @PageableDefault(size = 9, sort = "publishedDateTime", direction = DESC) Pageable pageable) {
         Page<Study> findStudiesByPaging = studyService.getAllStudiesForKeyword(studySearch, pageable);
 
         model.addAttribute(studySearch);

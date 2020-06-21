@@ -30,8 +30,8 @@
             <div th:replace="fragments.html :: profile-menu (currentMenu='study')"></div>
         </div>
 
-        <div class="col-8 pt-2">
-            <div th:if="${participatingStudies.size() > 0}" class="row">
+        <div class="col-8 pt-2 px-3">
+            <div th:if="${notClosedStudies.size() > 0}" class="row">
                 <h4><i class="fa fa-users"></i> 참여 중인 스터디</h4>
 
                 <table class="table mt-2 text-center">
@@ -39,20 +39,28 @@
                         <tr>
                             <th scope="col">#</th>
                             <th scope="col">스터디 이름</th>
+                            <th scope="col">관리자</th>
+                            <th scope="col">공개됨</th>
                             <th scope="col">공개 날짜</th>
-                            <th scope="col">관리 여부</th>
                             <th scope="col">가입 인원</th>
                             <th scope="col" th:if="${isOwner}"></th>
                         </tr>
                     </thead>
 
                     <tbody>
-                        <tr th:each="study : ${participatingStudies}">
+                        <tr th:each="study : ${notClosedStudies}">
                             <th scope="row" th:text="${studyStat.count}">1</th>
                             <td th:text="${study.title}">스터디 이름</td>
                             <td>
-                                <i class="fa fa-calendar"></i>
-                                <span class="date-weekday-time" th:text="${study.publishedDateTime}">공개 날짜</span>
+                                <span th:if="${study.published}" class="text-success">
+                                    <i class="fa fa-check-square"></i>
+                                </span>
+                            </td>
+                            <td>
+                                <span th:if="${study.published}">
+                                    <i class="fa fa-calendar"></i>
+                                    <span class="date-weekday-time" th:text="${study.publishedDateTime}">공개 날짜</span>
+                                </span>
                             </td>
                             <td>
                                 <span th:if="${study.isManager(#authentication.principal)}" class="text-success">
@@ -78,8 +86,8 @@
                         <tr>
                             <th scope="col">#</th>
                             <th scope="col">스터디 이름</th>
+                            <th scope="col">관리자</th>
                             <th scope="col">종료 날짜</th>
-                            <th scope="col">관리 여부</th>
                             <th scope="col" th:if="${isOwner}"></th>
                         </tr>
                     </thead>

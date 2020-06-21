@@ -14,15 +14,15 @@
         </div>
 
         <p><small class="text-info">아래 버튼을 누르시면 계정 인증 이메일이 재전송됩니다.</small></p>
-        <a class="btn btn-outline-info" th:href="@{/account/check-email-resend}">계정 인증 이메일 재전송</a>
+        <a class="btn btn-outline-primary" th:href="@{/account/check-email-resend}">계정 인증 이메일 재전송</a>
     </div>
 
     <!-- email check complete -->
     <div class="py-5 text-center" th:if="${error == null}">
         <h3>계정 인증 이메일 확인이 완료되었습니다.</h3>
-        <p class="mt-2">
-            <span th:text="${numberOfUser}">N</span>번째 회원,
-            <span th:text="${account.nickname}">사용자</span> 님 가입을 축하합니다.
+        <p class="mt-4">
+            [<span th:text="${numberOfUser}">N</span>번째 회원]
+            <span class="text-bolder" th:text="${account.nickname}">사용자</span> 님 가입을 축하합니다.
         </p>
         <small class="text-info">이제부터 가입한 이메일 또는 닉네임으로 로그인 할 수 있습니다.</small>
     </div>

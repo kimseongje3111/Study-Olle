@@ -38,7 +38,26 @@
             bottom: 0;
             left: 0;
             right: 0;
-            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Noto Sans KR", "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        }
+
+        body,
+        input,
+        button,
+        select,
+        optgroup,
+        textarea,
+        .tooltip,
+        .popover {
+            font-family: -apple-system, BlinkMacSystemFont, "Noto Sans KR", "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        }
+
+        button:focus, input[type=button]:focus {
+            outline: none;
         }
 
         .tagify-outside {
@@ -47,24 +66,62 @@
             margin: 0;
         }
 
-        button:focus, input[type=button]:focus {
-            outline: none;
+        label {
+            margin-left: 5px;
+            font-weight: 600;
+        }
+
+        small {
+            padding-left: 5px;
+        }
+
+        mark {
+            padding: 0;
+            background: transparent;
+            background: linear-gradient(to right, #f0ad4e 50%, transparent 50%);
+            background-position: right bottom;
+            background-size: 200% 100%;
+            transition: all .5s ease;
+            color: #fff;
+        }
+
+        mark.animate {
+            background-position: left bottom;
+            color: #000;
+        }
+
+        .jumbotron {
+            padding-top: 3rem;
+            padding-bottom: 2rem;
+            margin-bottom: 0;
+            background-color: #fff;
+        }
+
+        @media (min-width: 768px) {
+            .jumbotron {
+                padding-top: 6rem;
+                padding-bottom: 5rem;
+            }
+        }
+
+        .jumbotron p:last-child {
+            margin-bottom: 0;
+        }
+
+        .jumbotron h1 {
+            font-weight: 300;
+        }
+
+        .jumbotron .container {
+            max-width: 60rem;
         }
     </style>
 </head>
 
-<!-- footer -->
-<footer th:fragment="footer">
-    <div class="row justify-content-center" style="width: 100%;">
-        <img class="mr-2" src="/images/logo.png" width="25" height="25">
-        <small class="d-block mt-1 text-muted">&copy; 스터디올래 2020</small>
-    </div>
-</footer>
-
 <!-- nav -->
 <nav th:fragment="main-nav" class="navbar navbar-expand-sm navbar-dark bg-dark">
-    <a class="navbar-brand" href="/" th:href="@{/}">
-        <img src="/images/logo.png" width="30" height="30">
+    <a class="navbar-brand" th:href="@{/}">
+        <img src="/images/logo.png" width="35" height="35">
     </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -75,8 +132,8 @@
         <ul class="navbar-nav mr-auto">
             <li class="nav-item">
                 <form th:action="@{/search/study}" class="form-inline" method="get">
-                    <input class="form-control mr-sm-2" name="keyword" type="search"
-                           placeholder="스터디 찾기" aria-label="Search"/>
+                    <input class="form-control" name="keyword" type="search"
+                           placeholder="스터디 찾기" aria-label="Search" style="width: 300px"/>
                 </form>
             </li>
         </ul>
@@ -129,6 +186,14 @@
         </ul>
     </div>
 </nav>
+
+<!-- footer -->
+<footer th:fragment="footer">
+    <div class="row justify-content-center" style="width: 100%;">
+        <img class="mr-1" src="/images/logo.png" width="27" height="27">
+        <small class="d-block mt-1 text-muted">&copy; 스터디올래 2020.</small>
+    </div>
+</footer>
 
 <!-- profile menu -->
 <div th:fragment="profile-menu (currentMenu)" class="list-group mt-1">

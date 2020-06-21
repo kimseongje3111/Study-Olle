@@ -10,8 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public interface StudyMemberRepository extends JpaRepository<StudyMember, Long>, StudyMemberRepositoryCustom {
 
+    boolean existsByAccountAndStudy(Account account, Study study);
+
     @Transactional
     void deleteByAccountAndStudy(Account account, Study study);
-
-    boolean existsByAccountAndStudy(Account account, Study study);
 }

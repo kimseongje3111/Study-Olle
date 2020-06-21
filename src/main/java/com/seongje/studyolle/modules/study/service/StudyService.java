@@ -262,12 +262,12 @@ public class StudyService {
         eventPublisher.publishEvent(new StudyDeletedEvent(study));
     }
 
-    public List<Study> getUserStudiesForParticipating(Account account) {
+    public List<Study> getUserStudiesForNotClosed(Account account) {
         List<StudyMember> userStudies = studyMemberRepository.searchAllByAccountAndPublishedDateTimeDesc(account.getId());
 
         return userStudies.stream()
                 .map(StudyMember::getStudy)
-                .filter(study -> study.isPublished() && !study.isClosed())
+                .filter(study -> !study.isClosed())
                 .collect(Collectors.toList());
     }
 
