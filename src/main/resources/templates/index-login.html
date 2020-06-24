@@ -45,23 +45,30 @@
             <h4><i class="fa fa-hourglass-half"></i> 참석 예정 모임</h4>
             <p class="text-muted" th:if="${eventsToAttend.size() == 0}">예정된 모임이 없습니다.</p>
 
-            <div id="eventsToAttendTab" class="row row-cols-3" th:if="${eventsToAttend.size() > 0}">
+            <div id="eventsToAttendTab" class="row row-cols-3 pt-2" th:if="${eventsToAttend.size() > 0}">
                 <div class="col mb-4" th:each="event : ${eventsToAttend}">
                     <div class="card">
                         <div class="card-header text-center text-white font-weight-bold bg-info">
                             <span th:text="${event.title}">title</span>
                         </div>
 
-                        <h6 class="card-subtitle mb-2 text-muted">
-                            <i class="fa fa-link"></i>
-                            <a th:href="${'/study/studies/' + ${event.study.path}}" th:text="${event.study.title}"></a>
-                        </h6>
+                        <div class="card-body">
+                            <h6 class="card-subtitle mb-2 text-muted">
+                                <i class="fa fa-link"></i>
+                                <a th:href="@{'/study/studies/' + ${event.study.path}}" th:text="${event.study.title}"></a>
+                            </h6>
+                        </div>
 
                         <ul class="list-group list-group-flush">
-                            <li class="list-group-item list-group-item-light list-group-item-action justify-content-between">
-                                <i class="fa fa-calendar"></i>
-                                <span class="calendar mr-auto" th:text="${event.startDateTime}"></span>
-                                <small class="fromNow text-muted" th:text="${event.startDateTime}"></small>
+                            <li class="list-group-item list-group-item-light list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <div>
+                                        <i class="fa fa-calendar"></i>
+                                        <span class="calendar" th:text="${event.startDateTime}"></span>
+                                    </div>
+
+                                    <small class="fromNow text-muted" th:text="${event.startDateTime}"></small>
+                                </div>
                             </li>
                             <li class="list-group-item list-group-item-light text-center">
                                 <a th:href="@{'/study/studies/' + ${event.study.path} + '/event/events/' + ${event.id}}" class="card-link">
@@ -72,27 +79,38 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
 
-            <h4 class="mt-5"><i class="fa fa-history"></i> 최근 완료 모임</h4>
+    <div class="row justify-content-center">
+        <div class="col-sm-8 pt-5">
+            <h4><i class="fa fa-history"></i> 최근 완료 모임</h4>
             <p class="text-muted" th:if="${eventsForAttended.size() == 0}">완료된 모임이 없습니다.</p>
 
-            <div id="eventsForAttendedTab" class="row row-cols-3" th:if="${eventsForAttended.size() > 0}">
-                <div class="col mb-4" th:each="event : ${eventsForAttended}">
+            <div id="eventsForAttendedTab" class="row row-cols-3 pt-2" th:if="${eventsForAttended.size() > 0}">
+                <div class="col mt-2 mb-4" th:each="event : ${eventsForAttended}">
                     <div class="card">
                         <div class="card-header text-center text-white font-weight-bold bg-info">
                             <span th:text="${event.title}">title</span>
                         </div>
 
-                        <h6 class="card-subtitle mb-2 text-muted">
-                            <i class="fa fa-link"></i>
-                            <a th:href="${'/study/studies/' + ${event.study.path}}" th:text="${event.study.title}"></a>
-                        </h6>
+                        <div class="card-body">
+                            <h6 class="card-subtitle mb-2 text-muted">
+                                <i class="fa fa-link"></i>
+                                <a th:href="@{'/study/studies/' + ${event.study.path}}" th:text="${event.study.title}"></a>
+                            </h6>
+                        </div>
 
                         <ul class="list-group list-group-flush">
-                            <li class="list-group-item list-group-item-light list-group-item-action justify-content-between">
-                                <i class="fa fa-calendar"></i>
-                                <span class="calendar mr-auto" th:text="${event.startDateTime}"></span>
-                                <small class="fromNow text-muted" th:text="${event.startDateTime}"></small>
+                            <li class="list-group-item list-group-item-light list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <div>
+                                        <i class="fa fa-calendar"></i>
+                                        <span class="calendar" th:text="${event.startDateTime}"></span>
+                                    </div>
+
+                                    <small class="fromNow text-muted" th:text="${event.startDateTime}"></small>
+                                </div>
                             </li>
                             <li class="list-group-item list-group-item-light text-center">
                                 <a th:href="@{'/study/studies/' + ${event.study.path} + '/event/events/' + ${event.id}}" class="card-link">
@@ -103,8 +121,12 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
 
-            <h4 class="mt-5"><i class="fa fa-magic"></i> 추천 스터디 (주요 활동의 지역의 관심 주제 스터디)</h4>
+    <div class="row justify-content-center">
+        <div class="col-sm-8 pt-5">
+            <h4><i class="fa fa-magic"></i> 추천 스터디 (주요 활동의 지역의 관심 주제 스터디)</h4>
             <p class="text-muted" th:if="${recommendedStudies.size() == 0}">
                 추천 스터디를 찾을 수 없습니다.<br>
                 아직 주요 활동 지역과 관심 주제 태그를 등록하지 않으셨다면 등록해보세요.

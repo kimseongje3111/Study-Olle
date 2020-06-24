@@ -6,6 +6,7 @@ import com.seongje.studyolle.modules.study.domain.StudyTagItem;
 import com.seongje.studyolle.modules.study.domain.StudyZoneItem;
 import com.seongje.studyolle.modules.study.form.StudySearch;
 import com.seongje.studyolle.modules.tag.domain.Tag;
+import com.seongje.studyolle.modules.tag.repository.TagRepository;
 import com.seongje.studyolle.modules.zone.domain.Zone;
 import com.seongje.studyolle.modules.account.domain.Account;
 import com.seongje.studyolle.modules.study.domain.Study;
@@ -14,10 +15,12 @@ import com.seongje.studyolle.modules.study.repository.StudyMemberRepository;
 import com.seongje.studyolle.modules.study.repository.StudyRepository;
 import com.seongje.studyolle.modules.study.repository.StudyTagItemRepository;
 import com.seongje.studyolle.modules.study.repository.StudyZoneItemRepository;
+import com.seongje.studyolle.modules.zone.repository.ZoneRepository;
 import eu.maxschuster.dataurl.DataUrl;
 import eu.maxschuster.dataurl.DataUrlBuilder;
 import eu.maxschuster.dataurl.IDataUrlSerializer;
 import lombok.RequiredArgsConstructor;
+import net.bytebuddy.utility.RandomString;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.ClassPathResource;
@@ -58,6 +61,8 @@ public class StudyService {
     private final ResourceLoader resourceLoader;
     private final IDataUrlSerializer dataUrlSerializer;
     private final ApplicationEventPublisher eventPublisher;
+    private final TagRepository tagRepository;
+    private final ZoneRepository zoneRepository;
 
     public Study findStudy(String path) {
         Study findStudy = studyRepository.findByPath(path);

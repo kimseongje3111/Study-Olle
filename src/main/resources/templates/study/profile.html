@@ -52,6 +52,11 @@
                             <th scope="row" th:text="${studyStat.count}">1</th>
                             <td th:text="${study.title}">스터디 이름</td>
                             <td>
+                                <span th:if="${study.isManager(#authentication.principal)}" class="text-success">
+                                    <i class="fa fa-check-square"></i>
+                                </span>
+                            </td>
+                            <td>
                                 <span th:if="${study.published}" class="text-success">
                                     <i class="fa fa-check-square"></i>
                                 </span>
@@ -60,11 +65,6 @@
                                 <span th:if="${study.published}">
                                     <i class="fa fa-calendar"></i>
                                     <span class="date-weekday-time" th:text="${study.publishedDateTime}">공개 날짜</span>
-                                </span>
-                            </td>
-                            <td>
-                                <span th:if="${study.isManager(#authentication.principal)}" class="text-success">
-                                    <i class="fa fa-check-square"></i>
                                 </span>
                             </td>
                             <td th:text="${study.memberCount}">0</td>
@@ -97,13 +97,13 @@
                             <th scope="row" th:text="${studyStat.count}">1</th>
                             <td th:text="${study.title}">스터디 이름</td>
                             <td>
-                                <i class="fa fa-calendar"></i>
-                                <span class="date-weekday-time" th:text="${study.closedDateTime}">종료 날짜</span>
-                            </td>
-                            <td>
                                 <span th:if="${study.isManager(#authentication.principal)}" class="text-success">
                                     <i class="fa fa-check-square"></i>
                                 </span>
+                            </td>
+                            <td>
+                                <i class="fa fa-calendar"></i>
+                                <span class="date-weekday-time" th:text="${study.closedDateTime}">종료 날짜</span>
                             </td>
                             <td>
                                 <a th:if="${isOwner}" class="btn btn-primary" th:href="@{'/study/studies/' + ${study.path}}">
