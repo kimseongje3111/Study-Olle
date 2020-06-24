@@ -138,4 +138,6 @@ public class StudyController {
 
         return "study/search";
     }
+
+
 }
