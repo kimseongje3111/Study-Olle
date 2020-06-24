@@ -9,14 +9,263 @@
     스터디올레 가입을 완료하려면 <a class="alert-link" th:href="@{/account/check-email}">계정 인증 이메일을 확인</a>하세요.
 </div>
 
+<section class="jumbotron text-center">
+    <div class="container">
+        <p class="lead text-muted">
+            <strong>스터디올래</strong>에서 나에게 맞는 스터디를 찾아보세요.
+        </p>
+
+        <div class="row justify-content-center">
+            <form th:action="@{/search/study}" class="form-inline" method="get">
+                <div class="search-wrapper">
+                    <input class="form-control" name="keyword" type="text" aria-label="Search"
+                           placeholder="관심있는 스터디의 주제나 활동 지역을 입력해보세요."/>
+                    <button class="search-btn" type="submit"><i class="fa fa-search"></i></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
 <div class="container">
-    <div class="py-5 text-center">
-        <h1>스터디올래</h1>
+    <div class="row justify-content-center">
+        <nav id="home-nav" class="nav nav-pills justify-content-between col-sm-10 py-2 pl-3">
+            <a class="btn btn-success mr-auto" href="#my-menu">
+                <i class="fa fa-user-circle"></i>
+                내 정보
+            </a>
+            <a class="nav-item nav-link" href="#eventsToAttendTab">참석 예정 모임</a>
+            <a class="nav-item nav-link" href="#eventsForAttendedTab">최근 완료 모임</a>
+            <a class="nav-item nav-link" href="#recommendedStudiesTab">추천 스터디</a>
+        </nav>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-sm-8 pt-5">
+            <h4>
+                <i class="fas fa-hourglass-half"></i>
+                참석 예정 모임
+            </h4>
+            <p class="text-muted" th:if="${eventsToAttend.size() == 0}">
+                예정된 모임이 없습니다.
+            </p>
+
+            <div id="eventsToAttendTab" class="row row-cols-3" th:if="${eventsToAttend.size() > 0}">
+                <div class="col mb-4" th:each="event : ${eventsToAttend}">
+                    <div class="card">
+                        <div class="card-header text-center text-white font-weight-bold bg-info">
+                            <span th:text="${event.title}">title</span>
+                        </div>
+
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            <i class="fa fa-link"></i>
+                            <a th:href="${'/study/studies/' + ${event.study.path}}" th:text="${event.study.title}"></a>
+                        </h6>
+
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item list-group-item-light list-group-item-action justify-content-between">
+                                <i class="fa fa-calendar"></i>
+                                <span class="calendar mr-auto" th:text="${event.startDateTime}"></span>
+                                <small class="fromNow text-muted" th:text="${event.startDateTime}"></small>
+                            </li>
+                            <li class="list-group-item list-group-item-light text-center">
+                                <a th:href="@{'/study/studies/' + ${event.study.path} + '/event/events/' + ${event.id}}" class="card-link">
+                                    자세히 보기
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <h4 class="mt-5">
+                <i class="far fa-calendar-check"></i>
+                최근 완료 모임
+            </h4>
+            <p class="text-muted" th:if="${eventsForAttended.size() == 0}">
+                완료된 모임이 없습니다.
+            </p>
+
+            <div id="eventsForAttendedTab" class="row row-cols-3" th:if="${eventsForAttended.size() > 0}">
+                <div class="col mb-4" th:each="event : ${eventsForAttended}">
+                    <div class="card">
+                        <div class="card-header text-center text-white font-weight-bold bg-info">
+                            <span th:text="${event.title}">title</span>
+                        </div>
+
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            <i class="fa fa-link"></i>
+                            <a th:href="${'/study/studies/' + ${event.study.path}}" th:text="${event.study.title}"></a>
+                        </h6>
+
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item list-group-item-light list-group-item-action justify-content-between">
+                                <i class="fa fa-calendar"></i>
+                                <span class="calendar mr-auto" th:text="${event.startDateTime}"></span>
+                                <small class="fromNow text-muted" th:text="${event.startDateTime}"></small>
+                            </li>
+                            <li class="list-group-item list-group-item-light text-center">
+                                <a th:href="@{'/study/studies/' + ${event.study.path} + '/event/events/' + ${event.id}}" class="card-link">
+                                    자세히 보기
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <h4 class="mt-5">
+                <i class="fa fa-broadcast-tower"></i>
+                추천 스터디 (주요 활동의 지역의 관심 주제 스터디)
+            </h4>
+            <p class="text-muted" th:if="${recommendedStudies.size() == 0}">
+                추천 스터디를 찾을 수 없습니다.<br>
+                아직 주요 활동 지역과 관심 주제 태그를 등록하지 않으셨다면 등록해보세요.
+            </p>
+
+            <div id="recommendedStudiesTab" class="swiper-container" th:if="${recommendedStudies.size() > 0}">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide" th:each="study : ${recommendedStudies}">
+                        <div class="card shadow-sm">
+                            <img th:if="${!study.useBanner}" src="/images/basic_banners/basic_banner_5.png" class="card-img-top" th:alt="${study.title}">
+                            <img th:if="${study.useBanner}" th:src="${study.bannerImg}" class="card-img-top" th:alt="${study.title}">
+
+                            <div class="card-body">
+                                <a th:href="@{'/study/studies/' + ${study.path}}" class="text-decoration-none">
+                                    <h5 class="card-title context" th:text="${study.title}"></h5>
+                                </a>
+                                <p class="card-text" th:text="${study.shortDescription}">Short description</p>
+
+                                <div class="dropdown-divider"></div>
+
+                                <p class="card-text context">
+                                    <span th:each="tagItem : ${study.tags}" class="font-weight-light text-monospace badge badge-pill badge-info mr-2">
+                                        <a th:href="@{'/search/' + ${tagItem.tag.title}}" class="text-decoration-none text-white">
+                                            <i class="fa fa-tag"></i>
+                                            <span th:text="${tagItem.tag.title}">Tag</span>
+                                        </a>
+                                    </span>
+                                </p>
+                                <p class="card-text context">
+                                    <span th:each="zoneItem : ${study.zones}" class="font-weight-light text-monospace badge badge-primary mr-2">
+                                        <a th:href="@{'/search/' + ${zoneItem.zone.id}}" class="text-decoration-none text-white">
+                                            <i class="fa fa-globe"></i>
+                                            <span th:text="${zoneItem.zone.localNameOfCity}" class="text-white">City</span>
+                                        </a>
+                                    </span>
+                                </p>
+
+                                <div class="card-footer d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        <i class="fa fa-user-circle"></i>
+                                        <span th:text="${study.memberCount}"></span>명
+                                    </small>
+                                    <small class="text-muted date" th:text="${study.publishedDateTime}">공개 날짜</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-button-next"></div>
+            </div>
+        </div>
     </div>
 
     <footer th:replace="fragments.html :: footer"></footer>
 </div>
 
+<nav id="my-menu">
+    <ul>
+        <li>
+            <a th:href="@{/account/settings/tags}" class="content-title">
+                관심 스터디 주제
+                <i class="fa fa-plus-circle"></i>
+            </a>
+        </li>
+        <li th:each="tag : ${userTags}">
+            <span class="content-list">
+                <i class="fa fa-tag"></i>
+                <span th:text="${tag.title}"></span>
+            </span>
+        </li>
+        <li>
+            <a th:href="@{/account/settings/zones}" class="content-title">
+                주요 활동 지역
+                <i class="fa fa-plus-circle"></i>
+            </a>
+        </li>
+        <li th:each="zone : ${userZones}">
+            <span class="content-list">
+                <i class="fa fa-globe"></i>
+                <span th:text="${zone.localNameOfCity}"></span>
+            </span>
+        </li>
+        <li>
+            <span>
+                <a class="content-title">
+                    <i class="fa fa-list"></i>
+                    스터디 목록
+                </a>
+            </span>
+            <ul>
+                <li><a class="content-title">관리 중인 스터디</a></li>
+                <li th:each="study : ${userStudies}" th:if="${study.isManager(#authentication.principal)}">
+                    <a class="content-list-link" th:href="@{'/study/studies/' + ${study.path}}">
+                        <i class="fa fa-link"></i>
+                        <span th:text="${study.title}"></span>
+                    </a>
+                </li>
+                <li><a class="content-title">가입한 스터디</a></li>
+                <li th:each="study : ${userStudies}" th:if="${study.isMember(#authentication.principal)}">
+                    <a class="content-list-link" th:href="@{'/study/studies/' + ${study.path}}">
+                        <i class="fa fa-link"></i>
+                        <span th:text="${study.title}"></span>
+                    </a>
+                </li>
+            </ul>
+        </li>
+    </ul>
+</nav>
+
+<link rel="stylesheet" href="/node_modules/mmenu-js/dist/mmenu.css">
+<link rel="stylesheet" href="/node_modules/swiper/css/swiper.min.css">
+
+<script src="/node_modules/mmenu-js/dist/mmenu.js"></script>
+<script src="/node_modules/swiper/js/swiper.min.js"></script>
 <script th:replace="fragments.html :: date-time"></script>
+<script type="application/javascript">
+    $(function () {
+        var myMenu = new Mmenu("#my-menu", {
+            "navbar": {
+                "title": "내 정보"
+            },
+            "onclick": {
+                "close": true
+            },
+            "slidingSubmenus": false,
+            "extensions": [
+                "position-front",
+                "shadow-page",
+                "border-full"
+            ],
+            "setSelected": {
+                "hover": true
+            }
+        });
+
+        var mySwiper = new Swiper ('.swiper-container', {
+            slidesPerView: 3,
+            spaceBetween: 10,
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev'
+            }
+        });
+
+        $('.container').scrollspy({ target: '#home-nav' })
+    })
+</script>
 </body>
 </html>

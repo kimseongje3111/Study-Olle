@@ -3,7 +3,6 @@ package com.seongje.studyolle.modules.account.domain;
 import com.seongje.studyolle.modules.tag.domain.Tag;
 import com.seongje.studyolle.modules.zone.domain.Zone;
 import lombok.*;
-import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;

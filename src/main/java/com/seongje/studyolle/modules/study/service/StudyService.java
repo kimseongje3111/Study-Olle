@@ -2,6 +2,8 @@ package com.seongje.studyolle.modules.study.service;
 
 import com.seongje.studyolle.modules.study.app_event.custom.*;
 import com.seongje.studyolle.modules.study.domain.StudyMember;
+import com.seongje.studyolle.modules.study.domain.StudyTagItem;
+import com.seongje.studyolle.modules.study.domain.StudyZoneItem;
 import com.seongje.studyolle.modules.study.form.StudySearch;
 import com.seongje.studyolle.modules.tag.domain.Tag;
 import com.seongje.studyolle.modules.zone.domain.Zone;
@@ -33,7 +35,6 @@ import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.seongje.studyolle.modules.study.app_event.custom.StudyMemberEventType.*;
 import static com.seongje.studyolle.modules.study.app_event.custom.StudyUpdatedEventType.*;
@@ -42,6 +43,7 @@ import static com.seongje.studyolle.modules.study.domain.StudyMember.*;
 import static com.seongje.studyolle.modules.study.domain.StudyTagItem.*;
 import static com.seongje.studyolle.modules.study.domain.StudyZoneItem.*;
 import static eu.maxschuster.dataurl.DataUrlEncoding.*;
+import static java.util.stream.Collectors.*;
 
 @Service
 @RequiredArgsConstructor
@@ -119,7 +121,7 @@ public class StudyService {
                     .getResourcePatternResolver(resourceLoader)
                     .getResources("classpath:/static/images/basic_banners/**");
 
-            return Arrays.stream(resources).map(Resource::getFilename).collect(Collectors.toList());
+            return Arrays.stream(resources).map(Resource::getFilename).collect(toList());
 
         } catch (IOException e) {
             throw new RuntimeException("해당 경로에 파일이 존재하지 않습니다.", e);
@@ -155,10 +157,8 @@ public class StudyService {
         study.setUseBanner(use);
     }
 
-    public Set<String> getStudyTags(Study study) {
-        return study.getTags().stream()
-                .map(studyTagItem -> studyTagItem.getTag().getTitle())
-                .collect(Collectors.toSet());
+    public Set<Tag> getStudyTags(Study study) {
+        return study.getTags().stream().map(StudyTagItem::getTag).collect(toSet());
     }
 
     @Transactional
@@ -173,10 +173,8 @@ public class StudyService {
         study.removeTagItem(tag);
     }
 
-    public Set<String> getStudyZones(Study study) {
-        return study.getZones().stream()
-                .map(studyZoneItem -> studyZoneItem.getZone().toString())
-                .collect(Collectors.toSet());
+    public Set<Zone> getStudyZones(Study study) {
+        return study.getZones().stream().map(StudyZoneItem::getZone).collect(toSet());
     }
 
     @Transactional
@@ -225,10 +223,11 @@ public class StudyService {
             return false;
         }
 
+        String prevTitle = study.getTitle();
         study.setTitle(newTitle);
 
         StudyUpdatedEvent studyUpdatedEvent = new StudyUpdatedEvent(study, TITLE);
-        studyUpdatedEvent.setNewTitle(newTitle);
+        studyUpdatedEvent.setPrevTitle(prevTitle);
         eventPublisher.publishEvent(studyUpdatedEvent);
 
         return true;
@@ -242,10 +241,11 @@ public class StudyService {
             return false;
         }
 
+        String prevPath = study.getPath();
         study.setPath(newPath);
 
         StudyUpdatedEvent studyUpdatedEvent = new StudyUpdatedEvent(study, PATH);
-        studyUpdatedEvent.setNewPath(newPath);
+        studyUpdatedEvent.setPrevPath(prevPath);
         eventPublisher.publishEvent(studyUpdatedEvent);
 
         return true;
@@ -263,25 +263,40 @@ public class StudyService {
     }
 
     public List<Study> getUserStudiesForNotClosed(Account account) {
-        List<StudyMember> userStudies = studyMemberRepository.searchAllByAccountAndPublishedDateTimeDesc(account.getId());
+        List<StudyMember> userStudies =
+                studyMemberRepository.searchAllByAccountAndPublishedDateTimeDesc(account.getId());
 
         return userStudies.stream()
                 .map(StudyMember::getStudy)
                 .filter(study -> !study.isClosed())
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     public List<Study> getUserStudiesForClosed(Account account) {
-        List<StudyMember> userStudies = studyMemberRepository.searchAllByAccountAndPublishedDateTimeDesc(account.getId());
+        List<StudyMember> userStudies =
+                studyMemberRepository.searchAllByAccountAndPublishedDateTimeDesc(account.getId());
 
         return userStudies.stream()
                 .map(StudyMember::getStudy)
                 .filter(study -> study.isPublished() && study.isClosed())
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     public Page<Study> getAllStudiesForKeyword(StudySearch studySearch, Pageable pageable) {
-        return studyRepository.searchAllByStudySearchAndPaging(studySearch, pageable);
+        return studyRepository
+                .searchAllByStudySearchAndPaging(studySearch, pageable);
+    }
+
+    public List<Study> getStudiesForRecent9() {
+        return studyRepository
+                .findFirst9ByPublishedAndClosedOrderByPublishedDateTimeDesc(true, false);
+    }
+
+    public List<Study> getRecommendedStudiesForTagsAndZones(Set<Tag> tags, Set<Zone> zones) {
+        List<Study> studyList
+                = studyRepository.searchPublishedAndNotClosedByTagsAndZonesAndPublishedDateTimeDesc(tags, zones);
+
+        return studyList.size() > 10 ? studyList.subList(0, 9) : studyList;
     }
 
     private String getImageDataUrl(String basicBanner) throws IOException {

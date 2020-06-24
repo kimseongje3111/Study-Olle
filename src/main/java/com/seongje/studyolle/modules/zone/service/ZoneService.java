@@ -14,9 +14,10 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.seongje.studyolle.modules.zone.domain.Zone.*;
+import static java.util.Comparator.*;
+import static java.util.stream.Collectors.*;
 
 @Service
 @RequiredArgsConstructor
@@ -42,20 +43,20 @@ public class ZoneService {
 
                         return zoneBuilder.build();
                     })
-                    .collect(Collectors.toList());
+                    .collect(toList());
 
             zoneRepository.saveAll(zoneList);
         }
     }
 
     public Zone findZone(ZoneForm zoneForm) {
-        return zoneRepository.findByCityAndLocalNameOfCity(zoneForm.getCityName(), zoneForm.getLocalNameOfCity());
+        return zoneRepository
+                .findByCityAndLocalNameOfCity(zoneForm.getCityName(), zoneForm.getLocalNameOfCity());
     }
 
-    public List<String> getAllZones() {
+    public List<Zone> getAllZones() {
         return zoneRepository.findAll().stream()
-                .map(Zone::toString)
-                .sorted()
-                .collect(Collectors.toList());
+                .sorted(comparing(Zone::getLocalNameOfCity))
+                .collect(toList());
     }
 }

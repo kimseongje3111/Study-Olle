@@ -4,16 +4,15 @@ import com.seongje.studyolle.modules.account.domain.Account;
 import com.seongje.studyolle.modules.study.domain.Study;
 import com.seongje.studyolle.modules.account.authentication.UserAccount;
 import lombok.*;
-import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.seongje.studyolle.modules.event.domain.EventType.*;
+import static java.util.Comparator.*;
+import static java.util.stream.Collectors.*;
 
 @Entity
 @Getter @Setter @EqualsAndHashCode(of = "id")
@@ -91,7 +90,7 @@ public class Event {
     public boolean isApplied(UserAccount userAccount) {
         return this.enrollments.stream()
                 .map(Enrollment::getAccount)
-                .collect(Collectors.toSet())
+                .collect(toSet())
                 .contains(userAccount.getAccount());
     }
 
@@ -155,8 +154,8 @@ public class Event {
     public List<Enrollment> getWaitingEnrollmentsOfRemainingSeats() {
         return this.enrollments.stream()
                 .filter(enrollment -> !enrollment.isApproved())
-                .sorted(Comparator.comparing(Enrollment::getAppliedDateTime))
+                .sorted(comparing(Enrollment::getAppliedDateTime))
                 .limit(getNumberOfRemainingSeats())
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 }

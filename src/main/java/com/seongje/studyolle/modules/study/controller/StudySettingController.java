@@ -26,6 +26,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -137,8 +140,8 @@ public class StudySettingController {
                                 Model model) throws JsonProcessingException {
 
         Study findStudy = studyService.findStudyForUpdate(path, account);
-        Set<String> studyTags = studyService.getStudyTags(findStudy);
-        List<String> allTags = tagService.getAllTags();
+        List<String> allTags = tagService.getAllTags().stream().map(Tag::getTitle).collect(toList());
+        Set<String> studyTags = studyService.getStudyTags(findStudy).stream().map(Tag::getTitle).collect(toSet());
 
         model.addAttribute(account);
         model.addAttribute(findStudy);
@@ -182,8 +185,8 @@ public class StudySettingController {
                                  Model model) throws JsonProcessingException {
 
         Study findStudy = studyService.findStudyForUpdate(path, account);
-        Set<String> studyZones = studyService.getStudyZones(findStudy);
-        List<String> allZones = zoneService.getAllZones();
+        List<String> allZones = zoneService.getAllZones().stream().map(Zone::toString).collect(toList());
+        Set<String> studyZones = studyService.getStudyZones(findStudy).stream().map(Zone::toString).collect(toSet());
 
         model.addAttribute(account);
         model.addAttribute(findStudy);

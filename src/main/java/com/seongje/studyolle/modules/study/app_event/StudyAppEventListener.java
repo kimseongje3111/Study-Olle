@@ -2,16 +2,12 @@ package com.seongje.studyolle.modules.study.app_event;
 
 import com.seongje.studyolle.modules.account.domain.Account;
 import com.seongje.studyolle.modules.account.repository.AccountRepository;
-import com.seongje.studyolle.modules.event.app_event.custom.event.EventAppEvent;
 import com.seongje.studyolle.modules.notification.NotificationMailSender;
 import com.seongje.studyolle.modules.notification.domain.Notification;
-import com.seongje.studyolle.modules.notification.domain.NotificationType;
 import com.seongje.studyolle.modules.notification.repository.NotificationRepository;
 import com.seongje.studyolle.modules.study.app_event.custom.*;
 import com.seongje.studyolle.modules.study.domain.*;
-import com.seongje.studyolle.modules.study.repository.StudyRepository;
-import com.seongje.studyolle.modules.tag.domain.Tag;
-import com.seongje.studyolle.modules.zone.domain.Zone;
+import com.seongje.studyolle.modules.study.service.StudyService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.context.event.EventListener;
@@ -20,8 +16,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.seongje.studyolle.modules.notification.NotificationMailSender.*;
 import static com.seongje.studyolle.modules.notification.domain.Notification.*;
@@ -36,7 +30,7 @@ import static com.seongje.studyolle.modules.study.domain.ManagementLevel.*;
 @Transactional
 public class StudyAppEventListener {
 
-    private final StudyRepository studyRepository;
+    private final StudyService studyService;
     private final AccountRepository accountRepository;
     private final NotificationRepository notificationRepository;
     private final NotificationMailSender mailSender;
@@ -44,15 +38,17 @@ public class StudyAppEventListener {
     @SneakyThrows
     @EventListener
     public void handleStudyCreatedEvent(StudyCreatedEvent appEvent) {
-        Study findStudy = studyRepository.findByPath(appEvent.getStudy().getPath());
-        String title = findStudy.getTitle();
-        String link = "/study/studies/" + findStudy.getEncodedPath();
+        Study publishedStudy = appEvent.getStudy();
+        String title = publishedStudy.getTitle();
+        String link = "/study/studies/" + publishedStudy.getEncodedPath();
 
-        Set<Tag> studyTags = findStudy.getTags().stream().map(StudyTagItem::getTag).collect(Collectors.toSet());
-        Set<Zone> studyZones = findStudy.getZones().stream().map(StudyZoneItem::getZone).collect(Collectors.toSet());
-        List<Account> accountList = accountRepository.searchAllByTagsAndZones(studyTags, studyZones);
+        List<Account> accountList =
+                accountRepository.searchAllByTagsAndZones(
+                        studyService.getStudyTags(publishedStudy),
+                        studyService.getStudyZones(publishedStudy)
+                );
 
-        findStudy.getMembers().forEach(studyMember -> {
+        publishedStudy.getMembers().forEach(studyMember -> {
             if (studyMember.getManagementLevel() == MANAGER) {
                 Account manager = studyMember.getAccount();
 
@@ -65,7 +61,7 @@ public class StudyAppEventListener {
                 }
 
                 if (manager.isStudyUpdatedByEmail()) {
-                    mailSender.sendNotificationEmail(findStudy, manager, appEvent.getMessage(), emailSubjectForUpdated, false);
+                    mailSender.sendNotificationEmail(publishedStudy, manager, appEvent.getMessage(), emailSubjectForUpdated, false);
                 }
             }
         });
@@ -80,7 +76,7 @@ public class StudyAppEventListener {
             }
 
             if (account.isStudyCreatedByEmail()) {
-                mailSender.sendNotificationEmail(findStudy, account, appEvent.getMessage(), emailSubjectForCreated, false);
+                mailSender.sendNotificationEmail(publishedStudy, account, appEvent.getMessage(), emailSubjectForCreated, false);
             }
         });
     }
@@ -127,12 +123,13 @@ public class StudyAppEventListener {
     @SneakyThrows
     @EventListener
     public void handleStudyMemberEvent(StudyMemberEvent appEvent) {
-        Account findAccount = accountRepository.findByEmail(appEvent.getAccount().getEmail());
-        Study findStudy = studyRepository.findByPath(appEvent.getStudy().getPath());
-        String title = findStudy.getTitle();
-        String link = "/study/studies/" + findStudy.getEncodedPath();
+        Study currentStudy = appEvent.getStudy();
+        String title = currentStudy.getTitle();
+        String link = "/study/studies/" + currentStudy.getEncodedPath();
 
-        findStudy.getMembers().forEach(studyMember -> {
+        Account currentAccount = appEvent.getAccount();
+
+        currentStudy.getMembers().forEach(studyMember -> {
             if (studyMember.getManagementLevel() == MANAGER) {
                 Account manager = studyMember.getAccount();
 
@@ -145,13 +142,13 @@ public class StudyAppEventListener {
 
                 if (manager.isStudyUpdatedByWeb()) {
                     Notification newNotification = createNotification(title, link, appEvent.getMessage(), STUDY_UPDATED, true, manager);
-                    newNotification.setAdditionalExplanation("사용자 : " + findAccount.getNickname());
+                    newNotification.setAdditionalExplanation("사용자 : " + currentAccount.getNickname());
 
                     notificationRepository.save(newNotification);
                 }
 
                 if (manager.isStudyUpdatedByEmail()) {
-                    mailSender.sendNotificationEmail(findStudy, manager, appEvent.getMessage(), emailSubjectForUpdated, false);
+                    mailSender.sendNotificationEmail(currentStudy, manager, appEvent.getMessage(), emailSubjectForUpdated, false);
                 }
             }
         });
@@ -163,25 +160,25 @@ public class StudyAppEventListener {
             appEvent.setMessageContent("스터디에서 탈퇴하였습니다. 새로운 스터디를 찾아보세요.");
         }
 
-        if (findAccount.isStudyUpdatedByWeb()) {
+        if (currentAccount.isStudyUpdatedByWeb()) {
             notificationRepository.save(
-                    createNotification(title, link, appEvent.getMessage(), STUDY_UPDATED, false, findAccount)
+                    createNotification(title, link, appEvent.getMessage(), STUDY_UPDATED, false, currentAccount)
             );
         }
 
-        if (findAccount.isStudyUpdatedByEmail()) {
-            mailSender.sendNotificationEmail(findStudy, findAccount, appEvent.getMessage(), emailSubjectForUpdated, false);
+        if (currentAccount.isStudyUpdatedByEmail()) {
+            mailSender.sendNotificationEmail(currentStudy, currentAccount, appEvent.getMessage(), emailSubjectForUpdated, false);
         }
     }
 
     @SneakyThrows
     @EventListener
     public void handleStudyUpdatedEvent(StudyUpdatedEvent appEvent) {
-        Study findStudy = studyRepository.findByPath(appEvent.getStudy().getPath());
-        String title = findStudy.getTitle();
-        String link = "/study/studies/" + findStudy.getEncodedPath();
+        Study updatedStudy = appEvent.getStudy();
+        String title = updatedStudy.getTitle();
+        String link = "/study/studies/" + updatedStudy.getEncodedPath();
 
-        findStudy.getMembers().forEach(studyMember -> {
+        updatedStudy.getMembers().forEach(studyMember -> {
             if (studyMember.getManagementLevel() == MANAGER) {
                 Account manager = studyMember.getAccount();
 
@@ -191,14 +188,12 @@ public class StudyAppEventListener {
                     Notification newNotification;
 
                     if (appEvent.getEventType() == TITLE) {
-                        newNotification = createNotification(appEvent.getNewTitle(), link, appEvent.getMessage(), STUDY_UPDATED, true, manager);
-                        newNotification.setAdditionalExplanation("변경 전 : " + title);
+                        newNotification = createNotification(title, link, appEvent.getMessage(), STUDY_UPDATED, true, manager);
+                        newNotification.setAdditionalExplanation("변경 전 : " + appEvent.getPrevTitle());
 
                     } else if (appEvent.getEventType() == PATH) {
-                        String newLink = "/study/studies/" + appEvent.getNewPath();
-
-                        newNotification = createNotification(title, newLink, appEvent.getMessage(), STUDY_UPDATED, true, manager);
-                        newNotification.setAdditionalExplanation("변경 전 : " + link);
+                        newNotification = createNotification(title, link, appEvent.getMessage(), STUDY_UPDATED, true, manager);
+                        newNotification.setAdditionalExplanation("변경 전 : " + appEvent.getPrevPath());
 
                     } else {
                         newNotification = createNotification(title, link, appEvent.getMessage(), STUDY_UPDATED, true, manager);
@@ -208,7 +203,7 @@ public class StudyAppEventListener {
                 }
 
                 if (manager.isStudyUpdatedByEmail()) {
-                    mailSender.sendNotificationEmail(findStudy, manager, appEvent.getMessage(), emailSubjectForUpdated, false);
+                    mailSender.sendNotificationEmail(updatedStudy, manager, appEvent.getMessage(), emailSubjectForUpdated, false);
                 }
 
             } else {
@@ -220,14 +215,12 @@ public class StudyAppEventListener {
                     Notification newNotification;
 
                     if (appEvent.getEventType() == TITLE) {
-                        newNotification = createNotification(appEvent.getNewTitle(), link, appEvent.getMessage(), STUDY_UPDATED, false, member);
-                        newNotification.setAdditionalExplanation("변경 전 : " + title);
+                        newNotification = createNotification(title, link, appEvent.getMessage(), STUDY_UPDATED, false, member);
+                        newNotification.setAdditionalExplanation("변경 전 : " + appEvent.getPrevTitle());
 
                     } else if (appEvent.getEventType() == PATH) {
-                        String newLink = "/study/studies/" + appEvent.getNewPath();
-
-                        newNotification = createNotification(title, newLink, appEvent.getMessage(), STUDY_UPDATED, false, member);
-                        newNotification.setAdditionalExplanation("변경 전 : " + link);
+                        newNotification = createNotification(title, link, appEvent.getMessage(), STUDY_UPDATED, false, member);
+                        newNotification.setAdditionalExplanation("변경 전 : " + appEvent.getPrevPath());
 
                     } else {
                         newNotification = createNotification(title, link, appEvent.getMessage(), STUDY_UPDATED, false, member);
@@ -237,7 +230,7 @@ public class StudyAppEventListener {
                 }
 
                 if (member.isStudyUpdatedByEmail()) {
-                    mailSender.sendNotificationEmail(findStudy, member, appEvent.getMessage(), emailSubjectForUpdated, false);
+                    mailSender.sendNotificationEmail(updatedStudy, member, appEvent.getMessage(), emailSubjectForUpdated, false);
                 }
             }
         });

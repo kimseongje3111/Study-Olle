@@ -5,7 +5,6 @@ import com.seongje.studyolle.modules.zone.domain.Zone;
 import com.seongje.studyolle.modules.account.domain.Account;
 import com.seongje.studyolle.modules.account.authentication.UserAccount;
 import lombok.*;
-import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.io.UnsupportedEncodingException;
@@ -13,9 +12,9 @@ import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.seongje.studyolle.modules.study.domain.ManagementLevel.*;
+import static java.util.stream.Collectors.*;
 
 @Entity
 @Getter @Setter @EqualsAndHashCode(of = "id")
@@ -110,7 +109,7 @@ public class Study {
 
         return !this.members.stream()
                 .map(StudyMember::getAccount)
-                .collect(Collectors.toSet())
+                .collect(toSet())
                 .contains(userAccount.getAccount());
     }
 
@@ -118,7 +117,7 @@ public class Study {
         return this.members.stream()
                 .filter(studyMember -> studyMember.getManagementLevel() == MANAGER)
                 .map(StudyMember::getAccount)
-                .collect(Collectors.toSet())
+                .collect(toSet())
                 .contains(userAccount.getAccount());
     }
 
@@ -126,7 +125,7 @@ public class Study {
         return this.members.stream()
                 .filter(studyMember -> studyMember.getManagementLevel() == MEMBER)
                 .map(StudyMember::getAccount)
-                .collect(Collectors.toSet())
+                .collect(toSet())
                 .contains(userAccount.getAccount());
     }
 
@@ -134,7 +133,7 @@ public class Study {
         return this.members.stream()
                 .filter(studyMember -> studyMember.getManagementLevel() == MANAGER)
                 .map(StudyMember::getAccount)
-                .collect(Collectors.toSet())
+                .collect(toSet())
                 .contains(account);
     }
 

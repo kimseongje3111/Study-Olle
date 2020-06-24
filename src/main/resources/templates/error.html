@@ -1,10 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments.html :: header"></head>
 
+<body class="bg-light">
+<section class="jumbotron text-center">
+    <div class="container">
+        <h2>스터디올래</h2>
+        <div class="alert alert-danger text-center" role="alert">
+            <i class="fa fa-exclamation-triangle"></i>
+            잘못된 요청입니다.
+        </div>
+        <p>
+            <a th:href="@{/}" class="btn btn-primary my-2">첫 페이지로</a>
+        </p>
+    </div>
+</section>
 </body>
 </html>

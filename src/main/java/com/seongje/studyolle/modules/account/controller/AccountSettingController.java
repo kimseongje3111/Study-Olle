@@ -31,6 +31,8 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.Set;
 
+import static java.util.stream.Collectors.*;
+
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/")
@@ -137,8 +139,8 @@ public class AccountSettingController {
 
     @GetMapping(TAGS)
     public String updateTagForm(@CurrentUser Account account, Model model) throws JsonProcessingException {
-        List<String> allTags = tagService.getAllTags();
-        Set<String> userTags = accountService.getUserTags(account);
+        List<String> allTags = tagService.getAllTags().stream().map(Tag::getTitle).collect(toList());
+        Set<String> userTags = accountService.getUserTags(account).stream().map(Tag::getTitle).collect(toSet());
 
         model.addAttribute(account);
         model.addAttribute("tags", userTags);
@@ -175,8 +177,8 @@ public class AccountSettingController {
 
     @GetMapping(ZONES)
     public String updateZoneForm(@CurrentUser Account account, Model model) throws JsonProcessingException {
-        List<String> allZones = zoneService.getAllZones();
-        Set<String> userZones = accountService.getUserZones(account);
+        List<String> allZones = zoneService.getAllZones().stream().map(Zone::toString).collect(toList());
+        Set<String> userZones = accountService.getUserZones(account).stream().map(Zone::toString).collect(toSet());
 
         model.addAttribute(account);
         model.addAttribute("zones", userZones);

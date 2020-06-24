@@ -77,6 +77,7 @@
 
         mark {
             padding: 0;
+            border-radius: 20px;
             background: transparent;
             background: linear-gradient(to right, #f0ad4e 50%, transparent 50%);
             background-position: right bottom;
@@ -114,6 +115,68 @@
 
         .jumbotron .container {
             max-width: 60rem;
+        }
+
+        .search-wrapper {
+            max-width: 580px;
+            width: 100%;
+            position: relative;
+        }
+
+        .search-wrapper .form-control {
+            width: 550px;
+            background-color: rgba(29,192,120,.12);
+            border: 1px solid rgba(29,192,120,.24);
+            box-shadow: 0 2px 4px 0 rgba(0,0,0,.1);
+            padding: 14px 20px;
+            border-radius: 28px;
+            height: auto;
+            transition: all .2s ease;
+        }
+
+        .search-wrapper .search-btn {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+            background-color: inherit;
+            border: unset;
+            outline: none;
+        }
+
+        .search-wrapper .form-control:focus {
+            outline: unset;
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,.2);
+            border: 1px solid #dedede;
+            background-color: #fff;
+        }
+
+        .mm-menu {
+            --mm-offset-top: 100px;
+        }
+
+        .mm-menu .content-title {
+            font-weight: bolder;
+        }
+
+        .mm-menu .content-list {
+            background-color: #D8D8D8;
+            pointer-events: none;
+        }
+
+        .mm-menu .content-list-link {
+            background-color: #D8D8D8;
+        }
+
+        #home-nav {
+            background-color: #E6E6E6;
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,.2);
+        }
+
+        .swiper-container {
+            width: 100%;
+            height: auto;
         }
     </style>
 </head>
@@ -477,13 +540,13 @@
             <p>
                 <span th:each="tagItem: ${study.tags}"
                       class="font-weight-light text-monospace badge badge-pill badge-info mr-3">
-                    <a th:href="@{'/search/tag/' + ${tagItem.tag.title}}" class="text-decoration-none text-white">
+                    <a th:href="@{'/search/' + ${tagItem.tag.title}}" class="text-decoration-none text-white">
                         <i class="fa fa-tag"></i> <span th:text="${tagItem.tag.title}">Tag</span>
                     </a>
                 </span>
 
                 <span th:each="zoneItem: ${study.zones}" class="font-weight-light text-monospace badge badge-primary mr-3">
-                    <a th:href="@{'/search/zone/' + ${zoneItem.zone.id}}" class="text-decoration-none text-white">
+                    <a th:href="@{'/search/' + ${zoneItem.zone.id}}" class="text-decoration-none text-white">
                         <i class="fa fa-globe"></i> <span th:text="${zoneItem.zone.localNameOfCity}">City</span>
                     </a>
                 </span>
@@ -610,8 +673,10 @@
 
         <p th:text="${notification.message}" class="text-left mb-0 mt-1">message</p>
         <p th:if="${!#strings.isEmpty(notification.additionalExplanation)}" class="text-left mb-0 text-muted">
-            <small class="text-muted"><i class="fa fa-arrow-circle-right"></i></small>
-            <small th:text="${notification.additionalExplanation}">additional explanation</small>
+            <small class="text-muted">
+                <i class="fa fa-arrow-circle-right"></i>
+                <span th:text="${notification.additionalExplanation}">additional explanation</span>
+            </small>
         </p>
     </li>
 </ul>
@@ -634,7 +699,7 @@
 
                     <p class="card-text context">
                         <span th:each="tagItem : ${study.tags}" class="font-weight-light text-monospace badge badge-pill badge-info mr-2">
-                            <a th:href="@{'/search/tag/' + ${tagItem.tag.title}}" class="text-decoration-none text-white">
+                            <a th:href="@{'/search/' + ${tagItem.tag.title}}" class="text-decoration-none text-white">
                                 <i class="fa fa-tag"></i>
                                 <span th:text="${tagItem.tag.title}">Tag</span>
                             </a>
@@ -642,7 +707,7 @@
                     </p>
                     <p class="card-text context">
                         <span th:each="zoneItem : ${study.zones}" class="font-weight-light text-monospace badge badge-primary mr-2">
-                            <a th:href="@{'/search/zone/' + ${zoneItem.zone.id}}" class="text-decoration-none text-white">
+                            <a th:href="@{'/search/' + ${zoneItem.zone.id}}" class="text-decoration-none text-white">
                                 <i class="fa fa-globe"></i>
                                 <span th:text="${zoneItem.zone.localNameOfCity}" class="text-white">City</span>
                             </a>

@@ -5,7 +5,6 @@ import com.seongje.studyolle.modules.event.app_event.custom.enrollment.*;
 import com.seongje.studyolle.modules.event.domain.Event;
 import com.seongje.studyolle.modules.notification.NotificationMailSender;
 import com.seongje.studyolle.modules.notification.domain.Notification;
-import com.seongje.studyolle.modules.notification.domain.NotificationType;
 import com.seongje.studyolle.modules.notification.repository.NotificationRepository;
 import com.seongje.studyolle.modules.study.domain.Study;
 import lombok.RequiredArgsConstructor;
@@ -17,10 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static com.seongje.studyolle.modules.event.app_event.custom.enrollment.EnrollmentResultType.*;
 import static com.seongje.studyolle.modules.notification.NotificationMailSender.emailSubjectForEnrollmentResult;
-import static com.seongje.studyolle.modules.notification.NotificationMailSender.emailSubjectForUpdated;
 import static com.seongje.studyolle.modules.notification.domain.Notification.createNotification;
 import static com.seongje.studyolle.modules.notification.domain.NotificationType.*;
-import static com.seongje.studyolle.modules.notification.domain.NotificationType.STUDY_UPDATED;
 import static java.lang.String.*;
 
 @Async

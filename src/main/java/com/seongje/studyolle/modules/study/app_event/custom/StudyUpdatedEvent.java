@@ -7,19 +7,19 @@ import lombok.Getter;
 public class StudyUpdatedEvent extends StudyAppEvent {
 
     private StudyUpdatedEventType eventType;
-    private String newTitle;
-    private String newPath;
+    private String prevTitle;
+    private String prevPath;
 
     public StudyUpdatedEvent(Study study, StudyUpdatedEventType eventType) {
         super(study, "스터디 변경 사항");
         this.eventType = eventType;
     }
 
-    public void setNewTitle(String newTitle) {
-        this.newTitle = newTitle;
+    public void setPrevTitle(String prevTitle) {
+        this.prevTitle = prevTitle;
     }
 
-    public void setNewPath(String newPath) {
-        this.newPath = newPath;
+    public void setPrevPath(String prevPath) {
+        this.prevPath = prevPath;
     }
 }

@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static java.util.Comparator.*;
+import static java.util.stream.Collectors.*;
 
 @Service
 @RequiredArgsConstructor
@@ -31,10 +33,9 @@ public class TagService {
         return tagRepository.findByTitle(tagTitle);
     }
 
-    public List<String> getAllTags() {
+    public List<Tag> getAllTags() {
         return tagRepository.findAll().stream()
-                .map(Tag::getTitle)
-                .sorted()
-                .collect(Collectors.toList());
+                .sorted(comparing(Tag::getTitle))
+                .collect(toList());
     }
 }

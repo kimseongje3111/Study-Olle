@@ -3,7 +3,6 @@ package com.seongje.studyolle.modules.event.service;
 import com.seongje.studyolle.modules.account.domain.Account;
 import com.seongje.studyolle.modules.event.app_event.custom.enrollment.EnrollmentAppliedEvent;
 import com.seongje.studyolle.modules.event.app_event.custom.enrollment.EnrollmentCancelledEvent;
-import com.seongje.studyolle.modules.event.app_event.custom.enrollment.EnrollmentResultType;
 import com.seongje.studyolle.modules.event.app_event.custom.event.EventCancelledEvent;
 import com.seongje.studyolle.modules.event.app_event.custom.event.EventCreatedEvent;
 import com.seongje.studyolle.modules.event.app_event.custom.event.EventUpdatedEvent;
@@ -19,13 +18,13 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.seongje.studyolle.modules.event.app_event.custom.enrollment.EnrollmentResultType.*;
 import static com.seongje.studyolle.modules.event.domain.Enrollment.*;
 import static com.seongje.studyolle.modules.event.domain.EventType.*;
+import static java.util.Comparator.*;
+import static java.util.stream.Collectors.*;
 
 @Service
 @RequiredArgsConstructor
@@ -177,19 +176,42 @@ public class EventService {
         if (state.equals("NEW")) {
             return eventList.stream()
                     .filter(event -> !event.isAfterEnrollmentDeadline())
-                    .sorted(Comparator.comparing(Event::getEnrollmentDeadline))
-                    .collect(Collectors.toList());
+                    .sorted(comparing(Event::getEnrollmentDeadline))
+                    .collect(toList());
 
         } else if(state.equals("NOW")) {
             return eventList.stream()
                     .filter(event -> event.isAfterEnrollmentDeadline() && !event.isClosed())
-                    .sorted(Comparator.comparing(Event::getStartDateTime))
-                    .collect(Collectors.toList());
+                    .sorted(comparing(Event::getStartDateTime))
+                    .collect(toList());
         } else {
             return eventList.stream()
                     .filter(Event::isClosed)
-                    .sorted(Comparator.comparing(Event::getEndDateTime))
-                    .collect(Collectors.toList());
+                    .sorted(comparing(Event::getEndDateTime))
+                    .collect(toList());
         }
+    }
+
+    public List<Event> getEventsToAttend(Account account) {
+        List<Enrollment> findEnrollments =
+                enrollmentRepository.searchAllByAccountAndApprovedAndAttended(account.getId(), true, false);
+
+        return findEnrollments.stream()
+                .map(Enrollment::getEvent)
+                .filter(event -> !event.isClosed())
+                .sorted(comparing(Event::getStartDateTime))
+                .collect(toList());
+    }
+
+    public List<Event> getEventsForAttended(Account account) {
+        List<Enrollment> findEnrollments =
+                enrollmentRepository.searchAllByAccountAndApprovedAndAttended(account.getId(), true, true);
+
+        return findEnrollments.stream()
+                .map(Enrollment::getEvent)
+                .filter(Event::isClosed)
+                .sorted(comparing(Event::getEndDateTime).reversed())
+                .limit(3)
+                .collect(toList());
     }
 }

@@ -32,10 +32,10 @@ import org.thymeleaf.context.Context;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.seongje.studyolle.modules.account.domain.TagItem.*;
 import static com.seongje.studyolle.modules.account.domain.ZoneItem.*;
+import static java.util.stream.Collectors.*;
 
 @Service
 @RequiredArgsConstructor
@@ -157,13 +157,11 @@ public class AccountService implements UserDetailsService {
         login(account);
     }
 
-    public Set<String> getUserTags(Account account) throws IllegalStateException {
+    public Set<Tag> getUserTags(Account account) throws IllegalStateException {
         Optional<Account> findAccount = accountRepository.findById(account.getId());
         Set<TagItem> tags = findAccount.orElseThrow(IllegalStateException::new).getTags();
 
-        return tags.stream()
-                .map(tagItem -> tagItem.getTag().getTitle())
-                .collect(Collectors.toSet());
+        return tags.stream().map(TagItem::getTag).collect(toSet());
     }
 
     @Transactional
@@ -178,13 +176,11 @@ public class AccountService implements UserDetailsService {
         account.removeTagItem(tag);
     }
 
-    public Set<String> getUserZones(Account account) throws IllegalStateException {
+    public Set<Zone> getUserZones(Account account) throws IllegalStateException {
         Optional<Account> findAccount = accountRepository.findById(account.getId());
         Set<ZoneItem> zones = findAccount.orElseThrow(IllegalStateException::new).getZones();
 
-        return zones.stream()
-                .map(zoneItem -> zoneItem.getZone().toString())
-                .collect(Collectors.toSet());
+        return zones.stream().map(ZoneItem::getZone).collect(toSet());
     }
 
     @Transactional
