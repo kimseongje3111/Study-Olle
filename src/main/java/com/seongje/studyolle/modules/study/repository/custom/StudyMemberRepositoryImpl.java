@@ -2,9 +2,6 @@ package com.seongje.studyolle.modules.study.repository.custom;
 
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.seongje.studyolle.modules.account.domain.QAccount;
-import com.seongje.studyolle.modules.study.domain.QStudy;
-import com.seongje.studyolle.modules.study.domain.QStudyMember;
 import com.seongje.studyolle.modules.study.domain.StudyMember;
 
 import javax.persistence.EntityManager;
@@ -20,6 +17,16 @@ public class StudyMemberRepositoryImpl implements StudyMemberRepositoryCustom {
 
     public StudyMemberRepositoryImpl(EntityManager em) {
         this.queryFactory = new JPAQueryFactory(em);
+    }
+
+    @Override
+    public List<StudyMember> searchMembersByStudy(Long studyId) {
+        return queryFactory
+                .selectFrom(studyMember)
+                .join(studyMember.study, study).fetchJoin()
+                .join(studyMember.account, account).fetchJoin()
+                .where(study.id.eq(studyId))
+                .fetch();
     }
 
     @Override

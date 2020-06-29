@@ -108,33 +108,33 @@ public class Study {
         }
 
         return !this.members.stream()
-                .map(StudyMember::getAccount)
+                .map(studyMember -> studyMember.getAccount().getId())
                 .collect(toSet())
-                .contains(userAccount.getAccount());
+                .contains(userAccount.getAccount().getId());
     }
 
     public boolean isManager(UserAccount userAccount) {
         return this.members.stream()
                 .filter(studyMember -> studyMember.getManagementLevel() == MANAGER)
-                .map(StudyMember::getAccount)
+                .map(studyMember -> studyMember.getAccount().getId())
                 .collect(toSet())
-                .contains(userAccount.getAccount());
+                .contains(userAccount.getAccount().getId());
     }
 
     public boolean isMember(UserAccount userAccount) {
         return this.members.stream()
                 .filter(studyMember -> studyMember.getManagementLevel() == MEMBER)
-                .map(StudyMember::getAccount)
+                .map(studyMember -> studyMember.getAccount().getId())
                 .collect(toSet())
-                .contains(userAccount.getAccount());
+                .contains(userAccount.getAccount().getId());
     }
 
     public boolean isManagerBy(Account account) {
         return this.members.stream()
                 .filter(studyMember -> studyMember.getManagementLevel() == MANAGER)
-                .map(StudyMember::getAccount)
+                .map(studyMember -> studyMember.getAccount().getId())
                 .collect(toSet())
-                .contains(account);
+                .contains(account.getId());
     }
 
     public String getEncodedPath() throws UnsupportedEncodingException {

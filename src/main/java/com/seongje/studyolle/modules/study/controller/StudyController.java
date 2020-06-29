@@ -88,6 +88,7 @@ public class StudyController {
 
         model.addAttribute(account);
         model.addAttribute(findStudy);
+        model.addAttribute("studyMembers", studyService.getStudyMembers(findStudy));
 
         return "study/study-members";
     }

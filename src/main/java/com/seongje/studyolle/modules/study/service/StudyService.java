@@ -61,8 +61,6 @@ public class StudyService {
     private final ResourceLoader resourceLoader;
     private final IDataUrlSerializer dataUrlSerializer;
     private final ApplicationEventPublisher eventPublisher;
-    private final TagRepository tagRepository;
-    private final ZoneRepository zoneRepository;
 
     public Study findStudy(String path) {
         Study findStudy = studyRepository.findByPath(path);
@@ -97,6 +95,10 @@ public class StudyService {
         );
 
         return newStudy;
+    }
+
+    public List<StudyMember> getStudyMembers(Study study) {
+        return studyMemberRepository.searchMembersByStudy(study.getId());
     }
 
     @Transactional
