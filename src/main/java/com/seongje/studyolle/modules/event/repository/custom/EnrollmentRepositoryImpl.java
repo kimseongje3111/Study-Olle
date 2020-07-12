@@ -45,6 +45,16 @@ public class EnrollmentRepositoryImpl implements EnrollmentRepositoryCustom {
     }
 
     @Override
+    public List<Enrollment> searchAllByEvent(Long eventId) {
+        return queryFactory
+                .selectFrom(enrollment)
+                .join(enrollment.event, event).fetchJoin()
+                .join(enrollment.account, account).fetchJoin()
+                .where(event.id.eq(eventId))
+                .fetch();
+    }
+
+    @Override
     public List<Enrollment> searchAllByAccountAndApprovedAndAttended(Long accountId, boolean approved, boolean attended) {
         return queryFactory
                 .selectFrom(enrollment)

@@ -89,21 +89,21 @@ public class Event {
 
     public boolean isApplied(UserAccount userAccount) {
         return this.enrollments.stream()
-                .map(Enrollment::getAccount)
+                .map(enrollment -> enrollment.getAccount().getId())
                 .collect(toSet())
-                .contains(userAccount.getAccount());
+                .contains(userAccount.getAccount().getId());
     }
 
     public boolean isAttended(UserAccount userAccount) {
         return this.enrollments.stream()
-                .filter(enrollment -> enrollment.getAccount().equals(userAccount.getAccount())
+                .filter(enrollment -> enrollment.getAccount().getId().equals(userAccount.getAccount().getId())
                         && enrollment.isApproved() && enrollment.isAttended())
                 .count() == 1;
     }
 
     public boolean isNotAttended(UserAccount userAccount) {
         return this.enrollments.stream()
-                .filter(enrollment -> enrollment.getAccount().equals(userAccount.getAccount())
+                .filter(enrollment -> enrollment.getAccount().getId().equals(userAccount.getAccount().getId())
                         && enrollment.isApproved() && !enrollment.isAttended())
                 .count() == 1;
     }

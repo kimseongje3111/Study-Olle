@@ -1,6 +1,7 @@
 package com.seongje.studyolle.modules.event.controller;
 
 import com.seongje.studyolle.modules.account.domain.Account;
+import com.seongje.studyolle.modules.event.domain.Enrollment;
 import com.seongje.studyolle.modules.event.domain.Event;
 import com.seongje.studyolle.modules.study.domain.Study;
 import com.seongje.studyolle.modules.account.authentication.CurrentUser;
@@ -100,10 +101,12 @@ public class EventController {
 
         Study findStudy = studyService.findStudy(path);
         Event findEvent = eventService.findEvent(eventId);
+        List<Enrollment> findEnrollments = eventService.getEnrollmentsByEvent(eventId);
 
         model.addAttribute(account);
         model.addAttribute(findStudy);
         model.addAttribute(findEvent);
+        model.addAttribute("enrollments", findEnrollments);
 
         return "event/event-home";
     }

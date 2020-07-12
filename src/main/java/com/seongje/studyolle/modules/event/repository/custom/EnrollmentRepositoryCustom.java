@@ -13,5 +13,7 @@ public interface EnrollmentRepositoryCustom {
 
     Enrollment searchEnrollmentByEventAndAccount(Long eventId, Long accountId);
 
+    List<Enrollment> searchAllByEvent(Long eventId);
+
     List<Enrollment> searchAllByAccountAndApprovedAndAttended(Long accountId, boolean approved, boolean attended);
 }

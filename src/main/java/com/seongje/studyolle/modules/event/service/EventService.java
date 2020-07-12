@@ -170,6 +170,10 @@ public class EventService {
         }
     }
 
+    public List<Enrollment> getEnrollmentsByEvent(Long eventId) {
+        return enrollmentRepository.searchAllByEvent(eventId);
+    }
+
     public List<Event> getEventsFor(Long studyId, String state) {
         List<Event> eventList = eventRepository.searchEventsByStudy(studyId);
 

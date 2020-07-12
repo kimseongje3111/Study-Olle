@@ -167,9 +167,9 @@
             </div>
 
             <div class="row">
-                <h5>모임 참가 신청 현황 (<span th:text="${event.enrollments.size()}">0</span>)</h5>
+                <h5>모임 참가 신청 현황 (<span th:text="${enrollments.size()}">0</span>)</h5>
 
-                <table th:if="${event.enrollments.size() > 0}" class="table text-center">
+                <table th:if="${enrollments.size() > 0}" class="table text-center">
                     <thead class="thead-light">
                         <tr>
                             <th scope="col">#</th>
@@ -190,7 +190,7 @@
                     </thead>
 
                     <tbody>
-                        <tr th:each="enroll: ${event.enrollments}">
+                        <tr th:each="enroll: ${enrollments}">
                             <th scope="row" th:text="${enrollStat.count}"></th>
                             <td>
                                 <a th:href="@{'/account/profile/' + ${enroll.account.nickname}}" class="text-decoration-none">
