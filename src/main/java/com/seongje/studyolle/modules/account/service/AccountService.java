@@ -54,7 +54,7 @@ public class AccountService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String emailOrUsername) throws UsernameNotFoundException {
 
-        // Login administration //
+        // Authentication administration //
 
         Account account = accountRepository.findByEmail(emailOrUsername);
 
@@ -120,7 +120,7 @@ public class AccountService implements UserDetailsService {
         // SecurityContext 에 Authentication(Token) 이 존재하는가 //
 
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                new UserAccount(account),   // 현재 인증된 Principal
+                new UserAccount(account),   // 현재 인증된 사용자 Principal
                 account.getPassword(),
                 Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"))
         );

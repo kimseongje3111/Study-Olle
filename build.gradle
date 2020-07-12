@@ -36,7 +36,6 @@ dependencies {
     implementation 'eu.maxschuster:dataurl:2.0.0'
     implementation 'com.querydsl:querydsl-jpa'
 
-
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'org.postgresql:postgresql'

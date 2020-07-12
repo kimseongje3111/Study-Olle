@@ -7,6 +7,7 @@ import com.seongje.studyolle.modules.event.app_event.custom.event.EventUpdatedEv
 import com.seongje.studyolle.modules.notification.NotificationMailSender;
 import com.seongje.studyolle.modules.notification.repository.NotificationRepository;
 import com.seongje.studyolle.modules.study.domain.Study;
+import com.seongje.studyolle.modules.study.repository.StudyMemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.context.event.EventListener;
@@ -27,6 +28,7 @@ import static java.lang.String.*;
 public class EventAppEventListener {
 
     private final NotificationRepository notificationRepository;
+    private final StudyMemberRepository studyMemberRepository;
     private final NotificationMailSender mailSender;
 
     @SneakyThrows
@@ -36,7 +38,7 @@ public class EventAppEventListener {
         String title = study.getTitle();
         String link = "/study/studies/" + study.getEncodedPath();
 
-        study.getMembers().forEach(studyMember -> {
+        studyMemberRepository.searchMembersByStudy(study.getId()).forEach(studyMember -> {
             if (studyMember.getManagementLevel() == MANAGER) {
                 Account manager = studyMember.getAccount();
 

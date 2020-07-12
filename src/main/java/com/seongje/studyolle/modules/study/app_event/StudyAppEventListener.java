@@ -7,6 +7,7 @@ import com.seongje.studyolle.modules.notification.domain.Notification;
 import com.seongje.studyolle.modules.notification.repository.NotificationRepository;
 import com.seongje.studyolle.modules.study.app_event.custom.*;
 import com.seongje.studyolle.modules.study.domain.*;
+import com.seongje.studyolle.modules.study.repository.StudyMemberRepository;
 import com.seongje.studyolle.modules.study.service.StudyService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -33,6 +34,7 @@ public class StudyAppEventListener {
     private final StudyService studyService;
     private final AccountRepository accountRepository;
     private final NotificationRepository notificationRepository;
+    private final StudyMemberRepository studyMemberRepository;
     private final NotificationMailSender mailSender;
 
     @SneakyThrows
@@ -48,7 +50,7 @@ public class StudyAppEventListener {
                         studyService.getStudyZones(publishedStudy)
                 );
 
-        publishedStudy.getMembers().forEach(studyMember -> {
+        studyMemberRepository.searchMembersByStudy(publishedStudy.getId()).forEach(studyMember -> {
             if (studyMember.getManagementLevel() == MANAGER) {
                 Account manager = studyMember.getAccount();
 
@@ -86,7 +88,7 @@ public class StudyAppEventListener {
     public void handleStudyDeletedEvent(StudyDeletedEvent appEvent) {
         Study deletedStudy = appEvent.getStudy();
 
-        deletedStudy.getMembers().forEach(studyMember -> {
+        studyMemberRepository.searchMembersByStudy(deletedStudy.getId()).forEach(studyMember -> {
             if (studyMember.getManagementLevel() == MANAGER) {
                 Account manager = studyMember.getAccount();
 
@@ -129,7 +131,7 @@ public class StudyAppEventListener {
 
         Account currentAccount = appEvent.getAccount();
 
-        currentStudy.getMembers().forEach(studyMember -> {
+        studyMemberRepository.searchMembersByStudy(currentStudy.getId()).forEach(studyMember -> {
             if (studyMember.getManagementLevel() == MANAGER) {
                 Account manager = studyMember.getAccount();
 
@@ -178,7 +180,7 @@ public class StudyAppEventListener {
         String title = updatedStudy.getTitle();
         String link = "/study/studies/" + updatedStudy.getEncodedPath();
 
-        updatedStudy.getMembers().forEach(studyMember -> {
+        studyMemberRepository.searchMembersByStudy(updatedStudy.getId()).forEach(studyMember -> {
             if (studyMember.getManagementLevel() == MANAGER) {
                 Account manager = studyMember.getAccount();
 

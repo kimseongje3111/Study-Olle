@@ -40,7 +40,7 @@ public class EnrollmentAppEventListener {
         Account manager = event.getCreatedBy();
         Account member = appEvent.getEnrollment().getAccount();
 
-        if (!manager.equals(member)) {
+        if (!manager.getId().equals(member.getId())) {
             if (appEvent.getEventType() == APPROVED) {
                 appEvent.setMessageContent(format("'%s' 모임 확정자입니다. 자세한 내용은 모임 참가 신청 현황을 확인해주세요", event.getTitle()));
 
@@ -81,7 +81,7 @@ public class EnrollmentAppEventListener {
         Account manager = event.getCreatedBy();
         Account member = appEvent.getEnrollment().getAccount();
 
-        if (!manager.equals(member)) {
+        if (!manager.getId().equals(member.getId())) {
             appEvent.setMessageContent(format("'%s' 모임 신청 취소자가 발생하였습니다.", event.getTitle()));
 
             if (manager.isStudyUpdatedByWeb()) {

@@ -79,7 +79,8 @@ public class Study {
 
     public void removeStudyMember(Account account) {
         memberCount--;
-        this.members.removeIf(studyMember -> studyMember.getAccount().equals(account));
+        this.members.removeIf(studyMember ->
+                studyMember.getAccount().getId().equals(account.getId()));
     }
 
     public void addTagItem(StudyTagItem studyTagItem) {
