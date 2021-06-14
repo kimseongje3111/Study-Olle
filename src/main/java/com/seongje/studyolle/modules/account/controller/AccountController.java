@@ -62,6 +62,7 @@ public class AccountController {
         model.addAttribute(account);
 
         return CHECK_EMAIL;
+
     }
 
     @GetMapping(CHECK_EMAIL_TOKEN)
@@ -141,7 +142,6 @@ public class AccountController {
 
         accountService.login(findAccount);
         model.addAttribute(findAccount);
-
 
         return EMAIL_LOGIN_CONFIRM;
     }
